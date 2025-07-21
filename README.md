@@ -21,3 +21,4 @@ This is an MVP project for a crypto analysis tool that uses:
 
 ## Documentation
 - [`prd/PRD_v1.1.md`](./prd/PRD_v1.1.md)
+
