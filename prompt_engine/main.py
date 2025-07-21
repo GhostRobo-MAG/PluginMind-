@@ -1,5 +1,3 @@
-# main.py — Day 0 CLI Prompt Generator
-
 def generate_prompt(coin, timeframe, budget):
     return f"""
 You are an AI crypto assistant. Analyze {coin} over the last {timeframe} with an investment budget of ${budget}.
