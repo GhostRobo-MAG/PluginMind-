@@ -79,7 +79,7 @@ Disclaimer: This is not financial advice.
 
 ---
 
-##  [PRD v1.1 – Product Requirements Document](https://github.com/GhostRobo-MAG/CoinGrok-mvp/blob/main/PRD_v1.1.md)
+##  [PRD v1.1 – Product Requirements Document](https://github.com/GhostRobo-MAG/CoinGrok-mvp/blob/main/prd/PRD_v1.1.md)
 
 ---
 
