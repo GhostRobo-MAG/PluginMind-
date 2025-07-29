@@ -132,7 +132,6 @@ Backend API (FastAPI async)
 - Frontend React app
 - Secure endpoints (API key / JWT)
 - Add monitoring and usage tracking
-- ✅ Move keys to environment variables (done)
 
 ---
 
