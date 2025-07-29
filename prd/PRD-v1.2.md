@@ -117,7 +117,6 @@ No change from v1.1 except:
 ## 10. Next Steps
 
 - Secure backend (API key or JWT)
-- Use environment variables for keys
 - Frontend connection
 - Monitoring/cost tracking
 - Expand error handling
