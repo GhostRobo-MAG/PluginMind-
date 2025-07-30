@@ -1,101 +1,159 @@
-### CoinGrok MVP – AI-Powered Crypto Analysis Tool
+# CoinGrok MVP – AI-Powered Crypto Analysis Tool
 
-CoinGrok is a crypto analytics MVP that leverages the **Grok xAI API** and **OpenAI** to dynamically generate investment insights based on user input. It uses a 4-D Prompt Engine (**Deconstruct → Diagnose → Develop → Deliver**) to convert simple user queries or form inputs into structured prompts and deliver AI-powered analysis.
+CoinGrok is a crypto analytics MVP that leverages **Grok xAI** and **OpenAI** to generate investment insights based on user input.
 
----
-
-## ⚙ Core Tech Stack
-
-- **Python 3.10+** – backend logic and prompt engine  
-- **FastAPI** *(planned)* – for backend API development  
-- **OpenAI API** – for LLM-based prompt optimization  
-- **Grok xAI API** – for sentiment, news, and market data  
-- **VS Code** – dev environment  
-- **GitHub** – version control  
+It uses a 4-D Prompt Engine (**Deconstruct → Diagnose → Develop → Deliver**) to transform simple user queries or form inputs into optimized prompts and deliver AI-powered crypto analysis.
 
 ---
 
-##  How It Works (Current CLI Version)
+## 🚀 Current Status (v0.1)
 
-1. The user inputs either:
-   - A sentence like: `Analyze ETH in 7d with $300`
-   - Or structured values like: `ETH 7d 300`
+- **Backend:** FastAPI async API (running locally)
+- **Endpoints:**
+  - `GET /health` – health check
+  - `POST /analyze` – async analysis flow (OpenAI + Grok)
+- **Prompt Engine:** Connected to OpenAI for prompt optimization
+- **Analysis:** Integrated with Grok xAI (wrapped in executor)
+- **CLI version:** Still available for testing simple prompts
 
-2. The 4-D Prompt Engine runs:
-   - **Deconstruct**: Parses coin, timeframe, budget  
-   - **Diagnose**: Validates and sanitizes input  
-   - **Develop**: Builds an AI-ready prompt  
-   - **Deliver**: Prints final prompt to simulate Grok input  
-
----
-
-##  Example CLI Usage
-
-python main.py
-
-
-**Example query (sentence-style):**
-
-Analyze ETH in 7d with $300
-
-
-**Example query (form-style):**
-
-ETH 7d 300
-
-
-**Output:**
-
- Final Prompt:
-
-You are an AI crypto assistant. Analyze ETH over the last 7d with an investment budget of $300.
-
-Use Grok tools to return:
-
-    Sentiment from X (Twitter)
-
-    News overview from CoinGecko/CMC
-
-    Market snapshot (price, volume, volatility)
-
-    Buy/Sell Recommendation
-
-    Risk Score (1–10)
-
-Disclaimer: This is not financial advice.
-
+**Frontend:** Not implemented yet (planned).
 
 ---
 
-##  Architecture Plan (WIP)
+## ⚙️ Tech Stack
 
-- Current: CLI-based prototype  
-- Next steps:
-  -  Frontend input form  
-  -  Backend API (FastAPI)  
-  -  Dynamic prompt engine  
-  -  Grok + OpenAI integration  
-  -  Display structured analysis cards  
-
----
-
-##  [PRD v1.1 – Product Requirements Document](https://github.com/GhostRobo-MAG/CoinGrok-mvp/blob/main/prd/PRD_v1.1.md)
+- **Python 3.10+** – backend logic and prompt engine
+- **FastAPI (async)** – backend API
+- **OpenAI API (Async)** – LLM prompt optimization
+- **Grok xAI API** – sentiment, news, and market analysis
+- **VS Code** – development environment
+- **GitHub** – version control
 
 ---
 
-##  Future Features
+## 🔄 How It Works
 
-- Toggle between “Simple” and “Pro” analysis modes  
-- Sentiment trend chart from past 7 days  
-- Downloadable PDF reports  
-- Save & compare previous analyses  
-- User auth & saved queries (optional)
+1. **User Input:**
+   - Natural language: `Analyze ETH in 7d with $300`
+   - Structured: `ETH 7d 300`
+
+2. **Backend flow:**
+   - **Deconstruct** – Parse coin, timeframe, budget
+   - **Diagnose** – Validate and sanitize input
+   - **Develop** – Use OpenAI to build an optimized AI prompt
+   - **Deliver** – Send optimized prompt to Grok, aggregate results, return JSON
+
+---
+
+## 🛠️ How to Run Locally
+
+### 1. Clone the repo
+```bash
+git clone <repo_url>
+cd coingrok_backend
+```
+
+### 2. Create a virtual environment
+```bash
+python -m venv venv
+```
+
+### 3. Activate the virtual environment
+
+**macOS/Linux:**
+```bash
+source venv/bin/activate
+```
+
+**Windows (PowerShell):**
+```powershell
+.\venv\Scripts\Activate
+```
+
+You should now see `(venv)` at the start of your terminal prompt.
+
+### 4. Install dependencies
+```bash
+pip install -r requirements.txt
+```
+
+### 5. Set up environment variables
+
+Create a file named `.env` inside the `app/` folder (or at project root if configured that way):
+
+```env
+OPENAI_API_KEY=your_openai_api_key
+GROK_API_KEY=your_grok_api_key
+```
+
+> **Note:** Make sure `.env` is not committed (`.env` is listed in `.gitignore`).
+
+### 6. Run the backend server
+```bash
+uvicorn main:app --reload
+```
+
+### 7. Test the API
+
+Open Swagger UI in your browser: [http://localhost:8000/docs](http://localhost:8000/docs)
+
+- `GET /health` → Should return `{"status": "ok"}`
+- `POST /analyze` → Enter:
+  ```json
+  {
+    "user_input": "Analyze BTC for the past 48 hours"
+  }
+  ```
+
+You'll receive a JSON response with `optimized_prompt` and `analysis`.
+
+### 8. Stopping work
+
+- To stop the server: `Ctrl+C`
+- To deactivate the virtual environment: `deactivate`
 
 ---
 
-##  Built by Ghost
+## 📂 Architecture
 
-Aspiring Product Manager transitioning from automotive → tech.  
-This is my first hands-on product: learning Python + building a real app.
+### Current (v0.1)
+```
+Frontend (planned)
+       │
+       ▼
+Backend API (FastAPI async)
+       │
+       ├─ OpenAI (prompt refinement)
+       │
+       └─ Grok xAI (analysis)
+```
+
+### Next Steps:
+- Frontend React app
+- Secure endpoints (API key / JWT)
+- Add monitoring and usage tracking
 
 ---
+
+## 📄 Documentation
+
+- prd/PRD-v1.2.md
+- API Specification (coming soon )
+
+---
+
+## 🛠️ Future Features
+
+- Toggle between "Simple" and "Pro" analysis modes
+- Sentiment trend charts (7-day history)
+- Downloadable PDF reports
+- Save & compare previous analyses
+- User authentication and saved queries
+
+---
+
+## 👤 Built by Alexandru G. Mihai
+
+Aspiring Product Manager transitioning from automotive → tech.
+
+This is my first hands-on product: learning Python and building a real app from scratch.
