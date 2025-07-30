@@ -1,10 +1,9 @@
 import logging
-import asyncio
-from xai_sdk import Client
+from xai_sdk import AsyncClient
 from xai_sdk.chat import user, system
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field, validator
-from openai import AsyncOpenAI  # Async client for OpenAI
+from openai import AsyncOpenAI
 from app.config import OPENAI_API_KEY, GROK_API_KEY
 from app.ash_prompt import ASH_SYSTEM_PROMPT
 
@@ -17,8 +16,8 @@ app = FastAPI(title="CoinGrok Backend")
 
 # Initialize API clients with error handling
 try:
-    openai_client = AsyncOpenAI(api_key=OPENAI_API_KEY)  # Async OpenAI client
-    xai_client = Client(api_key=GROK_API_KEY)            # Synchronous xAI client
+    openai_client = AsyncOpenAI(api_key=OPENAI_API_KEY)
+    xai_client = AsyncClient(api_key=GROK_API_KEY)
     logger.info("API clients initialized successfully")
 except Exception as e:
     logger.error(f"Failed to initialize API clients: {str(e)}")
@@ -73,15 +72,10 @@ async def analyze(req: AnalysisRequest):
         # === Step 2: Send optimized prompt to Grok ===
         logger.info("Sending optimized prompt to Grok")
 
-        def sync_grok_call():
-            chat = xai_client.chat.create(model="grok-4-latest")
-            chat.append(system("You are an AI crypto analyst."))
-            chat.append(user(optimized_prompt))
-            return chat.sample()
-
-        # Run synchronous Grok call in separate thread
-        loop = asyncio.get_running_loop()
-        response = await loop.run_in_executor(None, sync_grok_call)
+        chat = xai_client.chat.create(model="grok-4-latest")
+        chat.append(system("You are an AI crypto analyst."))
+        chat.append(user(optimized_prompt))
+        response = await chat.sample()
 
         # Validate Grok response
         if not hasattr(response, "content") or not response.content:
