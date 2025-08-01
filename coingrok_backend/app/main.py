@@ -2,6 +2,7 @@ import logging
 from xai_sdk import AsyncClient
 from xai_sdk.chat import user, system
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, validator
 from openai import AsyncOpenAI
 from app.config import OPENAI_API_KEY, GROK_API_KEY
@@ -14,6 +15,13 @@ logger = logging.getLogger(__name__)
 # Initialize FastAPI app
 app = FastAPI(title="CoinGrok Backend")
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 # Initialize API clients with error handling
 try:
     openai_client = AsyncOpenAI(api_key=OPENAI_API_KEY)
