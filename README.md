@@ -45,129 +45,404 @@ CoinGrok is a full-stack web application that leverages OpenAI and Grok APIs to 
 
 ---
 
+## 🏗️ Project Architecture
+
+### Backend Structure (Production-Ready)
+```
+coingrok_backend/
+├── app/
+│   ├── main.py                 # FastAPI app initialization (118 lines)
+│   ├── database.py            # Database engine & session management  
+│   ├── ash_prompt.py          # 4-D Prompt Engine system prompt
+│   │
+│   ├── core/                  # Core infrastructure
+│   │   ├── config.py         # Environment settings & validation
+│   │   ├── logging.py        # Centralized logging setup
+│   │   └── exceptions.py     # Custom exception classes
+│   │
+│   ├── api/                   # API layer
+│   │   ├── dependencies.py   # FastAPI dependencies (DB sessions)
+│   │   └── routes/           # Endpoint handlers
+│   │       ├── analysis.py   # /analyze, /analyze-async
+│   │       ├── jobs.py       # /jobs management
+│   │       ├── health.py     # /health monitoring
+│   │       └── query_logs.py # /query-logs analytics
+│   │
+│   ├── services/              # Business logic layer
+│   │   ├── openai_service.py # OpenAI integration (4-D Engine)
+│   │   ├── grok_service.py   # Grok/xAI integration
+│   │   └── analysis_service.py # Orchestration & logging
+│   │
+│   ├── models/                # Data layer
+│   │   ├── database.py       # SQLModel tables (jobs, users, logs)
+│   │   ├── schemas.py        # Pydantic request/response models
+│   │   └── enums.py          # Status enums & constants
+│   │
+│   ├── middleware/            # Cross-cutting concerns
+│   │   ├── cors.py           # CORS configuration
+│   │   └── error_handler.py  # Global exception handling
+│   │
+│   └── utils/                 # Utilities
+│       └── background_tasks.py # Async job processing
+│
+├── requirements.txt           # Python dependencies
+├── .env.example              # Environment template
+└── .gitignore               # Security & cleanup
+```
+
+### Frontend Structure
+```
+frontend/
+├── app/                      # Next.js 15 App Router
+│   ├── page.tsx             # Landing page
+│   ├── layout.tsx           # Root layout
+│   ├── globals.css          # Global styles
+│   └── analyze/
+│       └── page.tsx         # Analysis interface
+│
+├── components/               # React components
+│   ├── ui/                  # shadcn/ui components
+│   ├── analysis-result.tsx  # Results display
+│   ├── crypto-chart.tsx     # Price charts
+│   └── market-insights.tsx  # Market data
+│
+├── lib/
+│   └── utils.ts             # Utility functions
+│
+├── package.json             # Dependencies
+└── tailwind.config.ts       # Styling config
+```
+
 ## 🔄 How It Works
 
-1. **User Input:**
-   - Natural language: `Analyze ETH in 7d with $300`
-   - Structured: `ETH 7d 300`
+### 4-D Prompt Engine Workflow
+1. **Deconstruct** → Extract coin, timeframe, budget from user input
+2. **Diagnose** → Validate and clarify the request
+3. **Develop** → OpenAI optimizes prompt for crypto analysis
+4. **Deliver** → Grok generates comprehensive analysis with sentiment, news, recommendations
 
-2. **Backend flow:**
-   - **Deconstruct** – Parse coin, timeframe, budget
-   - **Diagnose** – Validate and sanitize input
-   - **Develop** – Use OpenAI to build an optimized AI prompt
-   - **Deliver** – Send optimized prompt to Grok, aggregate results, return JSON
+### Request Flow
+```mermaid
+graph LR
+    A[User Input] --> B[Validation]
+    B --> C[OpenAI Service]
+    C --> D[Prompt Optimization]
+    D --> E[Grok Service]
+    E --> F[Market Analysis]
+    F --> G[Query Logging]
+    G --> H[Response]
+```
+
+### Architecture Benefits
+- **Modular Design**: Each component has single responsibility
+- **Type Safety**: Full TypeScript/Python type coverage
+- **Error Handling**: Centralized exception management
+- **Scalability**: Service layer ready for microservices
+- **Testing**: Clean architecture supports unit testing
+- **Monitoring**: Built-in logging and analytics
 
 ---
 
-## 🛠️ How to Run Locally
+## 🚀 Quick Start
 
-### 1. Clone the repo
+### Prerequisites
+- Python 3.11+
+- Node.js 18+
+- OpenAI API Key
+- Grok API Key
+
+### Backend Setup
+
 ```bash
+# Clone the repository
 git clone <repo_url>
-cd coingrok_backend
-```
+cd CoinGrok-mvp/coingrok_backend
 
-### 2. Create a virtual environment
-```bash
+# Create virtual environment
 python -m venv venv
-```
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-### 3. Activate the virtual environment
-
-**macOS/Linux:**
-```bash
-source venv/bin/activate
-```
-
-**Windows (PowerShell):**
-```powershell
-.\venv\Scripts\Activate
-```
-
-You should now see `(venv)` at the start of your terminal prompt.
-
-### 4. Install dependencies
-```bash
+# Install dependencies
 pip install -r requirements.txt
+
+# Configure environment
+cp .env.example .env
+# Edit .env with your API keys:
+# OPENAI_API_KEY=your-openai-key
+# GROK_API_KEY=your-grok-key
+# DATABASE_URL=sqlite:///./coingrok.db
+
+# Start the server
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### 5. Set up environment variables
+### Frontend Setup
 
-Create a file named `.env` inside the `app/` folder (or at project root if configured that way):
-
-```env
-OPENAI_API_KEY=your_openai_api_key
-GROK_API_KEY=your_grok_api_key
-```
-
-> **Note:** Make sure `.env` is not committed (`.env` is listed in `.gitignore`).
-
-### 6. Run the backend server
 ```bash
-uvicorn main:app --reload
+cd ../frontend
+
+# Install dependencies
+npm install
+# or
+pnpm install
+
+# Start development server
+npm run dev
+# or  
+pnpm dev
 ```
 
-### 7. Test the API
+Visit `http://localhost:3000` to access the application.
 
-Open Swagger UI in your browser: [http://localhost:8000/docs](http://localhost:8000/docs)
+### 🧪 Testing the API
 
-- `GET /health` → Should return `{"status": "ok"}`
-- `POST /analyze` → Enter:
-  ```json
-  {
-    "user_input": "Analyze BTC for the past 48 hours"
+**Health Check:**
+```bash
+curl http://localhost:8000/health
+# Response: {"status": "ok", "active_jobs": 0}
+```
+
+**Synchronous Analysis:**
+```bash
+curl -X POST "http://localhost:8000/analyze" \
+  -H "Content-Type: application/json" \
+  -d '{"user_input": "Analyze Bitcoin over 7 days with $500"}'
+```
+
+**Async Analysis:**
+```bash
+# Start job
+curl -X POST "http://localhost:8000/analyze-async" \
+  -H "Content-Type: application/json" \
+  -d '{"user_input": "Deep analysis of Ethereum market trends"}'
+
+# Check results (use job_id from above)
+curl http://localhost:8000/analyze-async/{job_id}
+```
+
+**API Documentation:**
+- Swagger UI: `http://localhost:8000/docs`
+- ReDoc: `http://localhost:8000/redoc`
+
+---
+
+## 📚 API Documentation
+
+### Core Endpoints
+
+#### `POST /analyze`
+Synchronous crypto analysis with immediate response
+```json
+{
+  "user_input": "Analyze Bitcoin over 7 days with $500"
+}
+```
+
+**Response:**
+```json
+{
+  "optimized_prompt": "Professional crypto analysis prompt...",
+  "analysis": "Comprehensive market analysis with sentiment, news, recommendations..."
+}
+```
+
+#### `POST /analyze-async`
+Start background analysis job
+```json
+{
+  "user_input": "Deep analysis of Ethereum market trends"
+}
+```
+
+**Response:**
+```json
+{
+  "job_id": "uuid-string",
+  "status": "queued",
+  "created_at": "2024-01-01T00:00:00Z",
+  "message": "Analysis started. Use the job_id to check status."
+}
+```
+
+#### `GET /analyze-async/{job_id}`
+Check job status and retrieve results
+
+#### `GET /health`
+Health check with active job count
+
+#### `GET /query-logs`
+View recent query history (debugging)
+
+### Database Schema
+
+#### QueryLog Table
+Tracks all user queries for analytics and billing:
+- `user_id`: User identifier (currently "test_user")
+- `user_input`: Original query
+- `ai_result`: Final analysis result
+- `response_time_ms`: Performance metrics
+- `success`: Query completion status
+
+#### AnalysisJob Table  
+Manages asynchronous job processing:
+- `job_id`: UUID for external tracking
+- `status`: queued → processing_openai → processing_grok → completed
+- `optimized_prompt`: OpenAI-generated prompt
+- `analysis`: Final Grok analysis
+
+## 🚀 Production Deployment
+
+### Environment Variables
+
+**Backend (.env)**
+```bash
+# Required API Keys
+OPENAI_API_KEY=your-openai-api-key
+GROK_API_KEY=your-grok-api-key
+
+# Database Configuration
+DATABASE_URL=postgresql://user:pass@localhost:5432/coingrok  # Production
+# DATABASE_URL=sqlite:///./coingrok.db  # Development
+
+# Security & Performance
+CORS_ORIGINS=https://coingrok.vercel.app,https://your-domain.com
+LOG_LEVEL=INFO
+DEBUG=false
+
+# Optional Configuration
+JOB_CLEANUP_HOURS=24
+MAX_USER_INPUT_LENGTH=5000
+```
+
+**Frontend (.env.local)**
+```bash
+NEXT_PUBLIC_API_URL=https://your-backend-domain.com
+```
+
+### Deployment Options
+
+#### Backend Deployment
+**Render/Railway/Fly.io:**
+```yaml
+# render.yaml
+services:
+- type: web
+  name: coingrok-api
+  env: python
+  plan: starter
+  buildCommand: pip install -r requirements.txt
+  startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+  envVars:
+  - key: OPENAI_API_KEY
+    sync: false
+  - key: GROK_API_KEY
+    sync: false
+```
+
+**Docker:**
+```dockerfile
+FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY app/ ./app/
+EXPOSE 8000
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+```
+
+#### Frontend Deployment
+**Vercel:**
+```json
+{
+  "env": {
+    "NEXT_PUBLIC_API_URL": "https://your-api-domain.com"
+  },
+  "build": {
+    "env": {
+      "NEXT_PUBLIC_API_URL": "https://your-api-domain.com"
+    }
   }
-  ```
-
-You'll receive a JSON response with `optimized_prompt` and `analysis`.
-
-### 8. Stopping work
-
-- To stop the server: `Ctrl+C`
-- To deactivate the virtual environment: `deactivate`
-
----
-
-## 📂 Architecture
-
-### Current (v0.1)
-```
-Frontend (planned)
-       │
-       ▼
-Backend API (FastAPI async)
-       │
-       ├─ OpenAI (prompt refinement)
-       │
-       └─ Grok xAI (analysis)
+}
 ```
 
-### Next Steps:
-- Frontend React app
-- Secure endpoints (API key / JWT)
-- Add monitoring and usage tracking
+### Database Setup
+**Production PostgreSQL:**
+```bash
+# Using Supabase, Neon, or similar
+DATABASE_URL=postgresql://username:password@host:5432/database
+```
+
+**Development SQLite:**
+```bash
+DATABASE_URL=sqlite:///./coingrok.db
+```
 
 ---
 
-## 📄 Documentation
+## 📊 Monitoring & Analytics
 
-- prd/PRD-v1.2.md
-- API Specification (coming soon )
+### Built-in Logging
+- Request/response timing with performance metrics
+- Error tracking with categorization and stack traces
+- API usage metrics and patterns
+- Database query performance monitoring
+
+### Query Analytics
+Access `/query-logs` endpoint to monitor:
+- User query patterns and trends
+- Response times and performance bottlenecks
+- Success/failure rates by endpoint
+- Popular analysis types and usage insights
+
+### Health Monitoring
+- `/health` endpoint for uptime monitoring
+- Automatic cleanup of old jobs and data
+- Database connection health checks
+- Memory and resource usage tracking
+
+## 🛣️ Roadmap
+
+### Phase 1: Authentication & Security ✅
+- [x] Database-based query logging
+- [x] CORS security configuration
+- [x] Input validation and sanitization
+- [ ] Google OAuth integration (Supabase)
+- [ ] JWT token authentication
+- [ ] User management system
+
+### Phase 2: Business Features
+- [ ] Subscription tiers (Free/Pro/Premium)
+- [ ] Stripe payment integration
+- [ ] Usage-based billing system
+- [ ] Query limits enforcement
+- [ ] User dashboard and analytics
+
+### Phase 3: Advanced Analytics
+- [ ] Real-time crypto data integration
+- [ ] Interactive charts and visualizations
+- [ ] Portfolio tracking capabilities
+- [ ] Automated alerts and notifications
+- [ ] Historical analysis comparison
+
+### Phase 4: Scale & Performance
+- [ ] Redis caching layer
+- [ ] Rate limiting middleware
+- [ ] API versioning strategy
+- [ ] Microservices architecture
+- [ ] Docker containerization
+
+## 🙏 Acknowledgments
+
+- **OpenAI** - GPT-4 for intelligent prompt optimization
+- **Grok AI** - Advanced crypto market analysis capabilities
+- **FastAPI** - High-performance async API framework
+- **Next.js** - React framework for production applications
+- **SQLModel** - Type-safe database ORM with automatic API integration
 
 ---
 
-## 🛠️ Future Features
+**Built with ❤️ by Alexandru G. Mihai & Adrian Ungureanu**
 
-- Toggle between "Simple" and "Pro" analysis modes
-- Sentiment trend charts (7-day history)
-- Downloadable PDF reports
-- Save & compare previous analyses
-- User authentication and saved queries
+*Transforming crypto curiosity into confident investment decisions through AI-powered analysis.*
 
----
-
-## 👤 Built by Alexandru G. Mihai
-
-Aspiring Product Manager transitioning from automotive → tech.
-
-This is my first hands-on product: learning Python and building a real app from scratch.
+> 🚀 **Ready for Production**: This refactored architecture provides a solid foundation for scaling, monitoring, and maintaining a professional cryptocurrency analysis service.
