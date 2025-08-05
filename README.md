@@ -1,33 +1,47 @@
-# CoinGrok MVP – AI-Powered Crypto Analysis Tool
+# 🪙 CoinGrok - AI-Powered Crypto Analysis Platform
 
-CoinGrok is a crypto analytics MVP that leverages **Grok xAI** and **OpenAI** to generate investment insights based on user input.
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-00a5ff.svg)](https://fastapi.tiangolo.com)
+[![Next.js](https://img.shields.io/badge/Next.js-15.2+-black.svg)](https://nextjs.org)
+[![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://python.org)
+[![SQLModel](https://img.shields.io/badge/SQLModel-latest-green.svg)](https://sqlmodel.tiangolo.com)
 
-It uses a 4-D Prompt Engine (**Deconstruct → Diagnose → Develop → Deliver**) to transform simple user queries or form inputs into optimized prompts and deliver AI-powered crypto analysis.
+> **Transform your crypto questions into intelligent investment insights using our 4-D AI Prompt Engine**
 
----
+CoinGrok is a full-stack web application that leverages OpenAI and Grok APIs to provide comprehensive cryptocurrency analysis. Simply ask natural language questions like "Analyze ETH over 7 days with $500" and get professional-grade insights including sentiment analysis, market data, and investment recommendations.
 
-## 🚀 Current Status (v0.1)
+## 🚀 Current Status (v1.0)
 
-- **Backend:** FastAPI async API (running locally)
-- **Endpoints:**
-  - `GET /health` – health check
-  - `POST /analyze` – async analysis flow (OpenAI + Grok)
-- **Prompt Engine:** Connected to OpenAI for prompt optimization
-- **Analysis:** Integrated with Grok xAI (wrapped in executor)
-- **CLI version:** Still available for testing simple prompts
-
-**Frontend:** Not implemented yet (planned).
+- **Backend:** FastAPI with SQLModel database integration ✅
+- **Frontend:** Modern Next.js 15 with TypeScript ✅
+- **Database:** PostgreSQL/SQLite support with query logging ✅
+- **Authentication:** Mock user system (production auth ready) ⚠️
+- **Deployment:** Development ready, production configuration included ✅
 
 ---
 
 ## ⚙️ Tech Stack
 
-- **Python 3.10+** – backend logic and prompt engine
-- **FastAPI (async)** – backend API
-- **OpenAI API (Async)** – LLM prompt optimization
-- **Grok xAI API** – sentiment, news, and market analysis
-- **VS Code** – development environment
-- **GitHub** – version control
+### Backend
+- **Python 3.11+** – Core application logic
+- **FastAPI** – High-performance async API framework
+- **SQLModel** – Type-safe database ORM with PostgreSQL/SQLite
+- **OpenAI API** – GPT-4 for prompt optimization
+- **Grok xAI API** – Advanced crypto market analysis
+- **Pydantic v2** – Data validation and serialization
+
+### Frontend  
+- **Next.js 15** – React framework with App Router
+- **React 19** – Latest React with concurrent features
+- **TypeScript** – Type-safe JavaScript development
+- **Tailwind CSS** – Utility-first CSS framework
+- **shadcn/ui** – Modern component library
+- **Recharts** – Interactive data visualizations
+
+### Database & Infrastructure
+- **PostgreSQL** – Production database
+- **SQLite** – Development database
+- **Database Migrations** – Automatic schema management
+- **Query Logging** – Complete usage analytics
 
 ---
 
