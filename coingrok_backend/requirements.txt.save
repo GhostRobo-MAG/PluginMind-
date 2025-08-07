@@ -6,3 +6,17 @@ python-dotenv
 python-multipart
 
 
+
+  python-jose[cryptography]
+  python-multipart
+  passlib[bcrypt]
+
+  
+  supabase
+  gotrue
+
+ 
+  httpx
+
+ 
+  cryptography

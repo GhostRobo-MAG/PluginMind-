@@ -5,8 +5,29 @@ __pycache__/
 .vscode/
 .idea/
 venv/
-__pycache__/
 .env
 
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Log files
+*.log
+logs/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Frontend
 node_modules/
 /.next/
+.next/
+dist/
+build/

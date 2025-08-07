@@ -83,7 +83,7 @@ class QueryLog(SQLModel, table=True):
     
     # Primary key and user tracking
     id: Optional[int] = Field(default=None, primary_key=True)
-    user_id: str = Field(index=True, description="User identifier for usage tracking")
+    user_id: Optional[str] = Field(None, index=True, description="User identifier for usage tracking")
     user_input: str = Field(description="Original user query")
     
     # AI processing results

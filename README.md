@@ -9,13 +9,14 @@
 
 CoinGrok is a full-stack web application that leverages OpenAI and Grok APIs to provide comprehensive cryptocurrency analysis. Simply ask natural language questions like "Analyze ETH over 7 days with $500" and get professional-grade insights including sentiment analysis, market data, and investment recommendations.
 
-## 🚀 Current Status (v1.0)
+## 🚀 Current Status (v1.1 - Phase 1 Complete)
 
 - **Backend:** FastAPI with SQLModel database integration ✅
 - **Frontend:** Modern Next.js 15 with TypeScript ✅
-- **Database:** PostgreSQL/SQLite support with query logging ✅
-- **Authentication:** Mock user system (production auth ready) ⚠️
-- **Deployment:** Development ready, production configuration included ✅
+- **Database:** PostgreSQL/SQLite with job storage migration complete ✅
+- **Authentication:** Supabase + Google OAuth infrastructure ready ✅
+- **Security:** CORS secured, secrets protected, .gitignore updated ✅
+- **Phase 2 Ready:** JWT validation, user management schema prepared ✅
 
 ---
 
@@ -162,15 +163,20 @@ cd CoinGrok-mvp/coingrok_backend
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-# Install dependencies
+# Install dependencies (includes Phase 2 auth dependencies)
 pip install -r requirements.txt
 
 # Configure environment
 cp .env.example .env
-# Edit .env with your API keys:
+# Edit .env with your API keys (minimum required):
 # OPENAI_API_KEY=your-openai-key
 # GROK_API_KEY=your-grok-key
 # DATABASE_URL=sqlite:///./coingrok.db
+
+# Optional: Configure for Phase 2 auth (see .env.example for full list)
+# SUPABASE_URL=https://your-project.supabase.co
+# SUPABASE_ANON_KEY=your-supabase-anon-key
+# JWT_SECRET=your-jwt-secret
 
 # Start the server
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
@@ -277,11 +283,12 @@ View recent query history (debugging)
 
 #### QueryLog Table
 Tracks all user queries for analytics and billing:
-- `user_id`: User identifier (currently "test_user")
+- `user_id`: User identifier (nullable for anonymous usage)
 - `user_input`: Original query
 - `ai_result`: Final analysis result
 - `response_time_ms`: Performance metrics
 - `success`: Query completion status
+- `openai_cost`, `grok_cost`, `total_cost`: Billing tracking
 
 #### AnalysisJob Table  
 Manages asynchronous job processing:
@@ -289,6 +296,16 @@ Manages asynchronous job processing:
 - `status`: queued → processing_openai → processing_grok → completed
 - `optimized_prompt`: OpenAI-generated prompt
 - `analysis`: Final Grok analysis
+- `user_id`: Links jobs to users (Phase 2)
+- `cost`: Total API cost for billing
+
+#### User Table (Phase 2 Ready)
+User management and subscription tracking:
+- `email`: User email address
+- `google_id`: Google OAuth identifier
+- `subscription_tier`: free, pro, premium
+- `queries_used`, `queries_limit`: Usage tracking
+- `is_active`: Account status
 
 ## 🚀 Production Deployment
 
@@ -308,6 +325,14 @@ DATABASE_URL=postgresql://user:pass@localhost:5432/coingrok  # Production
 CORS_ORIGINS=https://coingrok.vercel.app,https://your-domain.com
 LOG_LEVEL=INFO
 DEBUG=false
+
+# Phase 2 Authentication (Optional)
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-supabase-anon-key
+SUPABASE_SERVICE_ROLE=your-supabase-service-role-key
+JWT_SECRET=your-super-secret-jwt-key
+GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=GOCSPX-your-google-client-secret
 
 # Optional Configuration
 JOB_CLEANUP_HOURS=24
@@ -402,29 +427,37 @@ Access `/query-logs` endpoint to monitor:
 
 ## 🛣️ Roadmap
 
-### Phase 1: Authentication & Security ✅
-- [x] Database-based query logging
-- [x] CORS security configuration
-- [x] Input validation and sanitization
-- [ ] Google OAuth integration (Supabase)
-- [ ] JWT token authentication
-- [ ] User management system
+### ✅ Phase 1: Backend Infrastructure & DB (COMPLETE)
+- [x] Replace wildcard CORS with secure configuration
+- [x] Set up PostgreSQL using Supabase (infrastructure ready)
+- [x] Create users and queries tables with usage tracking
+- [x] Move job storage from RAM to database (SQLModel/SQLAlchemy)
+- [x] Database schema optimized for Phase 2 (nullable user_id)
+- [x] Authentication dependencies installed (JWT, Supabase, OAuth)
+- [x] Security audit complete (secrets protected, .gitignore updated)
 
-### Phase 2: Business Features
+### 🚀 Phase 2: Auth System (READY TO IMPLEMENT)
+- [ ] Supabase Google login integration
+- [ ] Backend JWT token validation middleware
+- [ ] Secure /analyze route with authentication
+- [ ] User registration and profile management
+- [ ] Usage tracking and rate limiting
+
+### Phase 3: Business Features
 - [ ] Subscription tiers (Free/Pro/Premium)
 - [ ] Stripe payment integration
 - [ ] Usage-based billing system
 - [ ] Query limits enforcement
 - [ ] User dashboard and analytics
 
-### Phase 3: Advanced Analytics
+### Phase 4: Advanced Analytics
 - [ ] Real-time crypto data integration
 - [ ] Interactive charts and visualizations
 - [ ] Portfolio tracking capabilities
 - [ ] Automated alerts and notifications
 - [ ] Historical analysis comparison
 
-### Phase 4: Scale & Performance
+### Phase 5: Scale & Performance
 - [ ] Redis caching layer
 - [ ] Rate limiting middleware
 - [ ] API versioning strategy

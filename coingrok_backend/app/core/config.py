@@ -53,7 +53,22 @@ class Settings:
         # Job Configuration
         self.job_cleanup_hours = int(os.getenv("JOB_CLEANUP_HOURS", "1"))
         self.max_user_input_length = int(os.getenv("MAX_USER_INPUT_LENGTH", "5000"))
-    
+        # Supabase Configuration
+        self.supabase_url = os.getenv("SUPABASE_URL")
+        self.supabase_anon_key = os.getenv("SUPABASE_ANON_KEY")
+        self.supabase_service_role = os.getenv("SUPABASE_SERVICE_ROLE")
+
+        # JWT Configuration
+        self.jwt_secret = os.getenv("JWT_SECRET")
+        self.jwt_algorithm = os.getenv("JWT_ALGORITHM", "HS256")
+
+        # Google OAuth
+        self.google_client_id = os.getenv("GOOGLE_CLIENT_ID")
+        self.google_client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
+
+        # Validation
+        if not all([self.supabase_url, self.supabase_anon_key, self.jwt_secret]):
+            raise ValueError("Missing required Supabase/JWT configuration")
     @property
     def connect_args(self) -> dict:
         """Get database connection arguments based on database type."""

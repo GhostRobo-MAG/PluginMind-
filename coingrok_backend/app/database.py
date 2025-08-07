@@ -27,6 +27,10 @@ def create_db_and_tables():
     all required tables are present in the database.
     """
     try:
+        # Import all models to register them with SQLModel metadata
+        from app.models.database import User, AnalysisJob, QueryLog  # noqa: F401
+        
+        logger.info(f"Creating database tables: {list(SQLModel.metadata.tables.keys())}")
         SQLModel.metadata.create_all(engine)
         logger.info("Database tables created successfully")
     except Exception as e:
