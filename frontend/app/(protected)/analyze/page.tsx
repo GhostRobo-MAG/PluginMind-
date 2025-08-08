@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
-import { Brain, Send, TrendingUp, DollarSign, Calendar, Loader2, ArrowLeft } from "lucide-react"
+import { Brain, Send, TrendingUp, DollarSign, Calendar, Loader2, ArrowLeft, LogOut } from "lucide-react"
 import Link from "next/link"
 import { CryptoChart } from "@/components/crypto-chart"
 import { AnalysisResult } from "@/components/analysis-result"
@@ -136,15 +136,13 @@ export default function AnalyzePage() {
     setIsLoading(true)
 
     try {
-      // For testing purposes, we'll use a valid temporary token
-      // In production, this would come from user authentication state
-      const tempToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LXVzZXItMTIzNDUiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE3NTQ2NTU5NTksImV4cCI6MTc1NDY1OTU1OX0.RklKBJTFtkZzIkm7A6wEkCebJYqLwG8ItV7jDziX4ng"
+      const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
       
-      const response = await fetch("http://localhost:8001/analyze", {
+      const response = await fetch("http://localhost:8000/analyze", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${tempToken}`,
+          "Authorization": `Bearer ${token}`,
         },
         body: JSON.stringify({ user_input: input }),
       })
@@ -184,7 +182,7 @@ export default function AnalyzePage() {
         console.error("Analysis request failed:", response.status, errorMessage)
         setAnalysisData(
           getDefaultMock({
-            analysis: `## Analysis Request Failed\n\n**Error**: ${errorMessage}\n\n**Status Code**: ${response.status}\n\n**What to try next:**\n\n1. Check your internet connection\n2. Verify the backend server is running on port 8001\n3. If authentication is required, make sure you're logged in\n4. Try refreshing the page and submitting again\n\nIf the problem persists, please contact support.`,
+            analysis: `## Analysis Request Failed\n\n**Error**: ${errorMessage}\n\n**Status Code**: ${response.status}\n\n**What to try next:**\n\n1. Check your internet connection\n2. Verify the backend server is running on port 8000\n3. If authentication is required, make sure you're logged in\n4. Try refreshing the page and submitting again\n\nIf the problem persists, please contact support.`,
           })
         )
         setIsLoading(false)
@@ -227,7 +225,7 @@ export default function AnalyzePage() {
       <header className="border-b border-purple-500/20 bg-dark-navy/50 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="sm" asChild className="text-slate-300 hover:text-cyan-400 hover:shadow-sm hover:shadow-cyan-400/20 transition-all duration-300">
+            <Button variant="default" size="sm" asChild className="text-slate-300 hover:text-cyan-400 hover:shadow-sm hover:shadow-cyan-400/20 transition-all duration-300">
               <Link href="/">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back
@@ -245,6 +243,15 @@ export default function AnalyzePage() {
             </div>
           </div>
           <Badge className="bg-purple-500/20 text-purple-500 border-purple-500/30">AI Analysis</Badge>
+          <Button variant="ghost" size="sm" asChild className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-500/90 hover:to-purple-600/90 shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-shadow duration-300">
+            <Button onClick={() => {
+              localStorage.removeItem("token");
+              window.location.href = "/";
+            }}>
+              <LogOut className="w-4 h-4 mr-2" />
+              Logout
+            </Button>
+          </Button>
         </div>
       </header>
 
