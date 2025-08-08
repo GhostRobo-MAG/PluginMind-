@@ -92,3 +92,22 @@ class QueryLogsResponse(BaseModel):
     """Response model for query logs listing."""
     total_logs: int = Field(description="Number of logs returned")
     logs: list[QueryLogSummary] = Field(description="List of query log summaries")
+
+
+class UserProfile(BaseModel):
+    """Response model for user profile information."""
+    id: int = Field(description="User database ID")
+    email: str = Field(description="User email address")
+    google_id: Optional[str] = Field(None, description="Google OAuth user ID")
+    subscription_tier: str = Field(description="Subscription level (free, pro, premium)")
+    is_active: bool = Field(description="Account active status")
+    created_at: datetime = Field(description="Account creation timestamp")
+
+
+class UserUsage(BaseModel):
+    """Response model for user usage statistics."""
+    queries_used: int = Field(description="Number of queries used in current billing period")
+    queries_limit: int = Field(description="Monthly query limit based on subscription tier")
+    remaining_queries: int = Field(description="Calculated remaining queries")
+    subscription_tier: str = Field(description="Current subscription tier")
+    can_make_query: bool = Field(description="Whether user can make another query")

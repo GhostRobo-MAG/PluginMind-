@@ -10,6 +10,7 @@ from datetime import datetime
 from fastapi import APIRouter, HTTPException
 from app.core.logging import get_logger
 from app.api.dependencies import SessionDep
+from app.middleware.auth import UserDep
 from app.models.schemas import (
     AnalysisRequest, 
     AnalysisResponse, 
@@ -17,6 +18,7 @@ from app.models.schemas import (
     JobResult
 )
 from app.services.analysis_service import analysis_service
+from app.services.user_service import user_service
 from app.utils.background_tasks import create_analysis_job, process_analysis_background
 from app.core.exceptions import AIServiceError, RateLimitError
 
@@ -25,9 +27,9 @@ router = APIRouter()
 
 
 @router.post("/analyze", response_model=AnalysisResponse)
-async def analyze(req: AnalysisRequest, session: SessionDep):
+async def analyze(req: AnalysisRequest, session: SessionDep, user_id: UserDep):
     """
-    Synchronous Crypto Analysis Endpoint
+    Synchronous Crypto Analysis Endpoint (Protected)
     
     Processes crypto analysis requests using the 4-D Prompt Engine:
     1. Deconstruct: Extract coin, timeframe, budget from user input
@@ -35,31 +37,50 @@ async def analyze(req: AnalysisRequest, session: SessionDep):
     3. Develop: Create optimized prompt via OpenAI, get analysis via Grok
     4. Deliver: Return structured insights with sentiment, news, recommendations
     
-    This endpoint logs all queries for usage tracking and analytics.
+    This endpoint requires authentication and tracks user queries for billing/limits.
     
     Args:
         req: Analysis request with user input
         session: Database session for query logging
+        user_id: Authenticated user ID from JWT token
         
     Returns:
         AnalysisResponse: Contains optimized_prompt and final analysis
         
     Raises:
-        HTTPException: For API failures, rate limits, or validation errors
+        HTTPException: For authentication, query limits, API failures, or validation errors
     """
-    logger.info(f"Starting synchronous analysis for input length: {len(req.user_input)}")
+    logger.info(f"Starting authenticated analysis for user: {user_id}, input length: {len(req.user_input)}")
     
     try:
-        # Perform analysis with complete logging
+        # Get or create user in database
+        user = user_service.get_or_create_user(session, user_id)
+        
+        # Check query limits
+        if not user_service.check_query_limit(user):
+            raise HTTPException(
+                status_code=429,
+                detail=f"Query limit exceeded. Used {user.queries_used}/{user.queries_limit} queries."
+            )
+        
+        # Increment user query count
+        user = user_service.increment_user_queries(session, user)
+        
+        # Perform analysis with user tracking
         optimized_prompt, analysis_result = await analysis_service.perform_analysis_with_logging(
-            req.user_input, session
+            req.user_input, session, user_id=user.google_id or user_id
         )
+        
+        logger.info(f"Analysis completed for user: {user.email} ({user.queries_used}/{user.queries_limit} queries used)")
         
         return AnalysisResponse(
             optimized_prompt=optimized_prompt,
             analysis=analysis_result
         )
         
+    except HTTPException:
+        # Re-raise HTTP exceptions (like query limit exceeded)
+        raise
     except RateLimitError as e:
         raise HTTPException(status_code=429, detail=str(e))
     except AIServiceError as e:

@@ -9,14 +9,14 @@
 
 CoinGrok is a full-stack web application that leverages OpenAI and Grok APIs to provide comprehensive cryptocurrency analysis. Simply ask natural language questions like "Analyze ETH over 7 days with $500" and get professional-grade insights including sentiment analysis, market data, and investment recommendations.
 
-## 🚀 Current Status (v1.1 - Phase 1 Complete)
+## 🚀 Current Status (v1.2 - Phase 2 Complete)
 
 - **Backend:** FastAPI with SQLModel database integration ✅
 - **Frontend:** Modern Next.js 15 with TypeScript ✅
 - **Database:** PostgreSQL/SQLite with job storage migration complete ✅
-- **Authentication:** Supabase + Google OAuth infrastructure ready ✅
-- **Security:** CORS secured, secrets protected, .gitignore updated ✅
-- **Phase 2 Ready:** JWT validation, user management schema prepared ✅
+- **Authentication:** Google OAuth + JWT validation + user management ✅
+- **Security:** Protected routes, usage tracking, query limits ✅
+- **API:** Auth-protected endpoints with auto user creation ✅
 
 ---
 
@@ -29,6 +29,8 @@ CoinGrok is a full-stack web application that leverages OpenAI and Grok APIs to 
 - **OpenAI API** – GPT-4 for prompt optimization
 - **Grok xAI API** – Advanced crypto market analysis
 - **Pydantic v2** – Data validation and serialization
+- **python-jose** – JWT token validation for authentication
+- **Supabase** – Google OAuth and user management
 
 ### Frontend  
 - **Next.js 15** – React framework with App Router
@@ -64,7 +66,8 @@ coingrok_backend/
 │   ├── api/                   # API layer
 │   │   ├── dependencies.py   # FastAPI dependencies (DB sessions)
 │   │   └── routes/           # Endpoint handlers
-│   │       ├── analysis.py   # /analyze, /analyze-async
+│   │       ├── analysis.py   # /analyze, /analyze-async (auth-protected)
+│   │       ├── users.py      # /me, /me/usage (user profiles)
 │   │       ├── jobs.py       # /jobs management
 │   │       ├── health.py     # /health monitoring
 │   │       └── query_logs.py # /query-logs analytics
@@ -72,7 +75,8 @@ coingrok_backend/
 │   ├── services/              # Business logic layer
 │   │   ├── openai_service.py # OpenAI integration (4-D Engine)
 │   │   ├── grok_service.py   # Grok/xAI integration
-│   │   └── analysis_service.py # Orchestration & logging
+│   │   ├── analysis_service.py # Orchestration & logging
+│   │   └── user_service.py   # User management & usage tracking
 │   │
 │   ├── models/                # Data layer
 │   │   ├── database.py       # SQLModel tables (jobs, users, logs)
@@ -80,6 +84,7 @@ coingrok_backend/
 │   │   └── enums.py          # Status enums & constants
 │   │
 │   ├── middleware/            # Cross-cutting concerns
+│   │   ├── auth.py           # JWT validation & auth dependencies
 │   │   ├── cors.py           # CORS configuration
 │   │   └── error_handler.py  # Global exception handling
 │   │
@@ -307,6 +312,103 @@ User management and subscription tracking:
 - `queries_used`, `queries_limit`: Usage tracking
 - `is_active`: Account status
 
+---
+
+# 🔐 Phase 2: Authentication & User Management
+
+> **Complete Google OAuth integration with Supabase, JWT-protected routes, and usage tracking**
+
+## 🚀 Features Implemented
+
+### **Authentication System**
+- **Google OAuth via Supabase** - Seamless social login integration
+- **JWT Token Verification** - Secure token validation using `python-jose`
+- **Middleware Protection** - Route-level authentication with dependency injection
+- **Auto User Creation** - First-time users automatically created with default settings
+
+### **User Management**
+- **Smart User Lookup** - Finds users by `google_id` or email with fallback logic
+- **Usage Tracking** - Real-time query counting for billing and limits
+- **Subscription Tiers** - Built-in support for `free`, `pro`, `premium` plans
+- **Query Limits** - Automatic enforcement prevents API overuse
+
+### **Protected API Endpoints**
+```http
+POST   /analyze        # 🔒 Protected - Crypto analysis with usage tracking
+GET    /me             # 🔒 Protected - User profile information
+GET    /me/usage       # 🔒 Protected - Query usage statistics
+```
+
+## 🏗️ Authentication Architecture
+
+### **Auth Flow**
+```
+Google OAuth → Supabase → JWT Token → FastAPI Middleware → Protected Route
+```
+
+1. **Client** triggers Google OAuth via Supabase
+2. **Supabase** returns JWT token with user claims
+3. **FastAPI** validates JWT using `python-jose` 
+4. **Middleware** extracts user ID and provides `UserDep`/`OptionalUserDep`
+5. **Routes** get authenticated user automatically
+
+### **Tech Stack**
+- **FastAPI Dependencies** - Clean dependency injection for auth
+- **python-jose[cryptography]** - JWT token validation
+- **Supabase** - OAuth provider and user management
+- **SQLModel** - Type-safe database operations
+- **HTTPBearer** - Secure header-based authentication
+
+## 📊 Auth API Usage Examples
+
+### **Protected Analysis with Auto User Creation**
+```bash
+curl -X POST "http://localhost:8000/analyze" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"user_input": "Analyze BTC price trends"}'
+```
+
+### **Get User Profile**
+```bash
+curl -X GET "http://localhost:8000/me" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+### **Check Usage Limits**
+```bash
+curl -X GET "http://localhost:8000/me/usage" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+## 🎯 Key Components
+
+| Component | Purpose | Location |
+|-----------|---------|----------|
+| **`auth.py`** | JWT validation & dependencies | `app/middleware/auth.py` |
+| **`user_service.py`** | User CRUD operations | `app/services/user_service.py` |
+| **`users.py`** | Profile & usage endpoints | `app/api/routes/users.py` |
+| **`UserProfile`** | Response schema for `/me` | `app/models/schemas.py` |
+| **`UserUsage`** | Response schema for `/me/usage` | `app/models/schemas.py` |
+
+## 🔄 User Lifecycle
+
+```mermaid
+graph LR
+    A[First API Call] --> B[JWT Validation]
+    B --> C{User Exists?}
+    C -->|No| D[Create User]
+    C -->|Yes| E[Load User]
+    D --> F[Check Limits]
+    E --> F
+    F --> G{Under Limit?}
+    G -->|Yes| H[Process Request]
+    G -->|No| I[Return 429 Error]
+    H --> J[Increment Usage]
+```
+
+---
+
 ## 🚀 Production Deployment
 
 ### Environment Variables
@@ -326,7 +428,7 @@ CORS_ORIGINS=https://coingrok.vercel.app,https://your-domain.com
 LOG_LEVEL=INFO
 DEBUG=false
 
-# Phase 2 Authentication (Optional)
+# Phase 2 Authentication (Required)
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_ANON_KEY=your-supabase-anon-key
 SUPABASE_SERVICE_ROLE=your-supabase-service-role-key
@@ -436,12 +538,12 @@ Access `/query-logs` endpoint to monitor:
 - [x] Authentication dependencies installed (JWT, Supabase, OAuth)
 - [x] Security audit complete (secrets protected, .gitignore updated)
 
-### 🚀 Phase 2: Auth System (READY TO IMPLEMENT)
-- [ ] Supabase Google login integration
-- [ ] Backend JWT token validation middleware
-- [ ] Secure /analyze route with authentication
-- [ ] User registration and profile management
-- [ ] Usage tracking and rate limiting
+### ✅ Phase 2: Auth System (COMPLETE)
+- [x] Supabase Google login integration with JWT validation
+- [x] Backend JWT token validation middleware using python-jose
+- [x] Secure /analyze route with UserDep authentication
+- [x] Auto user registration and profile management (/me endpoint)
+- [x] Usage tracking and query limit enforcement (/me/usage endpoint)
 
 ### Phase 3: Business Features
 - [ ] Subscription tiers (Free/Pro/Premium)
@@ -471,6 +573,7 @@ Access `/query-logs` endpoint to monitor:
 - **FastAPI** - High-performance async API framework
 - **Next.js** - React framework for production applications
 - **SQLModel** - Type-safe database ORM with automatic API integration
+- **Claude Anthropic** - Advanced assistant model
 
 ---
 

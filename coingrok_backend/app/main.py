@@ -23,7 +23,7 @@ from app.middleware.cors import setup_cors
 from app.middleware.error_handler import setup_error_handlers
 
 # API Routes
-from app.api.routes import health, analysis, jobs, query_logs
+from app.api.routes import health, analysis, jobs, query_logs, users
 
 # Initialize logging
 setup_logging()
@@ -92,6 +92,12 @@ app.include_router(
 app.include_router(
     query_logs.router,
     tags=["logs"],
+    prefix="",
+)
+
+app.include_router(
+    users.router,
+    tags=["users"],
     prefix="",
 )
 
