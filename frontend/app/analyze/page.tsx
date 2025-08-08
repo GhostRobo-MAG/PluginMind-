@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-
+import Image from "next/image"
 import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -196,25 +196,29 @@ export default function AnalyzePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-crypto-dark via-crypto-darker to-black">
+    <div className="min-h-screen bg-gradient-to-br from-dark-navy via-darker-navy to-dark-navy">
       {/* Header */}
-      <header className="border-b border-crypto-accent/20 bg-crypto-dark/50 backdrop-blur-sm">
+      <header className="border-b border-purple-500/20 bg-dark-navy/50 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="sm" asChild className="text-crypto-light hover:text-white">
+            <Button variant="ghost" size="sm" asChild className="text-slate-300 hover:text-cyan-400 hover:shadow-sm hover:shadow-cyan-400/20 transition-all duration-300">
               <Link href="/">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back
               </Link>
             </Button>
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-crypto-primary to-crypto-secondary rounded-lg flex items-center justify-center">
-                <Brain className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold text-white">CoinGrok</span>
+            <div className="flex items-center">
+              <Image 
+                src="/logos/coingrok-logo-with-text.png" 
+                alt="CoinGrok - AI Crypto Analysis" 
+                width={180}
+                height={40}
+                className="h-9 w-auto sm:h-10"
+                priority
+              />
             </div>
           </div>
-          <Badge className="bg-crypto-primary/20 text-crypto-primary border-crypto-primary/30">AI Analysis</Badge>
+          <Badge className="bg-purple-500/20 text-purple-500 border-purple-500/30">AI Analysis</Badge>
         </div>
       </header>
 
@@ -222,20 +226,20 @@ export default function AnalyzePage() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-white mb-4">AI-Powered Crypto Analysis</h1>
-            <p className="text-crypto-light text-lg">
+            <p className="text-slate-300 text-lg">
               Ask naturally or use structured input to get comprehensive crypto insights
             </p>
           </div>
 
           <div className="grid lg:grid-cols-2 gap-8 mb-8">
             {/* Natural Language Input */}
-            <Card className="bg-crypto-dark/50 border-crypto-accent/20">
+            <Card className="bg-dark-navy/50 border-purple-500/20 hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300">
               <CardHeader>
                 <CardTitle className="text-white flex items-center">
-                  <Brain className="w-5 h-5 mr-2 text-crypto-primary" />
+                  <Brain className="w-5 h-5 mr-2 text-purple-500" />
                   Natural Language Query
                 </CardTitle>
-                <CardDescription className="text-crypto-light">
+                <CardDescription className="text-slate-300">
                   Ask in plain English: "Analyze ETH in 7d with $300"
                 </CardDescription>
               </CardHeader>
@@ -245,12 +249,12 @@ export default function AnalyzePage() {
                     placeholder="Analyze Bitcoin over the next 2 weeks with a $500 investment..."
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    className="bg-crypto-darker border-crypto-accent/30 text-white placeholder:text-crypto-light/50 min-h-[100px]"
+                    className="bg-white border-blue-500/30 text-gray-900 placeholder:text-gray-500 min-h-[100px] focus:ring-purple-500 focus:border-purple-500"
                   />
                   <Button
                     type="submit"
                     disabled={isLoading || !query.trim()}
-                    className="w-full bg-gradient-to-r from-crypto-primary to-crypto-secondary hover:from-crypto-primary/90 hover:to-crypto-secondary/90"
+                    className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-500/90 hover:to-purple-600/90 shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-shadow duration-300"
                   >
                     {isLoading ? (
                       <>
@@ -269,13 +273,13 @@ export default function AnalyzePage() {
             </Card>
 
             {/* Structured Input */}
-            <Card className="bg-crypto-dark/50 border-crypto-accent/20">
+            <Card className="bg-dark-navy/50 border-purple-500/20 hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300">
               <CardHeader>
                 <CardTitle className="text-white flex items-center">
-                  <TrendingUp className="w-5 h-5 mr-2 text-crypto-secondary" />
+                  <TrendingUp className="w-5 h-5 mr-2 text-cyan-400" />
                   Structured Input
                 </CardTitle>
-                <CardDescription className="text-crypto-light">
+                <CardDescription className="text-slate-300">
                   Use specific parameters for targeted analysis
                 </CardDescription>
               </CardHeader>
@@ -283,7 +287,7 @@ export default function AnalyzePage() {
                 <form onSubmit={handleStructuredSubmit} className="space-y-4">
                   <div className="grid grid-cols-1 gap-4">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-crypto-light flex items-center">
+                      <label className="text-sm font-medium text-slate-300 flex items-center">
                         <TrendingUp className="w-4 h-4 mr-1" />
                         Cryptocurrency
                       </label>
@@ -295,8 +299,8 @@ export default function AnalyzePage() {
                             className={`px-3 py-1 rounded-full text-xs font-semibold border transition
                               ${
                                 structuredInput.coin.trim().toUpperCase() === coin
-                                  ? "bg-crypto-primary text-white border-crypto-primary"
-                                  : "bg-crypto-darker text-crypto-light border-crypto-accent/30 hover:bg-crypto-primary/20"
+                                  ? "bg-purple-500 text-white border-purple-500 shadow-md shadow-purple-500/30"
+                                  : "bg-gray-100 text-gray-700 border-cyan-400/30 hover:bg-cyan-400/10 hover:text-cyan-400 hover:border-cyan-400 hover:shadow-md hover:shadow-cyan-400/20"
                               }
                             `}
                             onClick={() =>
@@ -314,11 +318,11 @@ export default function AnalyzePage() {
                         placeholder="BTC, ETH, ADA..."
                         value={structuredInput.coin}
                         onChange={(e) => setStructuredInput((prev) => ({ ...prev, coin: e.target.value }))}
-                        className="bg-crypto-darker border-crypto-accent/30 text-white placeholder:text-crypto-light/50"
+                        className="bg-white border-blue-500/30 text-gray-900 placeholder:text-gray-500 focus:ring-purple-500 focus:border-purple-500"
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-crypto-light flex items-center">
+                      <label className="text-sm font-medium text-slate-300 flex items-center">
                         <Calendar className="w-4 h-4 mr-1" />
                         Timeframe
                       </label>
@@ -330,8 +334,8 @@ export default function AnalyzePage() {
                             className={`px-3 py-1 rounded-full text-xs font-semibold border transition
                               ${
                                 structuredInput.timeframe.trim().toLowerCase() === tf
-                                  ? "bg-crypto-secondary text-white border-crypto-secondary"
-                                  : "bg-crypto-darker text-crypto-light border-crypto-accent/30 hover:bg-crypto-secondary/20"
+                                  ? "bg-cyan-400 text-white border-cyan-400 shadow-md shadow-cyan-400/30"
+                                  : "bg-gray-100 text-gray-700 border-cyan-400/30 hover:bg-cyan-400/10 hover:text-cyan-400 hover:border-cyan-400 hover:shadow-md hover:shadow-cyan-400/20"
                               }
                             `}
                             onClick={() =>
@@ -349,11 +353,11 @@ export default function AnalyzePage() {
                         placeholder="7d, 1m, 3m..."
                         value={structuredInput.timeframe}
                         onChange={(e) => setStructuredInput((prev) => ({ ...prev, timeframe: e.target.value }))}
-                        className="bg-crypto-darker border-crypto-accent/30 text-white placeholder:text-crypto-light/50"
+                        className="bg-white border-blue-500/30 text-gray-900 placeholder:text-gray-500 focus:ring-purple-500 focus:border-purple-500"
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-crypto-light flex items-center">
+                      <label className="text-sm font-medium text-slate-300 flex items-center">
                         <DollarSign className="w-4 h-4 mr-1" />
                         Investment Amount
                       </label>
@@ -365,8 +369,8 @@ export default function AnalyzePage() {
                             className={`px-3 py-1 rounded-full text-xs font-semibold border transition
                               ${
                                 Number(structuredInput.investment) === amt
-                                  ? "bg-crypto-accent text-white border-crypto-accent"
-                                  : "bg-crypto-darker text-crypto-light border-crypto-accent/30 hover:bg-crypto-accent/20"
+                                  ? "bg-blue-500 text-white border-blue-500 shadow-md shadow-blue-500/30"
+                                  : "bg-gray-100 text-gray-700 border-cyan-400/30 hover:bg-cyan-400/10 hover:text-cyan-400 hover:border-cyan-400 hover:shadow-md hover:shadow-cyan-400/20"
                               }
                             `}
                             onClick={() =>
@@ -385,7 +389,7 @@ export default function AnalyzePage() {
                         placeholder="300"
                         value={structuredInput.investment}
                         onChange={(e) => setStructuredInput((prev) => ({ ...prev, investment: e.target.value }))}
-                        className="bg-crypto-darker border-crypto-accent/30 text-white placeholder:text-crypto-light/50"
+                        className="bg-white border-blue-500/30 text-gray-900 placeholder:text-gray-500 focus:ring-purple-500 focus:border-purple-500"
                       />
                     </div>
                   </div>
@@ -394,7 +398,7 @@ export default function AnalyzePage() {
                     disabled={
                       isLoading || !structuredInput.coin || !structuredInput.timeframe || !structuredInput.investment
                     }
-                    className="w-full bg-gradient-to-r from-crypto-secondary to-crypto-accent hover:from-crypto-secondary/90 hover:to-crypto-accent/90"
+                    className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-500/90 hover:to-purple-600/90 shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-shadow duration-300"
                   >
                     {isLoading ? (
                       <>
@@ -417,15 +421,15 @@ export default function AnalyzePage() {
           <div ref={resultsRef} className="space-y-8 min-h-[200px]">
             {isLoading && (
               <div className="animate-pulse">
-                <div className="bg-crypto-dark/60 border border-crypto-accent/20 rounded-xl p-8 flex flex-col items-center justify-center min-h-[180px]">
+                <div className="bg-dark-navy/60 border border-blue-500/20 rounded-xl p-8 flex flex-col items-center justify-center min-h-[180px]">
                   {loadingStep === 0 && (
-                    <span className="text-crypto-primary text-2xl font-bold mb-2 flex items-center">Gathering information from relevant sources<AnimatedEllipsis /></span>
+                    <span className="text-purple-500 text-2xl font-bold mb-2 flex items-center">Gathering information from relevant sources<AnimatedEllipsis /></span>
                   )}
                   {loadingStep === 1 && (
-                    <span className="text-crypto-secondary text-2xl font-bold mb-2 flex items-center">Analyzing market data, news, and sentiment<AnimatedEllipsis /></span>
+                    <span className="text-cyan-400 text-2xl font-bold mb-2 flex items-center">Analyzing market data, news, and sentiment<AnimatedEllipsis /></span>
                   )}
                   {loadingStep === 2 && (
-                    <span className="text-crypto-light text-2xl font-bold mb-2 flex items-center">Aggregating all the insights<AnimatedEllipsis /></span>
+                    <span className="text-slate-300 text-2xl font-bold mb-2 flex items-center">Aggregating all the insights<AnimatedEllipsis /></span>
                   )}
                 </div>
               </div>

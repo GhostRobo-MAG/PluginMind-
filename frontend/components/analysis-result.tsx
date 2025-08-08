@@ -94,7 +94,7 @@ export function AnalysisResult({ data, parsedSections }: AnalysisResultProps) {
       case "high":
         return "bg-red-500/20 text-red-400 border-red-500/30"
       default:
-        return "bg-crypto-accent/20 text-crypto-accent border-crypto-accent/30"
+        return "bg-blue-500/20 text-blue-500 border-blue-500/30"
     }
   }
 
@@ -114,7 +114,7 @@ export function AnalysisResult({ data, parsedSections }: AnalysisResultProps) {
   const getRecommendationIcon = (rec: string) => {
     if (rec.toLowerCase().includes("buy")) return <TrendingUp className="w-4 h-4 text-green-400" />
     if (rec.toLowerCase().includes("sell")) return <TrendingDown className="w-4 h-4 text-red-400" />
-    return <Target className="w-4 h-4 text-crypto-accent" />
+    return <Target className="w-4 h-4 text-blue-500" />
   }
 
   function renderSectionContent(content: string) {
@@ -168,19 +168,19 @@ export function AnalysisResult({ data, parsedSections }: AnalysisResultProps) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <AnimatedCard className="bg-gradient-to-r from-crypto-primary/10 to-crypto-secondary/10 border-crypto-primary/30" delay={0}>
+      <AnimatedCard className="bg-gradient-to-r from-purple-500/10 to-cyan-400/10 border-purple-500/30" delay={0}>
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-2xl flex items-center">
-                <Brain className="w-6 h-6 mr-2 text-crypto-primary" />
+                <Brain className="w-6 h-6 mr-2 text-purple-500" />
                 Analysis Complete
               </CardTitle>
-              <CardDescription className="text-crypto-light text-lg">
+              <CardDescription className="text-slate-300 text-lg">
                 {data.coin} • {data.timeframe} • ${data.investment.toLocaleString()} investment
               </CardDescription>
             </div>
-            <Badge className="bg-crypto-primary/20 text-crypto-primary border-crypto-primary/30 text-lg px-4 py-2 text-medium">
+            <Badge className="bg-purple-500/20 text-purple-500 border-purple-500/30 text-lg px-4 py-2 text-medium">
               {data.confidence}% Confidence
             </Badge>
           </div>
@@ -194,34 +194,34 @@ export function AnalysisResult({ data, parsedSections }: AnalysisResultProps) {
             parsedSections.map((section, idx) => (
               <AnimatedCard
                 key={idx}
-                className="bg-crypto-dark/50 border-crypto-accent/20"
+                className="bg-dark-navy/50 border-blue-500/20"
                 delay={getStaggeredDelay(idx, parsedSections.length)}
               >
                 <CardHeader>
                   <CardTitle className="text-white flex items-center">
-                    <BarChart3 className="w-5 h-5 mr-2 text-crypto-primary" />
+                    <BarChart3 className="w-5 h-5 mr-2 text-purple-500" />
                     {section.title}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-crypto-light leading-relaxed text-lg whitespace-pre-line">{renderSectionContent(section.content)}</div>
+                  <div className="text-slate-300 leading-relaxed text-lg whitespace-pre-line">{renderSectionContent(section.content)}</div>
                 </CardContent>
               </AnimatedCard>
             ))
           ) : (
             <>
-              <AnimatedCard className="bg-crypto-dark/50 border-crypto-accent/20" delay={120}>
+              <AnimatedCard className="bg-dark-navy/50 border-blue-500/20" delay={120}>
                 <CardHeader>
                   <CardTitle className="text-white flex items-center">
-                    <Brain className="w-5 h-5 mr-2 text-crypto-primary" />
+                    <Brain className="w-5 h-5 mr-2 text-purple-500" />
                     AI Analysis
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-crypto-light leading-relaxed text-lg">{data.analysis}</p>
+                  <p className="text-slate-300 leading-relaxed text-lg">{data.analysis}</p>
                 </CardContent>
               </AnimatedCard>
-              <AnimatedCard className="bg-crypto-dark/50 border-crypto-accent/20" delay={0}>
+              <AnimatedCard className="bg-dark-navy/50 border-blue-500/20" delay={0}>
                 <CardHeader>
                   <CardTitle className="text-white flex items-center">
                     {getRecommendationIcon(data.recommendation)}
@@ -229,7 +229,7 @@ export function AnalysisResult({ data, parsedSections }: AnalysisResultProps) {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-crypto-light leading-relaxed text-lg">{data.recommendation}</p>
+                  <p className="text-slate-300 leading-relaxed text-lg">{data.recommendation}</p>
                 </CardContent>
               </AnimatedCard>
             </>
@@ -239,13 +239,13 @@ export function AnalysisResult({ data, parsedSections }: AnalysisResultProps) {
         {/* Metrics Sidebar */}
         <div className="space-y-6">
           {/* Sidebar cards: bottom-most card appears first */}
-          <AnimatedCard className="bg-crypto-dark/50 border-crypto-accent/20" delay={360}>
+          <AnimatedCard className="bg-dark-navy/50 border-blue-500/20" delay={360}>
             <CardHeader>
               <CardTitle className="text-white text-lg">Risk Assessment</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-crypto-light">Risk Level</span>
+                <span className="text-slate-300">Risk Level</span>
                 <Badge className={getRiskColor(data.riskLevel)}>
                   {getRiskIcon(data.riskLevel)}
                   <span className="ml-1 capitalize">{data.riskLevel}</span>
@@ -253,91 +253,91 @@ export function AnalysisResult({ data, parsedSections }: AnalysisResultProps) {
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-crypto-light">Confidence</span>
+                  <span className="text-slate-300">Confidence</span>
                   <span className="text-white font-semibold">{data.confidence}%</span>
                 </div>
-                <Progress value={data.confidence} className="h-2 bg-crypto-darker" />
+                <Progress value={data.confidence} className="h-2 bg-dark-navyer" />
               </div>
             </CardContent>
           </AnimatedCard>
 
           {data.priceTarget > 0 && (
-            <AnimatedCard className="bg-crypto-dark/50 border-crypto-accent/20" delay={240}>
+            <AnimatedCard className="bg-dark-navy/50 border-blue-500/20" delay={240}>
               <CardHeader>
                 <CardTitle className="text-white text-lg flex items-center">
-                  <Target className="w-5 h-5 mr-2 text-crypto-secondary" />
+                  <Target className="w-5 h-5 mr-2 text-cyan-400" />
                   Price Target
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-crypto-primary">${data.priceTarget.toLocaleString()}</div>
-                  <div className="text-crypto-light text-sm mt-1">{data.timeframe} target</div>
+                  <div className="text-3xl font-bold text-purple-500">${data.priceTarget.toLocaleString()}</div>
+                  <div className="text-slate-300 text-sm mt-1">{data.timeframe} target</div>
                 </div>
               </CardContent>
             </AnimatedCard>
           )}
 
-          <AnimatedCard className="bg-crypto-dark/50 border-crypto-accent/20" delay={120}>
+          <AnimatedCard className="bg-dark-navy/50 border-blue-500/20" delay={120}>
             <CardHeader>
               <CardTitle className="text-white text-lg">Investment Summary</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex justify-between">
-                <span className="text-crypto-light">Asset</span>
+                <span className="text-slate-300">Asset</span>
                 <span className="text-white font-semibold">{data.coin}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-crypto-light">Timeframe</span>
+                <span className="text-slate-300">Timeframe</span>
                 <span className="text-white font-semibold">{data.timeframe}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-crypto-light">Investment</span>
+                <span className="text-slate-300">Investment</span>
                 <span className="text-white font-semibold">${data.investment.toLocaleString()}</span>
               </div>
             </CardContent>
           </AnimatedCard>
           {data.additionalMetrics && (
-            <AnimatedCard className="bg-crypto-dark/50 border-crypto-accent/20" delay={0}>
+            <AnimatedCard className="bg-dark-navy/50 border-blue-500/20" delay={0}>
               <CardHeader>
                 <CardTitle className="text-white text-lg flex items-center">
-                  <BarChart3 className="w-5 h-5 mr-2 text-crypto-accent" />
+                  <BarChart3 className="w-5 h-5 mr-2 text-blue-500" />
                   Performance Metrics
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="text-center p-2 bg-crypto-darker/50 rounded">
-                    <div className="text-lg font-bold text-crypto-primary">
+                  <div className="text-center p-2 bg-dark-navyer/50 rounded">
+                    <div className="text-lg font-bold text-purple-500">
                       +{data.additionalMetrics.expectedReturn.toFixed(1)}%
                     </div>
-                    <div className="text-xs text-crypto-light">Expected Return</div>
+                    <div className="text-xs text-slate-300">Expected Return</div>
                   </div>
-                  <div className="text-center p-2 bg-crypto-darker/50 rounded">
-                    <div className="text-lg font-bold text-crypto-secondary">
+                  <div className="text-center p-2 bg-dark-navyer/50 rounded">
+                    <div className="text-lg font-bold text-cyan-400">
                       {data.additionalMetrics.volatility.toFixed(1)}%
                     </div>
-                    <div className="text-xs text-crypto-light">Volatility</div>
+                    <div className="text-xs text-slate-300">Volatility</div>
                   </div>
-                  <div className="text-center p-2 bg-crypto-darker/50 rounded">
-                    <div className="text-lg font-bold text-crypto-accent">
+                  <div className="text-center p-2 bg-dark-navyer/50 rounded">
+                    <div className="text-lg font-bold text-blue-500">
                       {data.additionalMetrics.sharpeRatio.toFixed(2)}
                     </div>
-                    <div className="text-xs text-crypto-light">Sharpe Ratio</div>
+                    <div className="text-xs text-slate-300">Sharpe Ratio</div>
                   </div>
-                  <div className="text-center p-2 bg-crypto-darker/50 rounded">
-                    <div className="text-lg font-bold text-crypto-light">{data.additionalMetrics.winRate}%</div>
-                    <div className="text-xs text-crypto-light">Win Rate</div>
+                  <div className="text-center p-2 bg-dark-navyer/50 rounded">
+                    <div className="text-lg font-bold text-slate-300">{data.additionalMetrics.winRate}%</div>
+                    <div className="text-xs text-slate-300">Win Rate</div>
                   </div>
                 </div>
-                <div className="pt-2 border-t border-crypto-accent/20">
+                <div className="pt-2 border-t border-blue-500/20">
                   <div className="flex justify-between text-sm">
-                    <span className="text-crypto-light">Max Drawdown</span>
+                    <span className="text-slate-300">Max Drawdown</span>
                     <span className="text-red-400">{data.additionalMetrics.maxDrawdown.toFixed(1)}%</span>
                   </div>
                   <div className="flex justify-between text-sm mt-1">
-                    <span className="text-crypto-light">Avg Hold Period</span>
-                    <span className="text-crypto-accent">{data.additionalMetrics.avgHoldingPeriod}</span>
+                    <span className="text-slate-300">Avg Hold Period</span>
+                    <span className="text-blue-500">{data.additionalMetrics.avgHoldingPeriod}</span>
                   </div>
                 </div>
               </CardContent>

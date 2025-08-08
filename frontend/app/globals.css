@@ -30,13 +30,13 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
 
-    /* Custom crypto theme variables */
-    --crypto-primary: 259 94% 51%; /* Electric purple */
-    --crypto-secondary: 142 76% 36%; /* Emerald green */
-    --crypto-accent: 46 87% 65%; /* Golden yellow */
-    --crypto-dark: 222 47% 11%; /* Dark blue-gray */
-    --crypto-darker: 215 28% 7%; /* Darker blue-gray */
-    --crypto-light: 215 20% 65%; /* Light gray-blue */
+    /* CoinGrok Brand Colors */
+    --purple-500: 258 92% 65%; /* #8B5CF6 */
+    --purple-600: 258 90% 58%; /* #7C3AED */
+    --cyan-400: 190 100% 50%; /* #00D9FF */
+    --blue-500: 207 89% 54%; /* #0EA5E9 */
+    --dark-navy: 250 50% 20%; /* #1E1B4B */
+    --darker-navy: 250 73% 9%; /* #0F0D1F */
   }
 
   .dark {
@@ -71,22 +71,22 @@
   }
 }
 
-/* Custom scrollbar for crypto theme */
+/* Custom scrollbar for CoinGrok theme */
 ::-webkit-scrollbar {
   width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: hsl(var(--crypto-darker));
+  background: hsl(var(--darker-navy));
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--crypto-accent) / 0.3);
+  background: hsl(var(--blue-500) / 0.3);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--crypto-accent) / 0.5);
+  background: hsl(var(--blue-500) / 0.5);
 }
 
 /* Smooth animations */
@@ -96,7 +96,7 @@
 
 /* Gradient text utilities */
 .gradient-text {
-  background: linear-gradient(135deg, hsl(var(--crypto-primary)), hsl(var(--crypto-secondary)));
+  background: linear-gradient(135deg, hsl(var(--purple-500)), hsl(var(--cyan-400)));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -104,9 +104,9 @@
 
 /* Custom glow effects */
 .glow-primary {
-  box-shadow: 0 0 20px hsl(var(--crypto-primary) / 0.3);
+  box-shadow: 0 0 20px hsl(var(--purple-500) / 0.3);
 }
 
 .glow-secondary {
-  box-shadow: 0 0 20px hsl(var(--crypto-secondary) / 0.3);
+  box-shadow: 0 0 20px hsl(var(--cyan-400) / 0.3);
 }

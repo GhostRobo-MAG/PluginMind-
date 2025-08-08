@@ -53,15 +53,19 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // Custom crypto theme colors
-        crypto: {
-          primary: "hsl(var(--crypto-primary))",
-          secondary: "hsl(var(--crypto-secondary))",
-          accent: "hsl(var(--crypto-accent))",
-          dark: "hsl(var(--crypto-dark))",
-          darker: "hsl(var(--crypto-darker))",
-          light: "hsl(var(--crypto-light))",
+        // CoinGrok Brand Colors
+        purple: {
+          500: "hsl(var(--purple-500))",
+          600: "hsl(var(--purple-600))",
         },
+        cyan: {
+          400: "hsl(var(--cyan-400))",
+        },
+        blue: {
+          500: "hsl(var(--blue-500))",
+        },
+        "dark-navy": "hsl(var(--dark-navy))",
+        "darker-navy": "hsl(var(--darker-navy))",
       },
       borderRadius: {
         lg: "var(--radius)",

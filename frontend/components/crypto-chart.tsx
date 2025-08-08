@@ -87,11 +87,11 @@ const addTechnicalIndicators = (data: any[]) => {
 const chartConfig = {
   price: {
     label: "Price",
-    color: "hsl(var(--crypto-primary))",
+    color: "hsl(var(--purple-500))",
   },
   volume: {
     label: "Volume",
-    color: "hsl(var(--crypto-secondary))",
+    color: "hsl(var(--cyan-400))",
   },
 }
 
@@ -106,13 +106,13 @@ export function CryptoChart({ coin, timeframe }: CryptoChartProps) {
   return (
     <div className="space-y-6">
       {/* Enhanced Price Chart with Technical Indicators */}
-      <Card className="bg-crypto-dark/50 border-crypto-accent/20">
+      <Card className="bg-dark-navy/50 border-blue-500/20">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-white flex items-center text-xl">
                 {coin} Price Chart
-                <Badge className="ml-3 bg-crypto-primary/20 text-crypto-primary border-crypto-primary/30">
+                <Badge className="ml-3 bg-purple-500/20 text-purple-500 border-purple-500/30">
                   {timeframe}
                 </Badge>
               </CardTitle>
@@ -123,10 +123,10 @@ export function CryptoChart({ coin, timeframe }: CryptoChartProps) {
                   {isPositive ? <TrendingUp className="w-3 h-3 mr-1" /> : <TrendingDown className="w-3 h-3 mr-1" />}
                   {priceChangePercent}%
                 </Badge>
-                <span className="text-crypto-light text-sm">
+                <span className="text-slate-300 text-sm">
                   Vol: ${(data[data.length - 1]?.volume / 1000000000).toFixed(2)}B
                 </span>
-                <span className="text-crypto-light text-sm">
+                <span className="text-slate-300 text-sm">
                   MCap: ${(data[data.length - 1]?.marketCap / 1000000000).toFixed(1)}B
                 </span>
               </div>
@@ -136,7 +136,7 @@ export function CryptoChart({ coin, timeframe }: CryptoChartProps) {
               <div className={`text-lg ${isPositive ? "text-green-400" : "text-red-400"}`}>
                 {isPositive ? "+" : ""}${priceChange.toFixed(2)}
               </div>
-              <div className="text-sm text-crypto-light">
+              <div className="text-sm text-slate-300">
                 24h Range: ${Math.min(...data.slice(-6).map((d) => d.price)).toFixed(0)} - $
                 {Math.max(...data.slice(-6).map((d) => d.price)).toFixed(0)}
               </div>
@@ -149,20 +149,20 @@ export function CryptoChart({ coin, timeframe }: CryptoChartProps) {
               <AreaChart data={data}>
                 <defs>
                   <linearGradient id="priceGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="hsl(var(--crypto-primary))" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="hsl(var(--crypto-primary))" stopOpacity={0} />
+                    <stop offset="5%" stopColor="hsl(var(--purple-500))" stopOpacity={0.4} />
+                    <stop offset="95%" stopColor="hsl(var(--purple-500))" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <XAxis
                   dataKey="date"
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: "hsl(var(--crypto-light))", fontSize: 12 }}
+                  tick={{ fill: "hsl(var(--slate-300))", fontSize: 12 }}
                 />
                 <YAxis
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: "hsl(var(--crypto-light))", fontSize: 12 }}
+                  tick={{ fill: "hsl(var(--slate-300))", fontSize: 12 }}
                   tickFormatter={(value) => `$${value.toLocaleString()}`}
                   domain={["dataMin - 50", "dataMax + 50"]}
                 />
@@ -171,14 +171,14 @@ export function CryptoChart({ coin, timeframe }: CryptoChartProps) {
                     if (active && payload && payload.length) {
                       const data = payload[0].payload
                       return (
-                        <div className="bg-crypto-darker border border-crypto-accent/20 rounded-lg p-3 shadow-lg">
+                        <div className="bg-dark-navyer border border-blue-500/20 rounded-lg p-3 shadow-lg">
                           <p className="text-white font-semibold">{label}</p>
-                          <p className="text-crypto-primary">Price: ${data.price?.toLocaleString()}</p>
-                          <p className="text-crypto-light text-sm">Volume: ${(data.volume / 1000000).toFixed(1)}M</p>
+                          <p className="text-purple-500">Price: ${data.price?.toLocaleString()}</p>
+                          <p className="text-slate-300 text-sm">Volume: ${(data.volume / 1000000).toFixed(1)}M</p>
                           {data.sma20 && (
-                            <p className="text-crypto-secondary text-sm">SMA20: ${data.sma20.toLocaleString()}</p>
+                            <p className="text-cyan-400 text-sm">SMA20: ${data.sma20.toLocaleString()}</p>
                           )}
-                          {data.rsi && <p className="text-crypto-accent text-sm">RSI: {data.rsi.toFixed(1)}</p>}
+                          {data.rsi && <p className="text-blue-500 text-sm">RSI: {data.rsi.toFixed(1)}</p>}
                         </div>
                       )
                     }
@@ -188,7 +188,7 @@ export function CryptoChart({ coin, timeframe }: CryptoChartProps) {
                 <Area
                   type="monotone"
                   dataKey="price"
-                  stroke="hsl(var(--crypto-primary))"
+                  stroke="hsl(var(--purple-500))"
                   strokeWidth={3}
                   fill="url(#priceGradient)"
                 />
@@ -196,7 +196,7 @@ export function CryptoChart({ coin, timeframe }: CryptoChartProps) {
                 <Line
                   type="monotone"
                   dataKey="sma20"
-                  stroke="hsl(var(--crypto-secondary))"
+                  stroke="hsl(var(--cyan-400))"
                   strokeWidth={2}
                   dot={false}
                   strokeDasharray="5 5"
@@ -209,10 +209,10 @@ export function CryptoChart({ coin, timeframe }: CryptoChartProps) {
 
       {/* Volume and RSI Charts */}
       <div className="grid lg:grid-cols-2 gap-6">
-        <Card className="bg-crypto-dark/50 border-crypto-accent/20">
+        <Card className="bg-dark-navy/50 border-blue-500/20">
           <CardHeader>
             <CardTitle className="text-white">Trading Volume</CardTitle>
-            <CardDescription className="text-crypto-light">
+            <CardDescription className="text-slate-300">
               {timeframe} volume analysis • Avg: $
               {(data.reduce((sum, d) => sum + d.volume, 0) / data.length / 1000000).toFixed(0)}M
             </CardDescription>
@@ -223,29 +223,29 @@ export function CryptoChart({ coin, timeframe }: CryptoChartProps) {
                 <AreaChart data={data}>
                   <defs>
                     <linearGradient id="volumeGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(var(--crypto-secondary))" stopOpacity={0.4} />
-                      <stop offset="95%" stopColor="hsl(var(--crypto-secondary))" stopOpacity={0} />
+                      <stop offset="5%" stopColor="hsl(var(--cyan-400))" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="hsl(var(--cyan-400))" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <XAxis
                     dataKey="date"
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fill: "hsl(var(--crypto-light))", fontSize: 11 }}
+                    tick={{ fill: "hsl(var(--slate-300))", fontSize: 11 }}
                   />
                   <YAxis
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fill: "hsl(var(--crypto-light))", fontSize: 11 }}
+                    tick={{ fill: "hsl(var(--slate-300))", fontSize: 11 }}
                     tickFormatter={(value) => `${(value / 1000000).toFixed(0)}M`}
                   />
                   <ChartTooltip
                     content={({ active, payload, label }) => {
                       if (active && payload && payload.length) {
                         return (
-                          <div className="bg-crypto-darker border border-crypto-accent/20 rounded-lg p-3">
+                          <div className="bg-dark-navyer border border-blue-500/20 rounded-lg p-3">
                             <p className="text-white font-semibold">{label}</p>
-                            <p className="text-crypto-secondary">
+                            <p className="text-cyan-400">
                               Volume: ${((payload[0].value as number) / 1000000).toFixed(1)}M
                             </p>
                           </div>
@@ -257,7 +257,7 @@ export function CryptoChart({ coin, timeframe }: CryptoChartProps) {
                   <Area
                     type="monotone"
                     dataKey="volume"
-                    stroke="hsl(var(--crypto-secondary))"
+                    stroke="hsl(var(--cyan-400))"
                     strokeWidth={2}
                     fill="url(#volumeGradient)"
                   />
@@ -267,10 +267,10 @@ export function CryptoChart({ coin, timeframe }: CryptoChartProps) {
           </CardContent>
         </Card>
 
-        <Card className="bg-crypto-dark/50 border-crypto-accent/20">
+        <Card className="bg-dark-navy/50 border-blue-500/20">
           <CardHeader>
             <CardTitle className="text-white">RSI Indicator</CardTitle>
-            <CardDescription className="text-crypto-light">
+            <CardDescription className="text-slate-300">
               Relative Strength Index • Current: {data[data.length - 1]?.rsi?.toFixed(1) || "N/A"}
             </CardDescription>
           </CardHeader>
@@ -282,13 +282,13 @@ export function CryptoChart({ coin, timeframe }: CryptoChartProps) {
                     dataKey="date"
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fill: "hsl(var(--crypto-light))", fontSize: 11 }}
+                    tick={{ fill: "hsl(var(--slate-300))", fontSize: 11 }}
                   />
                   <YAxis
                     domain={[0, 100]}
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fill: "hsl(var(--crypto-light))", fontSize: 11 }}
+                    tick={{ fill: "hsl(var(--slate-300))", fontSize: 11 }}
                   />
                   <ChartTooltip
                     content={({ active, payload, label }) => {
@@ -296,10 +296,10 @@ export function CryptoChart({ coin, timeframe }: CryptoChartProps) {
                         const rsi = payload[0].value as number
                         const condition = rsi > 70 ? "Overbought" : rsi < 30 ? "Oversold" : "Neutral"
                         return (
-                          <div className="bg-crypto-darker border border-crypto-accent/20 rounded-lg p-3">
+                          <div className="bg-dark-navyer border border-blue-500/20 rounded-lg p-3">
                             <p className="text-white font-semibold">{label}</p>
-                            <p className="text-crypto-accent">RSI: {rsi.toFixed(1)}</p>
-                            <p className="text-crypto-light text-sm">{condition}</p>
+                            <p className="text-blue-500">RSI: {rsi.toFixed(1)}</p>
+                            <p className="text-slate-300 text-sm">{condition}</p>
                           </div>
                         )
                       }
@@ -309,7 +309,7 @@ export function CryptoChart({ coin, timeframe }: CryptoChartProps) {
                   {/* Overbought/Oversold lines */}
                   <Line y={70} stroke="hsl(var(--destructive))" strokeDasharray="3 3" />
                   <Line y={30} stroke="hsl(var(--destructive))" strokeDasharray="3 3" />
-                  <Line type="monotone" dataKey="rsi" stroke="hsl(var(--crypto-accent))" strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="rsi" stroke="hsl(var(--blue-500))" strokeWidth={2} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
             </ChartContainer>

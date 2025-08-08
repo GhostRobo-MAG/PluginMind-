@@ -1,0 +1,26 @@
+{
+  "name": "CoinGrok - AI Crypto Analysis",
+  "short_name": "CoinGrok",
+  "description": "AI-powered crypto analysis platform that transforms simple questions into deep, actionable insights",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0F0D1F",
+  "theme_color": "#8B5CF6",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logos/coingrok-logo-icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/logos/coingrok-logo-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "categories": ["finance", "productivity", "utilities"],
+  "lang": "en"
+}
