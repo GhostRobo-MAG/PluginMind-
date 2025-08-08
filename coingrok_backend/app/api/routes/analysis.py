@@ -7,10 +7,10 @@ using the 4-D Prompt Engine (OpenAI + Grok integration).
 
 import asyncio
 from datetime import datetime
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from app.core.logging import get_logger
 from app.api.dependencies import SessionDep
-from app.middleware.auth import UserDep
+from app.middleware.auth import get_current_user
 from app.models.schemas import (
     AnalysisRequest, 
     AnalysisResponse, 
@@ -27,7 +27,7 @@ router = APIRouter()
 
 
 @router.post("/analyze", response_model=AnalysisResponse)
-async def analyze(req: AnalysisRequest, session: SessionDep, user_id: UserDep):
+async def analyze(req: AnalysisRequest, session: SessionDep, user_id: str = Depends(get_current_user)):
     """
     Synchronous Crypto Analysis Endpoint (Protected)
     
@@ -54,32 +54,54 @@ async def analyze(req: AnalysisRequest, session: SessionDep, user_id: UserDep):
     
     try:
         # Get or create user in database
-        user = user_service.get_or_create_user(session, user_id)
+        try:
+            user = user_service.get_or_create_user(session, user_id)
+            logger.debug(f"Successfully retrieved/created user: {user.email if hasattr(user, 'email') else user_id}")
+        except Exception as db_error:
+            logger.error(f"Failed to get/create user {user_id}: {str(db_error)}")
+            raise HTTPException(
+                status_code=500,
+                detail="User account access failed. Please try again."
+            )
         
         # Check query limits
-        if not user_service.check_query_limit(user):
+        try:
+            if not user_service.check_query_limit(user):
+                logger.warning(f"Query limit exceeded for user {user_id}: {user.queries_used}/{user.queries_limit}")
+                raise HTTPException(
+                    status_code=429,
+                    detail=f"Query limit exceeded. Used {user.queries_used}/{user.queries_limit} queries."
+                )
+        except Exception as limit_error:
+            logger.error(f"Failed to check query limit for user {user_id}: {str(limit_error)}")
             raise HTTPException(
-                status_code=429,
-                detail=f"Query limit exceeded. Used {user.queries_used}/{user.queries_limit} queries."
+                status_code=500,
+                detail="Query limit check failed. Please try again."
             )
         
         # Increment user query count
-        user = user_service.increment_user_queries(session, user)
+        try:
+            user = user_service.increment_user_queries(session, user)
+            logger.debug(f"Incremented query count for user {user_id}: {user.queries_used}/{user.queries_limit}")
+        except Exception as increment_error:
+            logger.error(f"Failed to increment query count for user {user_id}: {str(increment_error)}")
+            # Don't fail the request for this, just log the error
         
         # Perform analysis with user tracking
         optimized_prompt, analysis_result = await analysis_service.perform_analysis_with_logging(
             req.user_input, session, user_id=user.google_id or user_id
         )
         
-        logger.info(f"Analysis completed for user: {user.email} ({user.queries_used}/{user.queries_limit} queries used)")
+        logger.info(f"Analysis completed for user: {user.email if hasattr(user, 'email') else user_id} ({user.queries_used}/{user.queries_limit} queries used)")
         
         return AnalysisResponse(
             optimized_prompt=optimized_prompt,
             analysis=analysis_result
         )
         
-    except HTTPException:
-        # Re-raise HTTP exceptions (like query limit exceeded)
+    except HTTPException as http_exc:
+        # Re-raise HTTP exceptions (like query limit exceeded) with enhanced logging
+        logger.warning(f"HTTP exception in analysis for user {user_id}: {http_exc.status_code} - {http_exc.detail}")
         raise
     except RateLimitError as e:
         raise HTTPException(status_code=429, detail=str(e))

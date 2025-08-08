@@ -69,13 +69,29 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
     Raises:
         HTTPException: 401 if token is missing or invalid
     """
+    from app.core.logging import get_logger
+    logger = get_logger(__name__)
+    
     if not credentials:
+        logger.warning("Authentication failed: Missing Authorization header")
         raise HTTPException(
             status_code=401,
-            detail="Authorization header required"
+            detail="Authentication required. Please provide a valid JWT token in the Authorization header."
         )
     
-    return verify_supabase_token(credentials.credentials)
+    try:
+        user_id = verify_supabase_token(credentials.credentials)
+        logger.debug(f"Authentication successful for user: {user_id}")
+        return user_id
+    except HTTPException as e:
+        logger.warning(f"Authentication failed: {e.detail}")
+        raise
+    except Exception as e:
+        logger.error(f"Unexpected authentication error: {str(e)}")
+        raise HTTPException(
+            status_code=401,
+            detail="Authentication failed due to invalid token"
+        )
 
 
 def get_current_user_optional(

@@ -136,10 +136,15 @@ export default function AnalyzePage() {
     setIsLoading(true)
 
     try {
-      const response = await fetch("http://localhost:8000/analyze", {
+      // For testing purposes, we'll use a valid temporary token
+      // In production, this would come from user authentication state
+      const tempToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LXVzZXItMTIzNDUiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE3NTQ2NTU5NTksImV4cCI6MTc1NDY1OTU1OX0.RklKBJTFtkZzIkm7A6wEkCebJYqLwG8ItV7jDziX4ng"
+      
+      const response = await fetch("http://localhost:8001/analyze", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${tempToken}`,
         },
         body: JSON.stringify({ user_input: input }),
       })
@@ -154,15 +159,36 @@ export default function AnalyzePage() {
         )
         setIsLoading(false)
       } else {
-      setTimeout(() => {
-          setAnalysisData(
-            getDefaultMock({
-              analysis: `Below is a comprehensive analysis of Ethereum (ETH) based on the specified parameters: a 7-day timeframe (covering approximately October 10-17, 2024, based on the most recent data available to me as of this response) and a $300 USD budget. As an AI crypto analyst, I've drawn from real-time market data sources (e.g., CoinMarketCap, CoinGecko), social media sentiment tools (e.g., LunarCrush for Twitter/X analysis), and news aggregators (e.g., CoinDesk, CryptoSlate). Note that cryptocurrency markets are highly volatile, and this analysis is for informational purposes only—not financial advice. Past performance does not guarantee future results. Always conduct your own research and consider consulting a financial advisor.\n\n### 1. Sentiment Analysis from Twitter (X) Over the Past 7 Days\nUsing sentiment analysis tools that aggregate and score tweets from Twitter (now X), I've evaluated over 50,000 ETH-related posts from October 10-17, 2024. The overall sentiment is **moderately positive**, with a sentiment score of +0.65 on a scale of -1 (extremely negative) to +1 (extremely positive). Key insights:\n\n- **Positive Drivers (60% of sentiment):** Enthusiasm around Ethereum's upcoming developments, such as the potential for Ethereum ETFs gaining more traction post-SEC approvals earlier in the year, and optimism about the Dencun upgrade's impact on layer-2 scaling (e.g., reducing fees). Influencers like Vitalik Buterin and popular accounts (@ethereum, @VitalikButerin) have driven bullish discussions, with hashtags like #ETH, #Ethereum, and #Web3 seeing high engagement. Viral tweets highlighted ETH's resilience amid broader market dips, with phrases like \"ETH to $4K\" trending.\n  \n- **Negative Drivers (30% of sentiment):** Concerns over regulatory scrutiny (e.g., SEC's stance on staking) and competition from faster blockchains like Solana. Some users expressed frustration with recent price volatility, with bearish tweets focusing on \"ETH dump\" or \"altcoin season over.\" Neutral sentiment (10%) came from technical discussions on gas fees and network congestion.\n\n- **Volume and Trends:** Tweet volume spiked 25% mid-week (October 13-14) due to Bitcoin's rally influencing ETH. Bullish-to-bearish tweet ratio was 2:1, but engagement (likes/retweets) favored positives. Overall, sentiment has improved from neutral last week, driven by ETF inflows and whale accumulations, but it's tempered by macroeconomic fears (e.g., U.S. inflation data).\n\nThis sentiment aligns with broader crypto trends, where ETH often mirrors Bitcoin's mood but benefits from its DeFi ecosystem hype.\n\n### 2. Summary of Recent News Impacting Ethereum\nOver the past 7 days, Ethereum has been influenced by a mix of positive ecosystem developments and external market pressures. Here's a curated summary of key news items (sourced from CoinDesk, Bloomberg, and Reuters):\n\n- **Positive News:**\n  - **ETF Inflows and Institutional Interest (October 12-15):** Spot Ethereum ETFs saw net inflows of ~$150 million this week, per Farside Investors data, boosting confidence. BlackRock's iShares Ethereum Trust (ETHA) crossed $1 billion in assets, signaling growing institutional adoption. This has been a tailwind, potentially pushing ETH toward $3,500 if inflows continue.\n  - **Dencun Upgrade Aftermath (Ongoing):** Post the March 2024 Dencun upgrade, layer-2 networks like Optimism and Arbitrum reported 20-30% fee reductions, leading to increased DeFi activity. News on October 14 highlighted a surge in ETH staked (now over 28% of supply), enhancing network security and yield opportunities.\n  - **Partnerships and Ecosystem Growth (October 11):** Ethereum-based projects like Uniswap announced integrations with new chains, and a report from Messari showed ETH's DeFi TVL (Total Value Locked) rising 5% to ~$50 billion, outpacing competitors.\n\n- **Negative/Neutral News:**\n  - **Regulatory Concerns (October 10-13):** The SEC delayed decisions on additional ETH-related products, and a lawsuit against Consensys (Ethereum software firm) raised staking regulation fears. This contributed to a brief price dip on October 13.\n  - **Market-Wide Pressures (October 16-17):** Broader crypto sell-offs tied to U.S. economic data (e.g., higher-than-expected CPI inflation) affected ETH, with correlations to Bitcoin dragging it down 3-4%. Additionally, competition from Solana's meme coin boom siphoned some retail interest.\n  - **Whale Activity (October 15):** On-chain data from Arkham Intelligence showed large ETH transfers to exchanges (potential selling pressure), but this was offset by accumulations from entities like the Ethereum Foundation.\n\nOverall, news has been net positive for long-term holders, emphasizing ETH's utility in DeFi and NFTs, but short-term volatility persists due to macro factors.\n\n### 3. Market Snapshot\nAs of October 17, 2024 (approx. 12:00 PM UTC; prices can fluctuate rapidly—check live sources for updates):\n\n- **Current Price:** $3,250 USD (down 2% from 7 days ago when it was ~$3,320). ETH has ranged between $3,100 (low on October 13) and $3,400 (high on October 15) over the past week, showing a slight upward trend in the last 48 hours.\n  \n- **Trading Volume:** 24-hour volume is ~$18 billion USD (up 15% from the 7-day average of $15.5 billion). This indicates strong liquidity and interest, with most volume on exchanges like Binance, Coinbase, and OKX. Weekly volume spiked on October 14 amid ETF news, reflecting institutional trading.\n\n- **Volatility:** Moderate to high, with a 7-day volatility index (based on standard deviation of price) at ~4.5% daily (compared to Bitcoin's 3.8%). ETH experienced swings of 5-7% on three days this week, driven by news events. The 30-day implied volatility (from options data) is around 60%, higher than traditional assets but typical for crypto. This suggests potential for quick gains or losses, especially with a $300 budget—expect possible 10-20% portfolio swings in a day.\n\nMarket cap stands at ~$390 billion (second to Bitcoin), with ETH/BTC ratio at 0.055 (stable, indicating ETH is holding ground against BTC).\n\n### 4. Buy, Sell, or Hold Recommendation\nBased on the analysis:\n- **Sentiment and News:** Moderately positive, with ETF inflows and ecosystem growth outweighing regulatory risks in the short term.\n- **Market Snapshot:** Price is consolidating around $3,200-$3,300, with potential for a breakout above $3,500 if Bitcoin rallies further. However, volatility and macro uncertainties (e.g., U.S. elections) add caution.\n- **Budget Consideration:** With $300 USD, you could buy ~0.092 ETH at current prices (factoring in ~1-2% exchange fees). This is a small position suitable for diversification, but crypto isn't ideal for tiny budgets due to fees and volatility—consider a reputable exchange like Coinbase for ease.\n\n**Recommendation: Hold (with a slight bias toward Buy for long-term holders).** If you already own ETH, hold through this consolidation phase as sentiment and news point to upside potential in the next 1-2 weeks (e.g., targeting $3,500+). If entering new, buy a small portion ($150-200 of your budget) now for potential short-term gains, and dollar-cost average the rest over the next few days to mitigate volatility. Avoid selling unless you need liquidity, as the 7-day trend shows resilience. Monitor for Bitcoin's movement—ETH often follows.\n\n### 5. Risk Score\n**7/10 (High Risk).** \n- **Rationale:** Ethereum's volatility (score boosted by recent swings) and regulatory uncertainties (e.g., SEC actions) elevate risk, especially in a 7-day window. Macro factors like inflation or geopolitical events could trigger sharp drops. However, it's not a 10 due to strong fundamentals (DeFi dominance, ETF support) and positive sentiment providing a buffer. With a $300 budget, risk is amplified—potential for 20-30% losses if the market dips, but also symmetric upside. Mitigate by using stop-loss orders (e.g., at 5-10% below entry) and avoiding leverage.\n\nIf you provide more details (e.g., your risk tolerance or existing portfolio), I can refine this analysis further. Remember, crypto investments carry the risk of total loss—invest only what you can afford to lose.`,
-            })
-          )
-          setIsLoading(false)
-         }, 12000)
-         return
+        // Handle different error status codes
+        let errorMessage = "Analysis request failed. Please try again."
+        
+        if (response.status === 401) {
+          errorMessage = "Authentication failed. Please log in and try again."
+        } else if (response.status === 403) {
+          errorMessage = "Access denied. Please check your permissions."
+        } else if (response.status === 429) {
+          errorMessage = "Query limit exceeded. Please upgrade your plan or try again later."
+        } else if (response.status >= 500) {
+          errorMessage = "Server error occurred. Please try again later."
+        }
+        
+        try {
+          const errorData = await response.json()
+          if (errorData.detail) {
+            errorMessage = errorData.detail
+          }
+        } catch (parseError) {
+          console.warn("Could not parse error response:", parseError)
+        }
+        
+        console.error("Analysis request failed:", response.status, errorMessage)
+        setAnalysisData(
+          getDefaultMock({
+            analysis: `## Analysis Request Failed\n\n**Error**: ${errorMessage}\n\n**Status Code**: ${response.status}\n\n**What to try next:**\n\n1. Check your internet connection\n2. Verify the backend server is running on port 8001\n3. If authentication is required, make sure you're logged in\n4. Try refreshing the page and submitting again\n\nIf the problem persists, please contact support.`,
+          })
+        )
+        setIsLoading(false)
+        return
       }
     } catch (error) {
       console.error("Analysis failed:", error)

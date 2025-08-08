@@ -5,10 +5,10 @@ Provides authenticated user access to their profile information,
 usage statistics, and account management features.
 """
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from app.core.logging import get_logger
 from app.api.dependencies import SessionDep
-from app.middleware.auth import UserDep
+from app.middleware.auth import get_current_user
 from app.services.user_service import user_service
 from app.models.schemas import UserProfile, UserUsage
 
@@ -17,7 +17,7 @@ router = APIRouter()
 
 
 @router.get("/me", response_model=UserProfile)
-async def get_current_user_profile(session: SessionDep, user_id: UserDep):
+async def get_current_user_profile(session: SessionDep, user_id: str = Depends(get_current_user)):
     """
     Get Current User Profile
     
@@ -53,7 +53,7 @@ async def get_current_user_profile(session: SessionDep, user_id: UserDep):
 
 
 @router.get("/me/usage", response_model=UserUsage)
-async def get_current_user_usage(session: SessionDep, user_id: UserDep):
+async def get_current_user_usage(session: SessionDep, user_id: str = Depends(get_current_user)):
     """
     Get Current User Usage Statistics
     
