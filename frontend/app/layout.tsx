@@ -4,6 +4,7 @@ import { GeistMono } from 'geist/font/mono'
 import './globals.css'
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000'),
   title: 'CoinGrok - AI Crypto Analysis',
   description: 'CoinGrok transforms your simple crypto questions into deep, actionable insights using our 4-D Prompt Engine powered by Grok xAI and OpenAI.',
   generator: 'CoinGrok',

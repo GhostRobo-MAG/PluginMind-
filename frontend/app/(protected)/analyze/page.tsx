@@ -13,6 +13,7 @@ import Link from "next/link"
 import { CryptoChart } from "@/components/crypto-chart"
 import { AnalysisResult } from "@/components/analysis-result"
 import { MarketInsights } from "@/components/market-insights"
+import { submitAnalysis } from "@/lib/api"
 
 interface AnalysisData {
   coin: string
@@ -136,60 +137,20 @@ export default function AnalyzePage() {
     setIsLoading(true)
 
     try {
-      const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+      console.log("🚀 analyze start:", input)
       
-      const response = await fetch("http://localhost:8000/analyze", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
-        },
-        body: JSON.stringify({ user_input: input }),
-      })
-
-      if (response.ok) {
-        const data = await response.json() // { analysis, optimized_prompt }
-        setAnalysisData(
-          getDefaultMock({
-            analysis: data.analysis,
-            // Optionally, you could parse optimized_prompt for coin/timeframe/investment if you want
-          })
-        )
-        setIsLoading(false)
-      } else {
-        // Handle different error status codes
-        let errorMessage = "Analysis request failed. Please try again."
-        
-        if (response.status === 401) {
-          errorMessage = "Authentication failed. Please log in and try again."
-        } else if (response.status === 403) {
-          errorMessage = "Access denied. Please check your permissions."
-        } else if (response.status === 429) {
-          errorMessage = "Query limit exceeded. Please upgrade your plan or try again later."
-        } else if (response.status >= 500) {
-          errorMessage = "Server error occurred. Please try again later."
-        }
-        
-        try {
-          const errorData = await response.json()
-          if (errorData.detail) {
-            errorMessage = errorData.detail
-          }
-        } catch (parseError) {
-          console.warn("Could not parse error response:", parseError)
-        }
-        
-        console.error("Analysis request failed:", response.status, errorMessage)
-        setAnalysisData(
-          getDefaultMock({
-            analysis: `## Analysis Request Failed\n\n**Error**: ${errorMessage}\n\n**Status Code**: ${response.status}\n\n**What to try next:**\n\n1. Check your internet connection\n2. Verify the backend server is running on port 8000\n3. If authentication is required, make sure you're logged in\n4. Try refreshing the page and submitting again\n\nIf the problem persists, please contact support.`,
-          })
-        )
-        setIsLoading(false)
-        return
-      }
+      const data = await submitAnalysis(input) // { analysis, optimized_prompt }
+      console.log("✅ analyze ok:", data)
+      
+      setAnalysisData(
+        getDefaultMock({
+          analysis: data.analysis,
+          // Optionally, you could parse optimized_prompt for coin/timeframe/investment if you want
+        })
+      )
+      setIsLoading(false)
     } catch (error) {
-      console.error("Analysis failed:", error)
+      console.error("❌ analyze fail:", error)
       setTimeout(() => {
         setAnalysisData(
           getDefaultMock({

@@ -36,7 +36,7 @@ class Settings:
         
         # API Configuration
         self.grok_api_url = "https://api.x.ai/v1/chat/completions"
-        self.openai_model = "gpt-4o"
+        self.openai_model = "gpt-5"
         self.grok_model = "grok-4-latest"
         
         # Database Configuration
@@ -67,8 +67,10 @@ class Settings:
         self.google_client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
 
         # Validation
-        if not all([self.supabase_url, self.supabase_anon_key, self.jwt_secret]):
-            raise ValueError("Missing required Supabase/JWT configuration")
+        if not all([self.supabase_url, self.supabase_anon_key]):
+            raise ValueError("Missing required Supabase configuration")
+        if not self.google_client_id:
+            raise ValueError("Missing required Google OAuth configuration")
     @property
     def connect_args(self) -> dict:
         """Get database connection arguments based on database type."""

@@ -1,46 +1,54 @@
 """
 Authentication middleware for CoinGrok Backend.
 
-Handles JWT token verification for Google OAuth via Supabase integration.
+Handles Google ID token verification using Google's public keys and RS256 algorithm.
 Provides FastAPI dependencies for both required and optional authentication.
 """
 
 from typing import Optional
 from fastapi import Request, HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from jose import jwt, JWTError
+from google.auth.transport import requests
+from google.oauth2 import id_token
 from app.core.config import settings
 
 
 security = HTTPBearer(auto_error=False)
 
 
-def verify_supabase_token(token: str) -> str:
+def verify_google_id_token(token: str) -> str:
     """
-    Verify and decode Supabase JWT token.
+    Verify and decode Google ID token using Google's public keys.
     
     Args:
-        token: JWT token string from Authorization header
+        token: Google ID token string from Authorization header
         
     Returns:
-        str: User ID extracted from token claims
+        str: User identifier (email) extracted from token claims
         
     Raises:
         HTTPException: 401 if token is invalid or missing required claims
     """
     try:
-        # Decode JWT using the secret from config
-        payload = jwt.decode(
-            token,
-            settings.jwt_secret,
-            algorithms=[settings.jwt_algorithm]
+        # Verify the token using Google's public keys and RS256
+        idinfo = id_token.verify_oauth2_token(
+            token, 
+            requests.Request(), 
+            settings.google_client_id
         )
         
-        # Extract user ID from token claims
-        user_id: str = payload.get("sub")
+        # Verify issuer
+        if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid token: wrong issuer"
+            )
+            
+        # Extract user identifier - prefer email over sub for user lookup
+        user_id = idinfo.get('email')
         if not user_id:
-            # Fallback to email if sub is not present
-            user_id = payload.get("email")
+            # Fallback to sub if email is not present
+            user_id = idinfo.get('sub')
             
         if not user_id:
             raise HTTPException(
@@ -50,10 +58,17 @@ def verify_supabase_token(token: str) -> str:
             
         return user_id
         
-    except JWTError as e:
+    except ValueError as e:
+        # Token verification failed
         raise HTTPException(
             status_code=401,
             detail=f"Invalid token: {str(e)}"
+        )
+    except Exception as e:
+        # Other errors during token verification
+        raise HTTPException(
+            status_code=401,
+            detail=f"Token verification failed: {str(e)}"
         )
 
 
@@ -80,7 +95,7 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
         )
     
     try:
-        user_id = verify_supabase_token(credentials.credentials)
+        user_id = verify_google_id_token(credentials.credentials)
         logger.debug(f"Authentication successful for user: {user_id}")
         return user_id
     except HTTPException as e:
@@ -111,7 +126,7 @@ def get_current_user_optional(
     if not credentials:
         return None
     
-    return verify_supabase_token(credentials.credentials)
+    return verify_google_id_token(credentials.credentials)
 
 
 # Dependency aliases for cleaner imports

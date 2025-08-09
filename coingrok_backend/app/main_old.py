@@ -196,7 +196,7 @@ async def process_analysis_background(job_id: str, user_input: str):
         logger.info(f"Job {job_id}: Requesting prompt optimization from OpenAI")
 
         ash_response = await openai_client.chat.completions.create(
-            model="gpt-4o",
+            model="gpt-5",
             messages=[
                 {"role": "system", "content": ASH_SYSTEM_PROMPT},
                 {"role": "user", "content": user_input},
@@ -278,7 +278,7 @@ async def process_analysis_background_db(job_id: str, user_input: str):
         logger.info(f"Job {job_id}: Requesting prompt optimization from OpenAI")
 
         ash_response = await openai_client.chat.completions.create(
-            model="gpt-4o",
+            model="gpt-5",
             messages=[
                 {"role": "system", "content": ASH_SYSTEM_PROMPT},
                 {"role": "user", "content": user_input},
@@ -411,7 +411,7 @@ async def analyze(
         logger.info("Requesting prompt optimization from OpenAI")
 
         ash_response = await openai_client.chat.completions.create(
-            model="gpt-4o",
+            model="gpt-5",
             messages=[
                 {"role": "system", "content": ASH_SYSTEM_PROMPT},
                 {"role": "user", "content": req.user_input},

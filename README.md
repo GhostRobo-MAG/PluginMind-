@@ -9,14 +9,14 @@
 
 CoinGrok is a full-stack web application that leverages OpenAI and Grok APIs to provide comprehensive cryptocurrency analysis. Simply ask natural language questions like "Analyze ETH over 7 days with $500" and get professional-grade insights including sentiment analysis, market data, and investment recommendations.
 
-## 🚀 Current Status (v1.2 - Phase 2 Complete)
+## 🚀 Current Status (v1.3 - Google Auth Complete)
 
-- **Backend:** FastAPI with SQLModel database integration ✅
-- **Frontend:** Modern Next.js 15 with TypeScript ✅
-- **Database:** PostgreSQL/SQLite with job storage migration complete ✅
-- **Authentication:** Google OAuth + JWT validation + user management ✅
+- **Backend:** FastAPI with Google ID token verification (RS256) ✅
+- **Frontend:** Next.js with `@react-oauth/google` integration ✅
+- **Database:** PostgreSQL/SQLite with user management ✅
+- **Authentication:** Native Google OAuth with secure token validation ✅
 - **Security:** Protected routes, usage tracking, query limits ✅
-- **API:** Auth-protected endpoints with auto user creation ✅
+- **API:** Centralized authentication wrapper with automatic token handling ✅
 
 ---
 
@@ -26,16 +26,17 @@ CoinGrok is a full-stack web application that leverages OpenAI and Grok APIs to 
 - **Python 3.11+** – Core application logic
 - **FastAPI** – High-performance async API framework
 - **SQLModel** – Type-safe database ORM with PostgreSQL/SQLite
-- **OpenAI API** – GPT-4 for prompt optimization
+- **OpenAI API** – GPT-5 for prompt optimization
 - **Grok xAI API** – Advanced crypto market analysis
 - **Pydantic v2** – Data validation and serialization
-- **python-jose** – JWT token validation for authentication
-- **Supabase** – Google OAuth and user management
+- **google-auth** – Google ID token verification (RS256)
+- **Supabase** – User database and management
 
 ### Frontend  
 - **Next.js 15** – React framework with App Router
 - **React 19** – Latest React with concurrent features
 - **TypeScript** – Type-safe JavaScript development
+- **@react-oauth/google** – Official Google OAuth for React
 - **Tailwind CSS** – Utility-first CSS framework
 - **shadcn/ui** – Modern component library
 - **Recharts** – Interactive data visualizations
@@ -178,10 +179,12 @@ cp .env.example .env
 # GROK_API_KEY=your-grok-key
 # DATABASE_URL=sqlite:///./coingrok.db
 
-# Optional: Configure for Phase 2 auth (see .env.example for full list)
+# Required for Google Auth (Phase 2)
+GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+
+# Optional: Configure Supabase for user management
 # SUPABASE_URL=https://your-project.supabase.co
 # SUPABASE_ANON_KEY=your-supabase-anon-key
-# JWT_SECRET=your-jwt-secret
 
 # Start the server
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
@@ -321,8 +324,8 @@ User management and subscription tracking:
 ## 🚀 Features Implemented
 
 ### **Authentication System**
-- **Google OAuth via Supabase** - Seamless social login integration
-- **JWT Token Verification** - Secure token validation using `python-jose`
+- **Native Google ID Token Verification** - Direct Google OAuth with RS256 algorithm
+- **google-auth Library** - Secure token validation using Google's public keys
 - **Middleware Protection** - Route-level authentication with dependency injection
 - **Auto User Creation** - First-time users automatically created with default settings
 
@@ -343,19 +346,19 @@ GET    /me/usage       # 🔒 Protected - Query usage statistics
 
 ### **Auth Flow**
 ```
-Google OAuth → Supabase → JWT Token → FastAPI Middleware → Protected Route
+Google OAuth → Google ID Token → FastAPI Verification → Protected Route
 ```
 
-1. **Client** triggers Google OAuth via Supabase
-2. **Supabase** returns JWT token with user claims
-3. **FastAPI** validates JWT using `python-jose` 
+1. **Client** triggers Google OAuth via `@react-oauth/google`
+2. **Google** returns ID token with user claims
+3. **FastAPI** validates token using `google-auth` with RS256 verification
 4. **Middleware** extracts user ID and provides `UserDep`/`OptionalUserDep`
 5. **Routes** get authenticated user automatically
 
 ### **Tech Stack**
 - **FastAPI Dependencies** - Clean dependency injection for auth
-- **python-jose[cryptography]** - JWT token validation
-- **Supabase** - OAuth provider and user management
+- **google-auth** - Google ID token verification with RS256
+- **@react-oauth/google** - Official React Google OAuth integration
 - **SQLModel** - Type-safe database operations
 - **HTTPBearer** - Secure header-based authentication
 
@@ -429,21 +432,29 @@ LOG_LEVEL=INFO
 DEBUG=false
 
 # Phase 2 Authentication (Required)
+GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+
+# Optional: Supabase for user management
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_ANON_KEY=your-supabase-anon-key
 SUPABASE_SERVICE_ROLE=your-supabase-service-role-key
-JWT_SECRET=your-super-secret-jwt-key
-GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=GOCSPX-your-google-client-secret
 
 # Optional Configuration
 JOB_CLEANUP_HOURS=24
 MAX_USER_INPUT_LENGTH=5000
 ```
 
-**Frontend (.env.local)**
+**Frontend (.env)**
 ```bash
-NEXT_PUBLIC_API_URL=https://your-backend-domain.com
+# Google OAuth Configuration
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+
+# Backend Configuration
+NEXT_PUBLIC_BACKEND_URL=https://your-backend-domain.com
+
+# Frontend Configuration
+NEXT_PUBLIC_FRONTEND_URL=https://your-frontend-domain.com
 ```
 
 ### Deployment Options
@@ -539,11 +550,14 @@ Access `/query-logs` endpoint to monitor:
 - [x] Security audit complete (secrets protected, .gitignore updated)
 
 ### ✅ Phase 2: Auth System (COMPLETE)
-- [x] Supabase Google login integration with JWT validation
-- [x] Backend JWT token validation middleware using python-jose
+- [x] Native Google ID token verification with RS256 algorithm
+- [x] Backend token validation using google-auth library
+- [x] Frontend auth with @react-oauth/google integration
 - [x] Secure /analyze route with UserDep authentication
 - [x] Auto user registration and profile management (/me endpoint)
 - [x] Usage tracking and query limit enforcement (/me/usage endpoint)
+- [x] Token expiry detection and automatic cleanup
+- [x] Protected routes with authentication middleware
 
 ### Phase 3: Business Features
 - [ ] Subscription tiers (Free/Pro/Premium)
