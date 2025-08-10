@@ -7,6 +7,10 @@ export interface DecodedToken {
   iat: number;
   email?: string;
   sub?: string;
+  name?: string;
+  picture?: string;
+  given_name?: string;
+  family_name?: string;
   [key: string]: any;
 }
 
@@ -95,7 +99,12 @@ export function logout(): void {
  * @param token - JWT token string
  * @returns User info or null if invalid
  */
-export function getUserFromToken(token: string): { email?: string; sub?: string } | null {
+export function getUserFromToken(token: string): { 
+  email?: string; 
+  sub?: string; 
+  name?: string; 
+  picture?: string;
+} | null {
   const decoded = decodeJWT(token);
   if (!decoded) {
     return null;
@@ -103,6 +112,9 @@ export function getUserFromToken(token: string): { email?: string; sub?: string 
 
   return {
     email: decoded.email,
-    sub: decoded.sub
+    sub: decoded.sub,
+    name: decoded.name || (decoded.given_name && decoded.family_name ? 
+      `${decoded.given_name} ${decoded.family_name}` : undefined),
+    picture: decoded.picture
   };
 }

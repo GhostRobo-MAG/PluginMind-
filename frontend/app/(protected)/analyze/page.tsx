@@ -8,11 +8,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
-import { Brain, Send, TrendingUp, DollarSign, Calendar, Loader2, ArrowLeft, LogOut } from "lucide-react"
+import { Brain, Send, TrendingUp, DollarSign, Calendar, Loader2, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { CryptoChart } from "@/components/crypto-chart"
 import { AnalysisResult } from "@/components/analysis-result"
 import { MarketInsights } from "@/components/market-insights"
+import { UserAvatar } from "@/components/auth/UserAvatar"
+import { AuthModal } from "@/components/auth/AuthModal"
+import { useAuth } from "@/hooks/useAuth"
 import { submitAnalysis } from "@/lib/api"
 
 interface AnalysisData {
@@ -99,6 +102,7 @@ function AnimatedEllipsis() {
 }
 
 export default function AnalyzePage() {
+  const { user, logout, isAuthenticated, isLoading: authLoading } = useAuth()
   const [query, setQuery] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null)
@@ -108,8 +112,16 @@ export default function AnalyzePage() {
     investment: "",
   })
   const [loadingStep, setLoadingStep] = useState(0)
+  const [showAuthModal, setShowAuthModal] = useState(false)
 
   const resultsRef = useRef<HTMLDivElement | null>(null)
+
+  // Show auth modal if user is not authenticated after loading completes
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      setShowAuthModal(true);
+    }
+  }, [authLoading, isAuthenticated]);
 
   useEffect(() => {
     if (analysisData && resultsRef.current) {
@@ -203,16 +215,15 @@ export default function AnalyzePage() {
               />
             </div>
           </div>
-          <Badge className="bg-purple-500/20 text-purple-500 border-purple-500/30">AI Analysis</Badge>
-          <Button variant="ghost" size="sm" asChild className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-500/90 hover:to-purple-600/90 shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-shadow duration-300">
-            <Button onClick={() => {
-              localStorage.removeItem("token");
-              window.location.href = "/";
-            }}>
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </Button>
-          </Button>
+          <div className="flex items-center space-x-4">
+            <Badge className="bg-purple-500/20 text-purple-500 border-purple-500/30">AI Analysis</Badge>
+            {user && (
+              <UserAvatar 
+                user={user} 
+                onLogout={logout} 
+              />
+            )}
+          </div>
         </div>
       </header>
 
@@ -441,6 +452,13 @@ export default function AnalyzePage() {
           </div>
         </div>
       </div>
+
+      {/* Auth Modal for direct access */}
+      <AuthModal 
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        redirectTo="/analyze"
+      />
     </div>
   )
 }

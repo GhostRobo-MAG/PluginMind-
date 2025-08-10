@@ -1,11 +1,30 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ArrowRight, Brain, TrendingUp, Zap, BarChart3, Shield, Sparkles } from "lucide-react"
+import { AuthModal } from "@/components/auth/AuthModal"
+import { UserAvatar } from "@/components/auth/UserAvatar"
+import { useAuth } from "@/hooks/useAuth"
 
 export default function LandingPage() {
+  const { isAuthenticated, user, logout } = useAuth();
+  const [showAuthModal, setShowAuthModal] = useState(false);
+
+  const handleStartAnalysis = () => {
+    if (isAuthenticated) {
+      // User is already authenticated, go directly to analyze
+      window.location.href = "/analyze";
+    } else {
+      // Show auth modal
+      setShowAuthModal(true);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-dark-navy via-darker-navy to-dark-navy">
       {/* Header */}
@@ -21,21 +40,28 @@ export default function LandingPage() {
               priority
             />
           </div>
-          <nav className="hidden md:flex items-center space-x-6">
-            <Link href="#features" className="text-slate-300 hover:text-purple-500 transition-colors">
-              Features
-            </Link>
-            <Link href="#how-it-works" className="text-slate-300 hover:text-purple-500 transition-colors">
-              How it Works
-            </Link>
-            <Button
-              asChild
-              variant="outline"
-              className="border-purple-500 text-purple-500 hover:bg-purple-500 hover:text-white bg-transparent hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
-            >
-              <Link href="/analyze">Try Now</Link>
-            </Button>
-          </nav>
+          <div className="flex items-center space-x-6">
+            <nav className="hidden md:flex items-center space-x-6">
+              <Link href="#features" className="text-slate-300 hover:text-purple-500 transition-colors">
+                Features
+              </Link>
+              <Link href="#how-it-works" className="text-slate-300 hover:text-purple-500 transition-colors">
+                How it Works
+              </Link>
+              {!isAuthenticated && (
+                <Button
+                  onClick={handleStartAnalysis}
+                  variant="outline"
+                  className="border-purple-500 text-purple-500 hover:bg-purple-500 hover:text-white bg-transparent hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
+                >
+                  Try Now
+                </Button>
+              )}
+            </nav>
+            {isAuthenticated && user && (
+              <UserAvatar user={user} onLogout={logout} />
+            )}
+          </div>
         </div>
       </header>
 
@@ -68,13 +94,11 @@ export default function LandingPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button
-              asChild
+              onClick={handleStartAnalysis}
               size="lg"
               className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-500/90 hover:to-purple-600/90 text-white px-8 py-3 text-lg shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-shadow duration-300"
             >
-              <Link href="/analyze">
-                Start Analysis <ArrowRight className="ml-2 w-5 h-5" />
-              </Link>
+              {isAuthenticated ? "Go to Analysis" : "Start Analysis"} <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
             <Button
               variant="outline"
@@ -206,13 +230,11 @@ export default function LandingPage() {
             Join thousands of traders who trust CoinGrok for their crypto analysis needs
           </p>
           <Button
-            asChild
+            onClick={handleStartAnalysis}
             size="lg"
             className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-500/90 hover:to-purple-600/90 text-white px-8 py-3 text-lg shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-shadow duration-300"
           >
-            <Link href="/analyze">
-              Start Your Analysis <ArrowRight className="ml-2 w-5 h-5" />
-            </Link>
+            {isAuthenticated ? "Go to Analysis" : "Start Your Analysis"} <ArrowRight className="ml-2 w-5 h-5" />
           </Button>
         </div>
       </section>
@@ -232,6 +254,13 @@ export default function LandingPage() {
           <p className="text-slate-300">© 2024 CoinGrok. AI-powered crypto analysis for the modern trader.</p>
         </div>
       </footer>
+
+      {/* Auth Modal */}
+      <AuthModal 
+        isOpen={showAuthModal} 
+        onClose={() => setShowAuthModal(false)}
+        redirectTo="/analyze"
+      />
     </div>
   )
 }

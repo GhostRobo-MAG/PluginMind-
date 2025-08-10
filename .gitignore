@@ -6,6 +6,7 @@ __pycache__/
 .idea/
 venv/
 .env
+.main_old.py
 
 # Database files
 *.db

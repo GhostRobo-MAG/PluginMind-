@@ -7,7 +7,7 @@ import { getValidToken, logout, getUserFromToken } from '@/lib/auth';
 export interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
-  user: { email?: string; sub?: string } | null;
+  user: { email?: string; sub?: string; name?: string; picture?: string } | null;
   token: string | null;
 }
 
