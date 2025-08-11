@@ -57,6 +57,16 @@ async def lifespan(app: FastAPI):
         raise
     finally:
         # Shutdown
+        logger.info("Starting application shutdown")
+        
+        # Gracefully close HTTP client connections
+        try:
+            from app.utils.http import http_client
+            await http_client.close()
+            logger.info("HTTP client connections closed gracefully")
+        except Exception as e:
+            logger.warning(f"Error during HTTP client shutdown: {str(e)}")
+        
         logger.info("Application shutdown completed")
 
 

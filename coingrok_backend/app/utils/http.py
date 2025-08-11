@@ -85,7 +85,7 @@ class HTTPClient:
                     return response
                 elif response.status_code == 429 or 500 <= response.status_code <= 599:
                     # Transient failure - will retry
-                    logger.warn(
+                    logger.warning(
                         "HTTP request failed with status %d, will retry (attempt %d/%d, request_id=%s)",
                         response.status_code, attempt + 1, settings.http_max_retries + 1, request_id
                     )
@@ -106,7 +106,7 @@ class HTTPClient:
                     
             except httpx.RequestError as e:
                 # Network-level error - transient
-                logger.warn(
+                logger.warning(
                     "HTTP request network error, will retry (attempt %d/%d, request_id=%s): %s",
                     attempt + 1, settings.http_max_retries + 1, request_id, str(e)
                 )
