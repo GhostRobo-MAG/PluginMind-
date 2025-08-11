@@ -55,46 +55,56 @@ CoinGrok is a full-stack web application that leverages OpenAI and Grok APIs to 
 ```
 coingrok_backend/
 ├── app/
-│   ├── main.py                 # FastAPI app initialization (118 lines)
-│   ├── database.py            # Database engine & session management  
-│   ├── ash_prompt.py          # 4-D Prompt Engine system prompt
+│   ├── main.py                    # FastAPI app initialization with graceful shutdown
+│   ├── database.py               # Database engine & session management  
+│   ├── ash_prompt.py             # 4-D Prompt Engine system prompt
 │   │
-│   ├── core/                  # Core infrastructure
-│   │   ├── config.py         # Environment settings & validation
-│   │   ├── logging.py        # Centralized logging setup
-│   │   └── exceptions.py     # Custom exception classes
+│   ├── core/                     # Core infrastructure
+│   │   ├── config.py            # Environment settings & validation
+│   │   ├── logging.py           # Centralized logging setup
+│   │   └── exceptions.py        # Custom exception classes
 │   │
-│   ├── api/                   # API layer
-│   │   ├── dependencies.py   # FastAPI dependencies (DB sessions)
-│   │   └── routes/           # Endpoint handlers
-│   │       ├── analysis.py   # /analyze, /analyze-async (auth-protected)
-│   │       ├── users.py      # /me, /me/usage (user profiles)
-│   │       ├── jobs.py       # /jobs management
-│   │       ├── health.py     # /health monitoring
-│   │       └── query_logs.py # /query-logs analytics
+│   ├── api/                      # API layer
+│   │   ├── dependencies.py      # FastAPI dependencies (DB sessions)
+│   │   ├── dependencies_rate_limit.py # Rate limiting dependencies
+│   │   └── routes/              # Endpoint handlers
+│   │       ├── analysis.py      # /analyze, /analyze-async (auth-protected)
+│   │       ├── users.py         # /me, /me/usage (user profiles)
+│   │       ├── jobs.py          # /jobs management with UUID validation
+│   │       ├── health.py        # /health, /live, /ready, /version endpoints
+│   │       └── query_logs.py    # /query-logs analytics
 │   │
-│   ├── services/              # Business logic layer
-│   │   ├── openai_service.py # OpenAI integration (4-D Engine)
-│   │   ├── grok_service.py   # Grok/xAI integration
-│   │   ├── analysis_service.py # Orchestration & logging
-│   │   └── user_service.py   # User management & usage tracking
+│   ├── services/                 # Business logic layer
+│   │   ├── openai_service.py    # OpenAI integration (4-D Engine)
+│   │   ├── grok_service.py      # Grok/xAI integration
+│   │   ├── analysis_service.py  # Orchestration & logging
+│   │   └── user_service.py      # User management & usage tracking
 │   │
-│   ├── models/                # Data layer
-│   │   ├── database.py       # SQLModel tables (jobs, users, logs)
-│   │   ├── schemas.py        # Pydantic request/response models
-│   │   └── enums.py          # Status enums & constants
+│   ├── models/                   # Data layer
+│   │   ├── database.py          # SQLModel tables (jobs, users, logs)
+│   │   ├── schemas.py           # Pydantic request/response models
+│   │   └── enums.py             # Status enums & constants
 │   │
-│   ├── middleware/            # Cross-cutting concerns
-│   │   ├── auth.py           # JWT validation & auth dependencies
-│   │   ├── cors.py           # CORS configuration
-│   │   └── error_handler.py  # Global exception handling
+│   ├── middleware/               # Cross-cutting concerns
+│   │   ├── auth.py              # JWT validation & auth dependencies
+│   │   ├── cors.py              # CORS configuration
+│   │   ├── error_handler.py     # Global exception handling
+│   │   ├── security_headers.py  # Production HTTP security headers
+│   │   ├── request_limits.py    # Request body size limits
+│   │   └── correlation_id.py    # Request tracing with correlation IDs
 │   │
-│   └── utils/                 # Utilities
-│       └── background_tasks.py # Async job processing
+│   └── utils/                    # Utilities
+│       ├── background_tasks.py  # Async job processing
+│       ├── http.py              # Resilient HTTP client with retries
+│       └── rate_limit.py        # Token-bucket rate limiting
 │
-├── requirements.txt           # Python dependencies
-├── .env.example              # Environment template
-└── .gitignore               # Security & cleanup
+├── scripts/
+│   └── smoke_backend.sh          # Comprehensive production smoke test
+│
+├── gunicorn_conf.py             # Production WSGI server configuration
+├── requirements.txt             # Python dependencies (includes Gunicorn)
+├── .env.example                # Environment template with production vars
+└── .gitignore                  # Security & cleanup
 ```
 
 ### Frontend Structure
@@ -514,6 +524,109 @@ DATABASE_URL=postgresql://username:password@host:5432/database
 ```bash
 DATABASE_URL=sqlite:///./coingrok.db
 ```
+
+## Production Deployment
+
+### Process Management with Gunicorn
+
+The backend includes production-ready Gunicorn configuration with environment-driven settings:
+
+```bash
+# Start with Gunicorn (production)
+cd coingrok_backend
+gunicorn app.main:app --config gunicorn_conf.py
+
+# Key production features:
+# - Environment-driven worker count and timeouts
+# - Correlation ID access logging for request tracing
+# - Graceful worker restarts and memory management
+# - Production-optimized connection pools
+```
+
+**Environment Variables for Production:**
+```bash
+# Process Management
+GUNICORN_WORKERS=4                    # CPU cores * 2 + 1
+GUNICORN_TIMEOUT=300                  # 5min timeout (matches AI call budget)
+GUNICORN_MAX_REQUESTS=1000           # Restart workers after N requests
+GUNICORN_MAX_REQUESTS_JITTER=100     # Add randomness to prevent thundering herd
+
+# HTTP Client Configuration  
+HTTP_TIMEOUT_SECONDS=120             # Timeout for OpenAI/Grok calls
+HTTP_MAX_RETRIES=1                   # Retry failed requests once
+HTTP_RETRY_BACKOFF_BASE=2.0         # Exponential backoff multiplier
+
+# Request Protection
+REQUEST_SIZE_LIMIT_MB=1              # Max request body size
+RATE_LIMIT_REQUESTS_PER_MINUTE=10   # Rate limiting per IP/user
+```
+
+### Production Security Features
+
+**HTTP Security Headers (Automatic):**
+- Content Security Policy (CSP) with safe defaults
+- X-Frame-Options: DENY (prevents clickjacking)
+- X-Content-Type-Options: nosniff (MIME type protection)
+- Strict-Transport-Security (HSTS) in production only
+- X-Request-ID correlation headers for tracing
+
+**Request Protection:**
+- Body size limits (1MB default, configurable)
+- Token-bucket rate limiting with IP/user-based tracking
+- UUID validation for all job endpoints
+- CORS configured for specific frontend domains only
+
+**Application Security:**
+- FastAPI docs/OpenAPI disabled in production (`DEBUG=false`)
+- Graceful HTTP client connection management
+- Structured logging with correlation IDs for request tracing
+- Resilient HTTP calls with exponential backoff retry logic
+
+### Health Monitoring
+
+Production-ready health endpoints for container orchestration:
+
+```bash
+# Kubernetes/Docker health checks
+GET /live     # Liveness probe (always returns 200)
+GET /ready    # Readiness probe (checks dependencies)
+GET /health   # Detailed health with active job count
+GET /version  # Build info (name, version, git SHA)
+```
+
+### Quality Assurance Script
+
+Run comprehensive smoke tests before deployment:
+
+```bash
+# Test all production features
+chmod +x scripts/smoke_backend.sh
+
+# Test against local development
+BASE=http://localhost:8000 ./scripts/smoke_backend.sh
+
+# Test against staging/production (with auth token)
+BASE=https://api.coingrok.com TOKEN=jwt_token ./scripts/smoke_backend.sh
+
+# Tests include:
+# ✅ Health endpoints and JSON responses
+# ✅ Security headers (CSP, HSTS, X-Frame-Options)  
+# ✅ CORS configuration and preflight requests
+# ✅ Authentication flows (with/without tokens)
+# ✅ Request size limits (413 for >1MB requests)
+# ✅ Rate limiting (429 after multiple requests)
+```
+
+### Production Readiness Checklist
+
+- [x] **Process Management**: Gunicorn with environment-driven configuration
+- [x] **Security Headers**: CSP, HSTS, X-Frame-Options, request correlation
+- [x] **Request Protection**: Size limits, rate limiting, input validation
+- [x] **Resilient HTTP**: Retry logic, exponential backoff, graceful timeouts
+- [x] **Health Monitoring**: Liveness, readiness, and detailed health endpoints
+- [x] **Observability**: Correlation ID tracing, structured logging, performance metrics
+- [x] **Quality Assurance**: Comprehensive smoke test script for pre-deployment validation
+- [x] **Graceful Shutdown**: Proper cleanup of HTTP clients and background tasks
 
 ---
 
