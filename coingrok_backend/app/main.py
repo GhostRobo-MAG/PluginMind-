@@ -43,7 +43,7 @@ async def lifespan(app: FastAPI):
     - Shutdown: Cleanup resources (if needed)
     """
     # Startup
-    logger.info(f"Starting {settings.app_name} v{settings.version}")
+    logger.info(f"Starting {settings.app_name} v{settings.version} debug={settings.debug} log_level={settings.log_level}")
     
     try:
         # Initialize database

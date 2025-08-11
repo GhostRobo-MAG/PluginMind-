@@ -35,7 +35,8 @@ def setup_cors(app: FastAPI) -> None:
             "Accept-Language", 
             "Content-Language",
             "Content-Type",
-            "Authorization",  # For future authentication
+            "Authorization",  # For authentication
+            "X-CSRF-Token",   # For CSRF protection
         ],
         max_age=86400,  # Cache preflight requests for 24 hours (performance)
     )

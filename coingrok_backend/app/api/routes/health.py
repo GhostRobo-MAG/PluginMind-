@@ -5,12 +5,16 @@ Provides application health monitoring and system status information
 for load balancers and monitoring systems.
 """
 
+import os
 import asyncio
 from datetime import datetime, timedelta
 from typing import Dict, Any
 from fastapi import APIRouter, HTTPException
+from sqlmodel import text
 from app.core.logging import get_logger
+from app.core.config import settings
 from app.models.schemas import HealthResponse
+from app.api.dependencies import SessionDep
 
 logger = get_logger(__name__)
 router = APIRouter()
@@ -59,3 +63,89 @@ async def health_check():
     except Exception as e:
         logger.error(f"Health check failed: {str(e)}")
         raise HTTPException(status_code=503, detail="Service unavailable")
+
+
+@router.get("/live")
+async def liveness_check():
+    """
+    Liveness probe endpoint.
+    
+    Always returns 200 to indicate the service process is running.
+    Used by orchestrators (K8s, Docker) to determine if container should be restarted.
+    
+    Returns:
+        dict: Simple live status
+    """
+    return {"status": "live"}
+
+
+@router.get("/ready")
+async def readiness_check(session: SessionDep):
+    """
+    Readiness probe endpoint.
+    
+    Performs comprehensive checks to determine if service is ready to accept traffic.
+    Checks database connectivity and required environment variables.
+    
+    Args:
+        session: Database session for connectivity check
+        
+    Returns:
+        dict: Readiness status with check details
+        
+    Raises:
+        HTTPException: 503 if any readiness checks fail
+    """
+    checks = {}
+    all_ready = True
+    
+    # Database connectivity check
+    try:
+        session.exec(text("SELECT 1"))
+        checks["db"] = "ok"
+        logger.debug("Database readiness check passed")
+    except Exception as e:
+        checks["db"] = f"failed: {str(e)}"
+        all_ready = False
+        logger.warning(f"Database readiness check failed: {str(e)}")
+    
+    # Required environment variables check
+    env_issues = []
+    if not settings.openai_api_key:
+        env_issues.append("OPENAI_API_KEY missing")
+    if not settings.grok_api_key:
+        env_issues.append("GROK_API_KEY missing")
+    
+    if env_issues:
+        checks["env"] = f"failed: {', '.join(env_issues)}"
+        all_ready = False
+        logger.warning(f"Environment readiness check failed: {', '.join(env_issues)}")
+    else:
+        checks["env"] = "ok"
+        logger.debug("Environment readiness check passed")
+    
+    if all_ready:
+        return {"status": "ready", "checks": checks}
+    else:
+        raise HTTPException(
+            status_code=503,
+            detail={"status": "not_ready", "checks": checks}
+        )
+
+
+@router.get("/version")
+async def version_info():
+    """
+    Version information endpoint.
+    
+    Returns application name, version, and git SHA for deployment tracking.
+    Useful for verifying deployments and debugging version-specific issues.
+    
+    Returns:
+        dict: Application version information
+    """
+    return {
+        "name": settings.app_name,
+        "version": settings.version,
+        "git_sha": os.getenv("GIT_SHA", "-")
+    }
