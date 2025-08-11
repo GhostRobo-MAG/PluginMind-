@@ -61,13 +61,24 @@ async def lifespan(app: FastAPI):
 
 
 # Initialize FastAPI application
-app = FastAPI(
-    title=settings.app_name,
-    description="AI-powered cryptocurrency analysis service using OpenAI and Grok",
-    version=settings.version,
-    lifespan=lifespan,
-    debug=settings.debug,
-)
+# Disable docs and OpenAPI in production for security
+fastapi_kwargs = {
+    "title": settings.app_name,
+    "description": "AI-powered cryptocurrency analysis service using OpenAI and Grok",
+    "version": settings.version,
+    "lifespan": lifespan,
+    "debug": settings.debug,
+}
+
+if not settings.debug:
+    # Production mode: disable interactive docs and OpenAPI
+    fastapi_kwargs.update({
+        "docs_url": None,
+        "redoc_url": None,
+        "openapi_url": None,
+    })
+
+app = FastAPI(**fastapi_kwargs)
 
 # Setup middleware (order matters - correlation ID first for logging)
 setup_cors(app)
