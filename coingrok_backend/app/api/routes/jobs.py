@@ -5,6 +5,7 @@ Provides endpoints for listing, monitoring, and managing analysis jobs
 for debugging and administrative purposes.
 """
 
+from uuid import UUID
 from fastapi import APIRouter, HTTPException
 from sqlmodel import select
 from app.core.logging import get_logger
@@ -48,7 +49,7 @@ async def list_jobs(session: SessionDep):
 
 
 @router.delete("/jobs/{job_id}")
-async def delete_job(job_id: str, session: SessionDep):
+async def delete_job(job_id: UUID, session: SessionDep):
     """
     Delete Analysis Job
     
@@ -65,7 +66,7 @@ async def delete_job(job_id: str, session: SessionDep):
     Raises:
         HTTPException: If job is not found
     """
-    statement = select(AnalysisJob).where(AnalysisJob.job_id == job_id)
+    statement = select(AnalysisJob).where(AnalysisJob.job_id == str(job_id))
     job = session.exec(statement).first()
     
     if not job:

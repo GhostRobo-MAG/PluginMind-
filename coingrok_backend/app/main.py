@@ -23,6 +23,7 @@ from app.middleware.cors import setup_cors
 from app.middleware.error_handler import setup_error_handlers
 from app.middleware.security_headers import SecurityHeadersMiddleware
 from app.middleware.request_limits import RequestSizeLimitMiddleware
+from app.middleware.correlation_id import CorrelationIdMiddleware
 
 # API Routes
 from app.api.routes import health, analysis, jobs, query_logs, users
@@ -68,8 +69,9 @@ app = FastAPI(
     debug=settings.debug,
 )
 
-# Setup middleware
+# Setup middleware (order matters - correlation ID first for logging)
 setup_cors(app)
+app.add_middleware(CorrelationIdMiddleware)
 app.add_middleware(RequestSizeLimitMiddleware)
 app.add_middleware(SecurityHeadersMiddleware)
 setup_error_handlers(app)

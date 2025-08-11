@@ -6,10 +6,18 @@ serialization, and documentation.
 """
 
 from datetime import datetime
+from enum import Enum
 from typing import Optional
 from pydantic import BaseModel, Field, field_validator
 
 from app.core.config import settings
+
+
+class SubscriptionTier(str, Enum):
+    """Enumeration of subscription tiers."""
+    FREE = "free"
+    PRO = "pro" 
+    PREMIUM = "premium"
 
 
 class AnalysisRequest(BaseModel):
@@ -39,11 +47,14 @@ class AnalysisRequest(BaseModel):
             Cleaned and validated input string
             
         Raises:
-            ValueError: If input is empty or whitespace only
+            ValueError: If input is empty or whitespace only after strip
         """
-        if not v.strip():
+        stripped = v.strip()
+        if not stripped:
             raise ValueError("User input cannot be empty or whitespace only")
-        return v.strip()
+        if len(stripped) < 1:
+            raise ValueError("User input must be at least 1 character after trimming whitespace")
+        return stripped
 
 
 class JobResponse(BaseModel):
@@ -99,7 +110,7 @@ class UserProfile(BaseModel):
     id: int = Field(description="User database ID")
     email: str = Field(description="User email address")
     google_id: Optional[str] = Field(None, description="Google OAuth user ID")
-    subscription_tier: str = Field(description="Subscription level (free, pro, premium)")
+    subscription_tier: SubscriptionTier = Field(description="Subscription level")
     is_active: bool = Field(description="Account active status")
     created_at: datetime = Field(description="Account creation timestamp")
 
@@ -109,5 +120,5 @@ class UserUsage(BaseModel):
     queries_used: int = Field(description="Number of queries used in current billing period")
     queries_limit: int = Field(description="Monthly query limit based on subscription tier")
     remaining_queries: int = Field(description="Calculated remaining queries")
-    subscription_tier: str = Field(description="Current subscription tier")
+    subscription_tier: SubscriptionTier = Field(description="Current subscription tier")
     can_make_query: bool = Field(description="Whether user can make another query")
