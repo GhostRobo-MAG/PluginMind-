@@ -5,7 +5,7 @@ Handles Google ID token verification using Google's public keys and RS256 algori
 Provides FastAPI dependencies for both required and optional authentication.
 """
 
-from typing import Optional
+from typing import Optional, Dict, Any
 from fastapi import Request, HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from google.auth.transport import requests
@@ -14,6 +14,65 @@ from app.core.config import settings
 
 
 security = HTTPBearer(auto_error=False)
+
+
+def verify_google_id_token_claims(token: str) -> Dict[str, Any]:
+    """
+    Verify and decode Google ID token using Google's public keys with explicit validation.
+    
+    This helper function returns the raw claims dict for unit testing and internal use.
+    
+    Args:
+        token: Google ID token string from Authorization header
+        
+    Returns:
+        Dict[str, Any]: Token claims dictionary
+        
+    Raises:
+        HTTPException: 401 if token is invalid or missing required claims
+    """
+    try:
+        # Verify the token using Google's public keys and RS256
+        # Note: Clock skew tolerance is handled internally by Google's library
+        # which allows for small time differences in exp/iat/nbf claims
+        idinfo = id_token.verify_oauth2_token(
+            token, 
+            requests.Request(), 
+            settings.google_client_id
+        )
+        
+        # Explicit audience validation
+        token_audience = idinfo.get("aud")
+        if token_audience != settings.google_client_id:
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid audience"
+            )
+        
+        # Verify issuer
+        if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid token: wrong issuer"
+            )
+            
+        return idinfo
+        
+    except ValueError as e:
+        # Token verification failed (includes signature, expiry, and format validation)
+        raise HTTPException(
+            status_code=401,
+            detail=f"Invalid token: {str(e)}"
+        )
+    except HTTPException:
+        # Re-raise our own HTTP exceptions (audience, issuer validation)
+        raise
+    except Exception as e:
+        # Other errors during token verification
+        raise HTTPException(
+            status_code=401,
+            detail=f"Token verification failed: {str(e)}"
+        )
 
 
 def verify_google_id_token(token: str) -> str:
@@ -29,47 +88,21 @@ def verify_google_id_token(token: str) -> str:
     Raises:
         HTTPException: 401 if token is invalid or missing required claims
     """
-    try:
-        # Verify the token using Google's public keys and RS256
-        idinfo = id_token.verify_oauth2_token(
-            token, 
-            requests.Request(), 
-            settings.google_client_id
-        )
+    idinfo = verify_google_id_token_claims(token)
+    
+    # Extract user identifier - prefer email over sub for user lookup
+    user_id = idinfo.get('email')
+    if not user_id:
+        # Fallback to sub if email is not present
+        user_id = idinfo.get('sub')
         
-        # Verify issuer
-        if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
-            raise HTTPException(
-                status_code=401,
-                detail="Invalid token: wrong issuer"
-            )
-            
-        # Extract user identifier - prefer email over sub for user lookup
-        user_id = idinfo.get('email')
-        if not user_id:
-            # Fallback to sub if email is not present
-            user_id = idinfo.get('sub')
-            
-        if not user_id:
-            raise HTTPException(
-                status_code=401,
-                detail="Invalid token: missing user identifier"
-            )
-            
-        return user_id
-        
-    except ValueError as e:
-        # Token verification failed
+    if not user_id:
         raise HTTPException(
             status_code=401,
-            detail=f"Invalid token: {str(e)}"
+            detail="Invalid token: missing user identifier"
         )
-    except Exception as e:
-        # Other errors during token verification
-        raise HTTPException(
-            status_code=401,
-            detail=f"Token verification failed: {str(e)}"
-        )
+        
+    return user_id
 
 
 def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> str:

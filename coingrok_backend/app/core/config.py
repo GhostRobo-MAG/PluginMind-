@@ -53,6 +53,12 @@ class Settings:
         # Job Configuration
         self.job_cleanup_hours = int(os.getenv("JOB_CLEANUP_HOURS", "1"))
         self.max_user_input_length = int(os.getenv("MAX_USER_INPUT_LENGTH", "5000"))
+        
+        # HTTP Client Configuration
+        self.http_timeout_seconds = float(os.getenv("HTTP_TIMEOUT_SECONDS", "120"))
+        self.http_max_retries = int(os.getenv("HTTP_MAX_RETRIES", "1"))
+        self.http_retry_backoff_base = float(os.getenv("HTTP_RETRY_BACKOFF_BASE", "0.5"))
+        self.grok_timeout_seconds = float(os.getenv("GROK_TIMEOUT_SECONDS", "200"))
         # Supabase Configuration
         self.supabase_url = os.getenv("SUPABASE_URL")
         self.supabase_anon_key = os.getenv("SUPABASE_ANON_KEY")

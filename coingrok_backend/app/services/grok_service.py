@@ -5,11 +5,15 @@ Handles all interactions with Grok (xAI) API for the final analysis
 step of the 4-D Prompt Engine (Deliver phase).
 """
 
-from xai_sdk import AsyncClient
-from xai_sdk.chat import user, system
+import json
+import uuid
+from typing import Optional
+import httpx
+from fastapi import HTTPException
 from app.core.config import settings
 from app.core.logging import get_logger
 from app.core.exceptions import AIServiceError, RateLimitError
+from app.utils.http import http_client
 
 logger = get_logger(__name__)
 
@@ -19,13 +23,66 @@ class GrokService:
     Service class for Grok (xAI) API interactions.
     
     Handles crypto market analysis using Grok's AI capabilities.
-    Provides comprehensive error handling and logging.
+    Provides resilient HTTP calls with retries, timeouts, and error handling.
     """
     
     def __init__(self):
-        """Initialize Grok client with API key from settings."""
-        self.client = AsyncClient(api_key=settings.grok_api_key)
-        logger.info("Grok service initialized")
+        """Initialize Grok service."""
+        self.api_url = settings.grok_api_url
+        logger.info("Grok service initialized with resilient HTTP client")
+    
+    async def _request_with_retries(
+        self, 
+        payload: dict, 
+        request_id: Optional[str] = None
+    ) -> dict:
+        """
+        Make resilient HTTP request to Grok API with retries.
+        
+        Args:
+            payload: Request payload for Grok API
+            request_id: Optional correlation ID for logging
+            
+        Returns:
+            dict: Response from Grok API
+            
+        Raises:
+            HTTPException: 502 on failure after retries
+        """
+        if not request_id:
+            request_id = str(uuid.uuid4())[:8]
+        
+        headers = {
+            "Authorization": f"Bearer {settings.grok_api_key}",
+            "Content-Type": "application/json",
+        }
+        
+        try:
+            # Use Grok-specific timeout (200s read timeout)
+            grok_timeout = httpx.Timeout(
+                connect=10.0, 
+                read=settings.grok_timeout_seconds, 
+                write=30.0, 
+                pool=5.0
+            )
+            
+            response = await http_client.request_with_retries(
+                method="POST",
+                url=self.api_url,
+                request_id=request_id,
+                headers=headers,
+                json=payload,
+                timeout=grok_timeout
+            )
+            
+            return response.json()
+            
+        except HTTPException:
+            # Re-raise HTTP exceptions from retry logic
+            raise
+        except Exception as e:
+            logger.error(f"Unexpected error in Grok request (request_id={request_id}): {str(e)}")
+            raise HTTPException(status_code=502, detail="Upstream service unavailable")
     
     async def analyze(self, optimized_prompt: str) -> str:
         """
@@ -41,44 +98,43 @@ class GrokService:
             Comprehensive crypto analysis result
             
         Raises:
-            RateLimitError: When Grok rate limits are exceeded
-            AIServiceError: For other Grok API errors
+            HTTPException: 502 on service failure after retries
+            AIServiceError: For invalid responses or business logic errors
         """
+        request_id = str(uuid.uuid4())[:8]
+        
         try:
-            logger.info("Sending optimized prompt to Grok for analysis")
+            logger.info(f"Sending optimized prompt to Grok for analysis (request_id={request_id})")
             
-            # Create chat session with Grok
-            chat = self.client.chat.create(model=settings.grok_model)
-            chat.append(system("You are an AI crypto analyst."))
-            chat.append(user(optimized_prompt))
+            payload = {
+                "model": settings.grok_model,
+                "messages": [
+                    {"role": "system", "content": "You are an AI crypto analyst."},
+                    {"role": "user", "content": optimized_prompt},
+                ],
+            }
             
-            # Get analysis response
-            response = await chat.sample()
+            response_data = await self._request_with_retries(payload, request_id)
             
-            # Validate response
-            if not hasattr(response, "content") or not response.content:
+            # Validate response structure
+            if not response_data.get("choices") or not response_data["choices"][0].get("message", {}).get("content"):
+                logger.error(f"Invalid Grok response structure (request_id={request_id})")
                 raise AIServiceError("Empty or invalid response from Grok")
             
-            analysis_result = response.content
-            logger.info("Successfully received analysis from Grok")
+            analysis_result = response_data["choices"][0]["message"]["content"]
+            logger.info(f"Successfully received analysis from Grok (request_id={request_id})")
             
             return analysis_result
             
+        except HTTPException:
+            # Re-raise HTTP exceptions (already logged in retry logic)
+            raise
+        except AIServiceError:
+            # Re-raise business logic errors
+            raise
         except Exception as e:
-            error_message = str(e).lower()
-            
-            if "rate limit" in error_message:
-                logger.warning("Grok rate limit exceeded")
-                raise RateLimitError("Rate limit exceeded. Please try again later.")
-            elif "api key" in error_message or "unauthorized" in error_message:
-                logger.error("Grok authentication failed")
-                raise AIServiceError("API authentication failed")
-            elif "timeout" in error_message:
-                logger.warning("Grok request timeout")
-                raise AIServiceError("Request timeout. Please try again.")
-            else:
-                logger.error(f"Grok service error: {str(e)}")
-                raise AIServiceError(f"Grok service failed: {str(e)}")
+            logger.error(f"Unexpected error in Grok analysis (request_id={request_id}): {str(e)}")
+            raise HTTPException(status_code=502, detail="Upstream service unavailable")
 
 
 # Global service instance
