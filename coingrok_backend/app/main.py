@@ -22,6 +22,7 @@ from app.database import create_db_and_tables
 from app.middleware.cors import setup_cors
 from app.middleware.error_handler import setup_error_handlers
 from app.middleware.security_headers import SecurityHeadersMiddleware
+from app.middleware.request_limits import RequestSizeLimitMiddleware
 
 # API Routes
 from app.api.routes import health, analysis, jobs, query_logs, users
@@ -69,6 +70,7 @@ app = FastAPI(
 
 # Setup middleware
 setup_cors(app)
+app.add_middleware(RequestSizeLimitMiddleware)
 app.add_middleware(SecurityHeadersMiddleware)
 setup_error_handlers(app)
 

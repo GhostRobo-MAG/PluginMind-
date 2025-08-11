@@ -11,6 +11,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from app.core.logging import get_logger
 from app.api.dependencies import SessionDep
 from app.middleware.auth import get_current_user
+from app.api.dependencies_rate_limit import RateLimiter
 from app.models.schemas import (
     AnalysisRequest, 
     AnalysisResponse, 
@@ -27,7 +28,7 @@ router = APIRouter()
 
 
 @router.post("/analyze", response_model=AnalysisResponse)
-async def analyze(req: AnalysisRequest, session: SessionDep, user_id: str = Depends(get_current_user)):
+async def analyze(req: AnalysisRequest, session: SessionDep, user_id: str = Depends(get_current_user), _rate_limit=RateLimiter):
     """
     Synchronous Crypto Analysis Endpoint (Protected)
     
@@ -120,7 +121,7 @@ async def analyze(req: AnalysisRequest, session: SessionDep, user_id: str = Depe
 
 
 @router.post("/analyze-async", response_model=JobResponse)
-async def start_async_analysis(req: AnalysisRequest):
+async def start_async_analysis(req: AnalysisRequest, _rate_limit=RateLimiter):
     """
     Start Asynchronous Analysis Job
     

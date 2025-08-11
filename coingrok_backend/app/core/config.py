@@ -59,6 +59,13 @@ class Settings:
         self.http_max_retries = int(os.getenv("HTTP_MAX_RETRIES", "1"))
         self.http_retry_backoff_base = float(os.getenv("HTTP_RETRY_BACKOFF_BASE", "0.5"))
         self.grok_timeout_seconds = float(os.getenv("GROK_TIMEOUT_SECONDS", "200"))
+        
+        # Request Limits Configuration
+        self.body_max_bytes = int(os.getenv("BODY_MAX_BYTES", "1000000"))  # ~1MB
+        
+        # Rate Limiting Configuration
+        self.rate_limit_per_min = int(os.getenv("RATE_LIMIT_PER_MIN", "60"))
+        self.rate_limit_burst = int(os.getenv("RATE_LIMIT_BURST", "120"))
         # Supabase Configuration
         self.supabase_url = os.getenv("SUPABASE_URL")
         self.supabase_anon_key = os.getenv("SUPABASE_ANON_KEY")
