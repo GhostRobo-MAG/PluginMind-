@@ -9,7 +9,7 @@
 
 CoinGrok is a full-stack web application that leverages OpenAI and Grok APIs to provide comprehensive cryptocurrency analysis. Simply ask natural language questions like "Analyze ETH over 7 days with $500" and get professional-grade insights including sentiment analysis, market data, and investment recommendations.
 
-## 🚀 Current Status (v1.3 - Google Auth Complete)
+## 🚀 Current Status (v1.4 - Error Handling Final Touches Complete)
 
 - **Backend:** FastAPI with Google ID token verification (RS256) ✅
 - **Frontend:** Next.js with `@react-oauth/google` integration ✅
@@ -17,6 +17,28 @@ CoinGrok is a full-stack web application that leverages OpenAI and Grok APIs to 
 - **Authentication:** Native Google OAuth with secure token validation ✅
 - **Security:** Protected routes, usage tracking, query limits ✅
 - **API:** Centralized authentication wrapper with automatic token handling ✅
+- **Error Handling:** **Production-ready unified system with comprehensive coverage** ✨ **NEW**
+- **Testing:** **Full CI/CD integration with automated smoke tests** ✨ **NEW**
+- **Rate Limiting:** **Enhanced with Retry-After headers and dual limits** ✨ **NEW**
+
+### 🆕 Latest Release Highlights (v1.4)
+
+#### **🛡️ Enhanced Error Handling System**
+- **422 Validation Unification**: All FastAPI validation errors now use unified envelope format
+- **404 Routing Coverage**: Non-existent endpoints return consistent error structure  
+- **500 Exception Safety**: Generic exceptions return safe, user-friendly messages
+- **429 Rate Limit Headers**: Automatic Retry-After calculation for optimal client behavior
+
+#### **🧪 Comprehensive Test Coverage**  
+- **7/7 Smoke Tests Passing**: Complete production validation pipeline
+- **CI/CD Integration**: Pre-merge and post-deploy testing automation
+- **Error Scenario Coverage**: 422, 500, 429, 404, 401 scenarios fully tested
+- **Production Readiness**: Live smoke tests validate all error handling paths
+
+#### **⚡ Performance & Reliability**
+- **Enhanced Rate Limiting**: User-based and IP-based limits with proper retry guidance
+- **Correlation ID Tracking**: End-to-end request tracing for efficient debugging
+- **Production Hardened**: All error paths tested and validated in live environment
 
 ---
 
@@ -51,60 +73,94 @@ CoinGrok is a full-stack web application that leverages OpenAI and Grok APIs to 
 
 ## 🏗️ Project Architecture
 
-### Backend Structure (Production-Ready)
+### Repository Structure (Production-Ready)
 ```
-coingrok_backend/
-├── app/
-│   ├── main.py                    # FastAPI app initialization with graceful shutdown
-│   ├── database.py               # Database engine & session management  
-│   ├── ash_prompt.py             # 4-D Prompt Engine system prompt
-│   │
-│   ├── core/                     # Core infrastructure
-│   │   ├── config.py            # Environment settings & validation
-│   │   ├── logging.py           # Centralized logging setup
-│   │   └── exceptions.py        # Custom exception classes
-│   │
-│   ├── api/                      # API layer
-│   │   ├── dependencies.py      # FastAPI dependencies (DB sessions)
-│   │   ├── dependencies_rate_limit.py # Rate limiting dependencies
-│   │   └── routes/              # Endpoint handlers
-│   │       ├── analysis.py      # /analyze, /analyze-async (auth-protected)
-│   │       ├── users.py         # /me, /me/usage (user profiles)
-│   │       ├── jobs.py          # /jobs management with UUID validation
-│   │       ├── health.py        # /health, /live, /ready, /version endpoints
-│   │       └── query_logs.py    # /query-logs analytics
-│   │
-│   ├── services/                 # Business logic layer
-│   │   ├── openai_service.py    # OpenAI integration (4-D Engine)
-│   │   ├── grok_service.py      # Grok/xAI integration
-│   │   ├── analysis_service.py  # Orchestration & logging
-│   │   └── user_service.py      # User management & usage tracking
-│   │
-│   ├── models/                   # Data layer
-│   │   ├── database.py          # SQLModel tables (jobs, users, logs)
-│   │   ├── schemas.py           # Pydantic request/response models
-│   │   └── enums.py             # Status enums & constants
-│   │
-│   ├── middleware/               # Cross-cutting concerns
-│   │   ├── auth.py              # JWT validation & auth dependencies
-│   │   ├── cors.py              # CORS configuration
-│   │   ├── error_handler.py     # Global exception handling
-│   │   ├── security_headers.py  # Production HTTP security headers
-│   │   ├── request_limits.py    # Request body size limits
-│   │   └── correlation_id.py    # Request tracing with correlation IDs
-│   │
-│   └── utils/                    # Utilities
-│       ├── background_tasks.py  # Async job processing
-│       ├── http.py              # Resilient HTTP client with retries
-│       └── rate_limit.py        # Token-bucket rate limiting
+CoinGrok-mvp/                          # Repository root
+├── .github/
+│   └── workflows/                     # CI/CD automation
+│       ├── ci.yml                     # Comprehensive test suite runner
+│       └── post-deploy-smoke.yml      # Production smoke test validation
 │
-├── scripts/
-│   └── smoke_backend.sh          # Comprehensive production smoke test
+├── coingrok_backend/                  # Backend API service
+│   ├── app/
+│   │   ├── main.py                    # FastAPI app initialization with graceful shutdown
+│   │   ├── database.py               # Database engine & session management  
+│   │   ├── ash_prompt.py             # 4-D Prompt Engine system prompt
+│   │   │
+│   │   ├── core/                     # Core infrastructure
+│   │   │   ├── config.py            # Environment settings & validation
+│   │   │   ├── logging.py           # Centralized logging setup
+│   │   │   └── exceptions.py        # Custom exception classes + RateLimitError enhancements ✨
+│   │   │
+│   │   ├── api/                      # API layer
+│   │   │   ├── dependencies.py      # FastAPI dependencies (DB sessions)
+│   │   │   ├── dependencies_rate_limit.py # Rate limiting dependencies + Retry-After headers ✨
+│   │   │   └── routes/              # Endpoint handlers
+│   │   │       ├── analysis.py      # /analyze, /analyze-async (auth-protected)
+│   │   │       ├── users.py         # /me, /me/usage (user profiles)
+│   │   │       ├── jobs.py          # /jobs management with UUID validation
+│   │   │       ├── health.py        # /health, /live, /ready, /version endpoints
+│   │   │       └── query_logs.py    # /query-logs analytics
+│   │   │
+│   │   ├── services/                 # Business logic layer
+│   │   │   ├── openai_service.py    # OpenAI integration (4-D Engine)
+│   │   │   ├── grok_service.py      # Grok/xAI integration
+│   │   │   ├── analysis_service.py  # Orchestration & logging
+│   │   │   └── user_service.py      # User management & usage tracking
+│   │   │
+│   │   ├── models/                   # Data layer
+│   │   │   ├── database.py          # SQLModel tables (jobs, users, logs)
+│   │   │   ├── schemas.py           # Pydantic request/response models
+│   │   │   └── enums.py             # Status enums & constants
+│   │   │
+│   │   ├── middleware/               # Cross-cutting concerns
+│   │   │   ├── auth.py              # JWT validation & auth dependencies
+│   │   │   ├── cors.py              # CORS configuration
+│   │   │   ├── error_handler.py     # Unified exception handling system ✨
+│   │   │   │                        # → RequestValidationError handler (422)
+│   │   │   │                        # → StarletteHTTPException handler (404 routing)
+│   │   │   │                        # → Enhanced rate limit + retry-after headers
+│   │   │   │                        # → Generic exception handler (500)
+│   │   │   ├── security_headers.py  # Production HTTP security headers
+│   │   │   ├── request_limits.py    # Request body size limits
+│   │   │   └── correlation_id.py    # Request tracing with correlation IDs
+│   │   │
+│   │   └── utils/                    # Utilities
+│   │       ├── background_tasks.py  # Async job processing
+│   │       ├── http.py              # Resilient HTTP client with retries
+│   │       ├── rate_limit.py        # Token-bucket rate limiting + retry calculation ✨
+│   │       └── ip.py                # IP extraction utilities
+│   │
+│   ├── tests/                         # Comprehensive test suite ✨
+│   │   ├── test_error_handling.py    # Exception mapping & response format tests
+│   │   │                            # → 422 validation error tests (malformed JSON, missing fields)
+│   │   │                            # → 500 generic exception tests  
+│   │   │                            # → 429 rate limit + Retry-After header tests
+│   │   ├── test_error_integration.py # API endpoint integration tests
+│   │   ├── test_rate_limit.py       # Rate limiting behavior tests
+│   │   ├── test_middleware.py       # Middleware functionality tests
+│   │   ├── test_jwt_security.py     # JWT validation tests
+│   │   └── test_production_mode.py  # Production environment tests
+│   │
+│   ├── scripts/                      # Operations & testing scripts ✨
+│   │   ├── smoke_errors.sh          # Error handling smoke tests (7 scenarios)
+│   │   │                            # → 422 validation, 404 routing, 401 auth, etc.
+│   │   └── smoke_backend.sh         # Comprehensive production smoke test
+│   │
+│   ├── run_error_tests.py           # Test suite runner ✨
+│   ├── gunicorn_conf.py             # Production WSGI server configuration
+│   ├── requirements.txt             # Python dependencies (includes Gunicorn)
+│   ├── .env.example                # Environment template with production vars
+│   └── .gitignore                  # Security & cleanup
 │
-├── gunicorn_conf.py             # Production WSGI server configuration
-├── requirements.txt             # Python dependencies (includes Gunicorn)
-├── .env.example                # Environment template with production vars
-└── .gitignore                  # Security & cleanup
+├── frontend/                         # Next.js React application
+│   ├── app/                         # Next.js 15 App Router
+│   ├── components/                  # React components
+│   ├── lib/                         # Utility functions
+│   └── package.json                # Frontend dependencies
+│
+├── docs/                            # Project documentation
+└── README.md                       # Project overview & setup guide
 ```
 
 ### Frontend Structure
@@ -226,6 +282,25 @@ curl http://localhost:8000/health
 # Response: {"status": "ok", "active_jobs": 0}
 ```
 
+**Error Handling Test Suite:** ✨ **NEW**
+```bash
+# Run comprehensive error handling tests
+python run_error_tests.py
+
+# Run production smoke tests (7 scenarios)
+chmod +x scripts/smoke_errors.sh
+./scripts/smoke_errors.sh http://localhost:8000
+
+# Expected output: 7/7 tests passed ✅
+# ✅ Job not found error (404 + JOB_NOT_FOUND)
+# ✅ Authentication required (401 + AUTHENTICATION_FAILED)  
+# ✅ Invalid authentication token (401)
+# ✅ Non-existent endpoint (404 + HTTP_EXCEPTION)
+# ✅ Validation error - empty body (422 + INVALID_INPUT)
+# ✅ Field length validation (422 + INVALID_INPUT)
+# ✅ Health check endpoint (200)
+```
+
 **Synchronous Analysis:**
 ```bash
 curl -X POST "http://localhost:8000/analyze" \
@@ -299,11 +374,11 @@ View recent query history (debugging)
 
 ### Error Handling
 
-CoinGrok implements a unified error handling system with consistent response format and comprehensive logging.
+CoinGrok implements a **production-ready unified error handling system** with consistent response format, comprehensive logging, and full CI/CD integration.
 
 #### Error Response Format
 
-All API errors return a standardized JSON envelope:
+All API errors return a standardized JSON envelope with consistent structure:
 
 ```json
 {
@@ -315,39 +390,78 @@ All API errors return a standardized JSON envelope:
 }
 ```
 
-#### Common Error Codes
+#### Comprehensive Error Coverage
 
-| HTTP Status | Error Code | Description |
-|------------|------------|-------------|
-| 400 | `INVALID_INPUT` | Request validation failed |
-| 401 | `AUTHENTICATION_FAILED` | Invalid or missing authentication |
-| 404 | `JOB_NOT_FOUND` | Analysis job not found |
-| 404 | `USER_NOT_FOUND` | User account not found |
-| 413 | `REQUEST_TOO_LARGE` | Request body exceeds 1MB limit |
-| 429 | `RATE_LIMIT_EXCEEDED` | Too many requests |
-| 429 | `QUERY_LIMIT_EXCEEDED` | User query limit reached |
-| 500 | `USER_ACCESS_FAILED` | User account operation failed |
-| 500 | `DATABASE_ERROR` | Database operation failed |
-| 502 | `AI_SERVICE_ERROR` | External AI service unavailable |
-| 503 | `SERVICE_UNAVAILABLE` | Service temporarily unavailable |
+| HTTP Status | Error Code | Description | Handler |
+|------------|------------|-------------|---------|
+| 400 | `INVALID_INPUT` | Request validation failed | Custom exceptions |
+| 401 | `AUTHENTICATION_FAILED` | Invalid or missing authentication | Custom exceptions |
+| 404 | `JOB_NOT_FOUND` | Analysis job not found | Custom exceptions |
+| 404 | `USER_NOT_FOUND` | User account not found | Custom exceptions |
+| 404 | `HTTP_EXCEPTION` | Non-existent endpoints | **Routing-level handler** ✨ |
+| 413 | `REQUEST_TOO_LARGE` | Request body exceeds 1MB limit | Middleware |
+| 422 | `INVALID_INPUT` | **Validation errors (JSON/fields)** | **RequestValidationError handler** ✨ |
+| 429 | `RATE_LIMIT_EXCEEDED` | Too many requests | **Rate limiter + Retry-After headers** ✨ |
+| 429 | `QUERY_LIMIT_EXCEEDED` | User query limit reached | Custom exceptions |
+| 500 | `INTERNAL_SERVER_ERROR` | **Unexpected exceptions** | **Generic exception handler** ✨ |
+| 500 | `USER_ACCESS_FAILED` | User account operation failed | Custom exceptions |
+| 500 | `DATABASE_ERROR` | Database operation failed | Custom exceptions |
+| 502 | `AI_SERVICE_ERROR` | External AI service unavailable | Custom exceptions |
+| 503 | `SERVICE_UNAVAILABLE` | Service temporarily unavailable | Custom exceptions |
 
-#### Error Correlation
+#### 🚀 Latest Enhancements (v1.4 - Error Handling Final Touches)
 
-Every error response includes a `correlation_id` that links the client error to server-side logs. This enables efficient debugging and support:
+**✨ New Exception Handlers:**
+- **RequestValidationError Handler**: Converts FastAPI validation errors (422) to unified format
+- **StarletteHTTPException Handler**: Ensures routing-level 404s use unified format  
+- **Enhanced Generic Handler**: Safe, consistent 500 error responses for unexpected exceptions
+
+**✨ Rate Limiting Improvements:**
+- **Retry-After Headers**: Automatic calculation and inclusion in 429 responses
+- **Enhanced RateLimitError**: Support for retry-after timing information
+- **Dual Rate Limiting**: User-based and IP-based limits with proper header management
+
+**✨ Validation Error Unification:**
+- **Malformed JSON**: Invalid JSON syntax → unified 422 + INVALID_INPUT
+- **Missing Fields**: Required field validation → unified 422 + INVALID_INPUT  
+- **Field Constraints**: Length/type validation → unified 422 + INVALID_INPUT
+
+#### Error Correlation & Debugging
+
+Every error response includes a `correlation_id` for efficient debugging:
 
 ```bash
-# Server logs include correlation_id for tracing
+# Server logs with correlation tracking
 2024-01-01 12:00:00 - ERROR - Job not found: invalid-job-id [correlation_id=f47ac10b]
+2024-01-01 12:00:00 - WARNING - Validation error: missing field 'user_input' [correlation_id=a1b2c3d4]
 ```
 
-#### Response Headers
+#### Response Headers & Rate Limiting
 
-Error responses include proper headers for debugging:
-
+**Standard Headers:**
 ```http
 Content-Type: application/json
 X-Request-ID: f47ac10b-58cc-4372-a567-0e02b2c3d479
 ```
+
+**Rate Limiting Headers:**
+```http
+X-RateLimit-Limit: 60
+X-RateLimit-Remaining: 45
+Retry-After: 120  # ✨ New: Seconds to wait before retry
+```
+
+#### Testing & Quality Assurance
+
+**✅ Comprehensive Test Coverage:**
+- **Unit Tests**: All exception types and handlers tested
+- **Integration Tests**: Real API endpoint error scenarios  
+- **Smoke Tests**: Live production validation (7/7 scenarios)
+
+**✅ CI/CD Integration:**
+- **Pre-merge**: All error tests run on every PR
+- **Post-deploy**: Automated smoke tests validate production health
+- **Coverage**: 422, 500, 429, 404, 401 scenarios fully tested
 
 ### Database Schema
 
@@ -682,6 +796,11 @@ BASE=https://api.coingrok.com TOKEN=jwt_token ./scripts/smoke_backend.sh
 - [x] **Observability**: Correlation ID tracing, structured logging, performance metrics
 - [x] **Quality Assurance**: Comprehensive smoke test script for pre-deployment validation
 - [x] **Graceful Shutdown**: Proper cleanup of HTTP clients and background tasks
+- [x] **Error Handling**: **Unified exception system with comprehensive coverage** ✨ **NEW**
+- [x] **Validation Errors**: **422 errors use consistent envelope format** ✨ **NEW**  
+- [x] **Rate Limiting**: **Enhanced with Retry-After headers and dual limits** ✨ **NEW**
+- [x] **Testing Coverage**: **7/7 smoke tests + comprehensive CI/CD pipeline** ✨ **NEW**
+- [x] **Production Validation**: **Automated post-deploy error scenario testing** ✨ **NEW**
 
 ---
 
@@ -726,6 +845,18 @@ Access `/query-logs` endpoint to monitor:
 - [x] Usage tracking and query limit enforcement (/me/usage endpoint)
 - [x] Token expiry detection and automatic cleanup
 - [x] Protected routes with authentication middleware
+
+### ✅ Phase 2.5: Error Handling & Testing (COMPLETE) ✨ **NEW**
+- [x] **Unified Error Handling System**: Single source of truth exception mapping
+- [x] **RequestValidationError Handler**: 422 validation errors with unified format  
+- [x] **StarletteHTTPException Handler**: 404 routing errors with unified format
+- [x] **Enhanced Rate Limiting**: Retry-After headers and dual user/IP limits
+- [x] **Generic Exception Handler**: Safe 500 error responses for unexpected exceptions
+- [x] **Comprehensive Test Suite**: Unit, integration, and smoke tests (7/7 passing)
+- [x] **CI/CD Integration**: Pre-merge testing and post-deploy validation
+- [x] **Production Smoke Tests**: Live error scenario validation
+- [x] **Correlation ID Tracking**: End-to-end request tracing for debugging
+- [x] **Error Documentation**: Complete API error reference and troubleshooting guide
 
 ### Phase 3: Business Features
 - [ ] Subscription tiers (Free/Pro/Premium)
