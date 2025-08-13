@@ -11,6 +11,8 @@ from starlette.responses import Response, JSONResponse
 
 from app.core.config import settings
 from app.core.logging import get_logger
+from app.middleware.correlation_id import get_request_id
+from app.core.exceptions import ErrorCodes
 
 logger = get_logger(__name__)
 
@@ -39,9 +41,16 @@ class BodySizeLimitMiddleware(BaseHTTPMiddleware):
                         f"Request rejected: body size {content_length} exceeds limit {self.max_bytes} "
                         f"from {request.client.host if request.client else 'unknown'}"
                     )
+                    correlation_id = get_request_id()
                     return JSONResponse(
                         status_code=413,
-                        content={"detail": "Request body too large"}
+                        content={
+                            "error": {
+                                "message": "Request body too large. Maximum size allowed is 1MB.",
+                                "code": ErrorCodes.REQUEST_TOO_LARGE,
+                                "correlation_id": correlation_id
+                            }
+                        }
                     )
             except (ValueError, TypeError):
                 # Invalid Content-Length header, let it pass and potentially fail later

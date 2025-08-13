@@ -122,3 +122,15 @@ class UserUsage(BaseModel):
     remaining_queries: int = Field(description="Calculated remaining queries")
     subscription_tier: SubscriptionTier = Field(description="Current subscription tier")
     can_make_query: bool = Field(description="Whether user can make another query")
+
+
+class ErrorDetail(BaseModel):
+    """Error detail information."""
+    message: str = Field(description="User-friendly error message")
+    code: str = Field(description="Constant error code for programmatic handling")
+    correlation_id: str = Field(description="Request correlation ID for support/debugging")
+
+
+class ErrorResponse(BaseModel):
+    """Unified error response model for all API errors."""
+    error: ErrorDetail = Field(description="Error details")

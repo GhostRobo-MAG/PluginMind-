@@ -297,6 +297,58 @@ Health check with active job count
 #### `GET /query-logs`
 View recent query history (debugging)
 
+### Error Handling
+
+CoinGrok implements a unified error handling system with consistent response format and comprehensive logging.
+
+#### Error Response Format
+
+All API errors return a standardized JSON envelope:
+
+```json
+{
+  "error": {
+    "message": "User-friendly error message",
+    "code": "ERROR_CODE_CONSTANT", 
+    "correlation_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+  }
+}
+```
+
+#### Common Error Codes
+
+| HTTP Status | Error Code | Description |
+|------------|------------|-------------|
+| 400 | `INVALID_INPUT` | Request validation failed |
+| 401 | `AUTHENTICATION_FAILED` | Invalid or missing authentication |
+| 404 | `JOB_NOT_FOUND` | Analysis job not found |
+| 404 | `USER_NOT_FOUND` | User account not found |
+| 413 | `REQUEST_TOO_LARGE` | Request body exceeds 1MB limit |
+| 429 | `RATE_LIMIT_EXCEEDED` | Too many requests |
+| 429 | `QUERY_LIMIT_EXCEEDED` | User query limit reached |
+| 500 | `USER_ACCESS_FAILED` | User account operation failed |
+| 500 | `DATABASE_ERROR` | Database operation failed |
+| 502 | `AI_SERVICE_ERROR` | External AI service unavailable |
+| 503 | `SERVICE_UNAVAILABLE` | Service temporarily unavailable |
+
+#### Error Correlation
+
+Every error response includes a `correlation_id` that links the client error to server-side logs. This enables efficient debugging and support:
+
+```bash
+# Server logs include correlation_id for tracing
+2024-01-01 12:00:00 - ERROR - Job not found: invalid-job-id [correlation_id=f47ac10b]
+```
+
+#### Response Headers
+
+Error responses include proper headers for debugging:
+
+```http
+Content-Type: application/json
+X-Request-ID: f47ac10b-58cc-4372-a567-0e02b2c3d479
+```
+
 ### Database Schema
 
 #### QueryLog Table

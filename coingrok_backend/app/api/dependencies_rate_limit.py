@@ -14,6 +14,7 @@ from app.core.logging import get_logger
 from app.utils.rate_limit import rate_limiter
 from app.utils.ip import extract_client_ip
 from app.middleware.auth import security, verify_google_id_token
+from app.core.exceptions import AuthenticationError
 
 logger = get_logger(__name__)
 
@@ -40,7 +41,7 @@ def get_rate_limit_key(
         try:
             user_id = verify_google_id_token(credentials.credentials)
             return f"user:{user_id}"
-        except HTTPException:
+        except AuthenticationError:
             # Invalid token, fall back to IP-based limiting
             pass
     
@@ -74,7 +75,7 @@ async def rate_limiter_dependency(
     if credentials and credentials.credentials:
         try:
             user_id = verify_google_id_token(credentials.credentials)
-        except HTTPException:
+        except AuthenticationError:
             # Invalid token, user_id remains None
             pass
     

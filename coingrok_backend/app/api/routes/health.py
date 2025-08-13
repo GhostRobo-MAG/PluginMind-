@@ -15,6 +15,7 @@ from app.core.logging import get_logger
 from app.core.config import settings
 from app.models.schemas import HealthResponse
 from app.api.dependencies import SessionDep
+from app.core.exceptions import ServiceUnavailableError
 
 logger = get_logger(__name__)
 router = APIRouter()
@@ -62,7 +63,7 @@ async def health_check():
         
     except Exception as e:
         logger.error(f"Health check failed: {str(e)}")
-        raise HTTPException(status_code=503, detail="Service unavailable")
+        raise ServiceUnavailableError("Service unavailable")
 
 
 @router.get("/live")
@@ -127,6 +128,8 @@ async def readiness_check(session: SessionDep):
     if all_ready:
         return {"status": "ready", "checks": checks}
     else:
+        # For readiness checks, we still use HTTPException with custom detail format
+        # This preserves the structured response format expected by orchestrators
         raise HTTPException(
             status_code=503,
             detail={"status": "not_ready", "checks": checks}

@@ -17,6 +17,7 @@ from google.auth.transport import requests
 from google.oauth2 import id_token
 from app.core.config import settings
 from app.core.logging import get_logger
+from app.core.exceptions import AuthenticationError
 
 logger = get_logger(__name__)
 
@@ -78,36 +79,24 @@ def verify_google_id_token_claims(token: str) -> Dict[str, Any]:
         # Explicit audience validation
         token_audience = idinfo.get("aud")
         if token_audience != settings.google_client_id:
-            raise HTTPException(
-                status_code=401,
-                detail="Invalid audience"
-            )
+            raise AuthenticationError("Invalid audience")
         
         # Verify issuer using cached discovery
         expected_issuer = get_google_issuer()
         if idinfo['iss'] != expected_issuer:
-            raise HTTPException(
-                status_code=401,
-                detail="Invalid issuer"
-            )
+            raise AuthenticationError("Invalid issuer")
             
         return idinfo
         
     except ValueError as e:
         # Token verification failed (includes signature, expiry, and format validation)
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid token format"
-        )
-    except HTTPException:
-        # Re-raise our own HTTP exceptions (audience, issuer validation)
+        raise AuthenticationError("Invalid token format")
+    except AuthenticationError:
+        # Re-raise our own authentication exceptions
         raise
     except Exception as e:
         # Other errors during token verification
-        raise HTTPException(
-            status_code=401,
-            detail="Token verification failed"
-        )
+        raise AuthenticationError("Token verification failed")
 
 
 def verify_google_id_token(token: str) -> str:
@@ -132,10 +121,7 @@ def verify_google_id_token(token: str) -> str:
         user_id = idinfo.get('sub')
         
     if not user_id:
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid token: missing user identifier"
-        )
+        raise AuthenticationError("Invalid token: missing user identifier")
         
     return user_id
 
@@ -157,24 +143,18 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
     
     if not credentials:
         logger.warning("Authentication failed: Missing Authorization header")
-        raise HTTPException(
-            status_code=401,
-            detail="Authentication required. Please provide a valid JWT token in the Authorization header."
-        )
+        raise AuthenticationError("Authentication required. Please provide a valid JWT token in the Authorization header.")
     
     try:
         user_id = verify_google_id_token(credentials.credentials)
         logger.debug("Authentication successful")
         return user_id
-    except HTTPException as e:
-        logger.warning(f"Authentication failed: {e.detail}")
+    except AuthenticationError as e:
+        logger.warning(f"Authentication failed: {str(e)}")
         raise
     except Exception as e:
         logger.error(f"Unexpected authentication error: {str(e)}")
-        raise HTTPException(
-            status_code=401,
-            detail="Authentication failed due to invalid token"
-        )
+        raise AuthenticationError("Authentication failed due to invalid token")
 
 
 def get_current_user_optional(

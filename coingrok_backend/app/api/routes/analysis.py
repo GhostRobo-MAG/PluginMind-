@@ -21,7 +21,13 @@ from app.models.schemas import (
 from app.services.analysis_service import analysis_service
 from app.services.user_service import user_service
 from app.utils.background_tasks import create_analysis_job, process_analysis_background
-from app.core.exceptions import AIServiceError, RateLimitError
+from app.core.exceptions import (
+    AIServiceError, 
+    RateLimitError, 
+    UserAccessError, 
+    QueryLimitExceededError,
+    JobNotFoundError
+)
 
 logger = get_logger(__name__)
 router = APIRouter()
@@ -60,25 +66,18 @@ async def analyze(req: AnalysisRequest, session: SessionDep, user_id: str = Depe
             logger.debug(f"Successfully retrieved/created user: {user.email if hasattr(user, 'email') else user_id}")
         except Exception as db_error:
             logger.error(f"Failed to get/create user {user_id}: {str(db_error)}")
-            raise HTTPException(
-                status_code=500,
-                detail="User account access failed. Please try again."
-            )
+            raise UserAccessError("User account access failed. Please try again.")
         
         # Check query limits
         try:
             if not user_service.check_query_limit(user):
                 logger.warning(f"Query limit exceeded for user {user_id}: {user.queries_used}/{user.queries_limit}")
-                raise HTTPException(
-                    status_code=429,
-                    detail=f"Query limit exceeded. Used {user.queries_used}/{user.queries_limit} queries."
-                )
+                raise QueryLimitExceededError(f"Query limit exceeded. Used {user.queries_used}/{user.queries_limit} queries.")
+        except QueryLimitExceededError:
+            raise
         except Exception as limit_error:
             logger.error(f"Failed to check query limit for user {user_id}: {str(limit_error)}")
-            raise HTTPException(
-                status_code=500,
-                detail="Query limit check failed. Please try again."
-            )
+            raise UserAccessError("Query limit check failed. Please try again.")
         
         # Increment user query count
         try:
@@ -100,24 +99,12 @@ async def analyze(req: AnalysisRequest, session: SessionDep, user_id: str = Depe
             analysis=analysis_result
         )
         
-    except HTTPException as http_exc:
-        # Re-raise HTTP exceptions (like query limit exceeded) with enhanced logging
-        logger.warning(f"HTTP exception in analysis for user {user_id}: {http_exc.status_code} - {http_exc.detail}")
+    except (UserAccessError, QueryLimitExceededError, RateLimitError, AIServiceError):
+        # Re-raise custom exceptions (handled by error handlers)
         raise
-    except RateLimitError as e:
-        raise HTTPException(status_code=429, detail=str(e))
-    except AIServiceError as e:
-        # Check for specific error types
-        error_msg = str(e).lower()
-        if "authentication" in error_msg:
-            raise HTTPException(status_code=401, detail=str(e))
-        elif "timeout" in error_msg:
-            raise HTTPException(status_code=504, detail=str(e))
-        else:
-            raise HTTPException(status_code=502, detail=str(e))
     except Exception as e:
         logger.error(f"Analysis failed with unexpected error: {str(e)}")
-        raise HTTPException(status_code=500, detail="Analysis failed due to internal error")
+        raise AIServiceError("Analysis failed due to internal error")
 
 
 @router.post("/analyze-async", response_model=JobResponse)
@@ -154,7 +141,7 @@ async def start_async_analysis(req: AnalysisRequest, _rate_limit=RateLimiter):
         
     except Exception as e:
         logger.error(f"Failed to start async analysis: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to start analysis job")
+        raise AIServiceError("Failed to start analysis job")
 
 
 @router.get("/analyze-async/{job_id}", response_model=JobResult)
@@ -181,7 +168,7 @@ async def get_analysis_result(job_id: str, session: SessionDep):
     job = session.exec(statement).first()
     
     if not job:
-        raise HTTPException(status_code=404, detail="Job not found")
+        raise JobNotFoundError("Job not found")
     
     return JobResult(
         job_id=job.job_id,

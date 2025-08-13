@@ -1,0 +1,154 @@
+name: Post-Deploy Smoke Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to test (staging, production)'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+        - staging
+        - production
+      base_url:
+        description: 'Base URL to test against (optional - uses secret if not provided)'
+        required: false
+        type: string
+  
+  # Can also be triggered by deployment completion
+  workflow_run:
+    workflows: ["Deploy to Production"] # Adjust to match your deploy workflow name
+    types:
+      - completed
+
+jobs:
+  smoke-tests:
+    name: Error Handling Smoke Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up environment variables
+      run: |
+        # Determine base URL
+        if [ -n "${{ github.event.inputs.base_url }}" ]; then
+          echo "BASE_URL=${{ github.event.inputs.base_url }}" >> $GITHUB_ENV
+          echo "ENVIRONMENT=custom" >> $GITHUB_ENV
+        elif [ "${{ github.event.inputs.environment }}" = "production" ]; then
+          echo "BASE_URL=${{ secrets.PRODUCTION_BASE_URL }}" >> $GITHUB_ENV
+          echo "ENVIRONMENT=production" >> $GITHUB_ENV
+        else
+          echo "BASE_URL=${{ secrets.STAGING_BASE_URL }}" >> $GITHUB_ENV
+          echo "ENVIRONMENT=staging" >> $GITHUB_ENV
+        fi
+        
+        # Fallback URL if secrets not set
+        if [ -z "$BASE_URL" ]; then
+          echo "BASE_URL=https://api.coingrok.com" >> $GITHUB_ENV
+          echo "⚠️ Using fallback BASE_URL - please set STAGING_BASE_URL/PRODUCTION_BASE_URL secrets"
+        fi
+        
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y curl jq
+        
+    - name: Wait for deployment to stabilize
+      if: github.event_name == 'workflow_run'
+      run: |
+        echo "⏳ Waiting 30 seconds for deployment to stabilize..."
+        sleep 30
+        
+    - name: Run error handling smoke tests
+      id: smoke_tests
+      run: |
+        cd coingrok_backend
+        echo "🧪 Running smoke tests against: $BASE_URL"
+        echo "Environment: $ENVIRONMENT"
+        echo ""
+        
+        chmod +x scripts/smoke_errors.sh
+        
+        # Run smoke tests and capture output
+        if ./scripts/smoke_errors.sh "$BASE_URL"; then
+          echo "SMOKE_RESULT=success" >> $GITHUB_OUTPUT
+          echo "🎉 All smoke tests passed!"
+        else
+          echo "SMOKE_RESULT=failure" >> $GITHUB_OUTPUT
+          echo "❌ Some smoke tests failed!"
+          exit 1
+        fi
+        
+    - name: Run additional endpoint validation
+      if: steps.smoke_tests.outputs.SMOKE_RESULT == 'success'
+      run: |
+        echo "🔍 Running additional endpoint validation..."
+        
+        # Test health endpoints
+        echo "Testing health endpoints..."
+        curl -f -s "$BASE_URL/health" > /dev/null && echo "✅ /health" || echo "❌ /health"
+        curl -f -s "$BASE_URL/live" > /dev/null && echo "✅ /live" || echo "❌ /live"
+        curl -f -s "$BASE_URL/ready" > /dev/null && echo "✅ /ready" || echo "❌ /ready"
+        curl -f -s "$BASE_URL/version" > /dev/null && echo "✅ /version" || echo "❌ /version"
+        
+        echo "🎯 Additional validation complete!"
+        
+    - name: Generate smoke test summary
+      if: always()
+      run: |
+        echo "## 🚀 Post-Deploy Smoke Test Results" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Environment:** $ENVIRONMENT" >> $GITHUB_STEP_SUMMARY
+        echo "**Base URL:** $BASE_URL" >> $GITHUB_STEP_SUMMARY
+        echo "**Timestamp:** $(date -u)" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [ "${{ steps.smoke_tests.outputs.SMOKE_RESULT }}" = "success" ]; then
+          echo "### ✅ All Tests Passed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "The following error handling scenarios were validated:" >> $GITHUB_STEP_SUMMARY
+          echo "- 🔒 Authentication errors (401)" >> $GITHUB_STEP_SUMMARY
+          echo "- 🔍 Not found errors (404)" >> $GITHUB_STEP_SUMMARY  
+          echo "- 📄 Validation errors (422)" >> $GITHUB_STEP_SUMMARY
+          echo "- 🚫 Request size limits (413)" >> $GITHUB_STEP_SUMMARY
+          echo "- ❤️ Health check endpoint (200)" >> $GITHUB_STEP_SUMMARY
+          echo "- 🔗 Unified error format validation" >> $GITHUB_STEP_SUMMARY
+          echo "- 🆔 Correlation ID presence" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Status: 🟢 DEPLOYMENT HEALTHY**" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "### ❌ Tests Failed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Status: 🔴 DEPLOYMENT ISSUES DETECTED**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Please review the test output above and investigate any failing endpoints." >> $GITHUB_STEP_SUMMARY
+        fi
+        
+    - name: Notify on failure
+      if: failure()
+      run: |
+        echo "🚨 Post-deploy smoke tests failed!"
+        echo "Environment: $ENVIRONMENT"
+        echo "Base URL: $BASE_URL"
+        echo ""
+        echo "This indicates potential issues with the deployed error handling system."
+        echo "Please investigate and consider rollback if necessary."
+        
+    - name: Create deployment status
+      if: always()
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const status = '${{ steps.smoke_tests.outputs.SMOKE_RESULT }}' === 'success' ? 'success' : 'failure';
+          const description = status === 'success' 
+            ? 'Error handling smoke tests passed' 
+            : 'Error handling smoke tests failed';
+            
+          // This would create a deployment status (adjust as needed for your setup)
+          console.log(`Deployment status: ${status}`);
+          console.log(`Description: ${description}`);
+          console.log(`Environment: ${process.env.ENVIRONMENT}`);
+          console.log(`Base URL: ${process.env.BASE_URL}`);

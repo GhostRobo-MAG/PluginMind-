@@ -12,7 +12,7 @@ import httpx
 from fastapi import HTTPException
 from app.core.config import settings
 from app.core.logging import get_logger
-from app.core.exceptions import AIServiceError, RateLimitError
+from app.core.exceptions import AIServiceError, RateLimitError, ServiceUnavailableError
 from app.utils.http import http_client
 
 logger = get_logger(__name__)
@@ -82,7 +82,7 @@ class GrokService:
             raise
         except Exception as e:
             logger.error(f"Unexpected error in Grok request (request_id={request_id}): {str(e)}")
-            raise HTTPException(status_code=502, detail="Upstream service unavailable")
+            raise ServiceUnavailableError("Upstream service unavailable")
     
     async def analyze(self, optimized_prompt: str) -> str:
         """
@@ -134,7 +134,7 @@ class GrokService:
             raise
         except Exception as e:
             logger.error(f"Unexpected error in Grok analysis (request_id={request_id}): {str(e)}")
-            raise HTTPException(status_code=502, detail="Upstream service unavailable")
+            raise ServiceUnavailableError("Upstream service unavailable")
 
 
 # Global service instance

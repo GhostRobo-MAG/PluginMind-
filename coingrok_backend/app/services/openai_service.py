@@ -12,7 +12,7 @@ from openai import AsyncOpenAI
 from fastapi import HTTPException
 from app.core.config import settings
 from app.core.logging import get_logger
-from app.core.exceptions import AIServiceError, RateLimitError
+from app.core.exceptions import AIServiceError, RateLimitError, ServiceUnavailableError
 from app.ash_prompt import ASH_SYSTEM_PROMPT
 from app.utils.http import http_client
 
@@ -74,7 +74,7 @@ class OpenAIService:
             raise
         except Exception as e:
             logger.error(f"Unexpected error in OpenAI request (request_id={request_id}): {str(e)}")
-            raise HTTPException(status_code=502, detail="Upstream service unavailable")
+            raise ServiceUnavailableError("Upstream service unavailable")
     
     async def optimize_prompt(self, user_input: str) -> str:
         """
@@ -126,7 +126,7 @@ class OpenAIService:
             raise
         except Exception as e:
             logger.error(f"Unexpected error in prompt optimization (request_id={request_id}): {str(e)}")
-            raise HTTPException(status_code=502, detail="Upstream service unavailable")
+            raise ServiceUnavailableError("Upstream service unavailable")
 
 
 # Global service instance

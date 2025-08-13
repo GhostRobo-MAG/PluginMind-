@@ -11,6 +11,7 @@ from sqlmodel import select
 from app.core.logging import get_logger
 from app.api.dependencies import SessionDep
 from app.models.database import AnalysisJob
+from app.core.exceptions import JobNotFoundError
 
 logger = get_logger(__name__)
 router = APIRouter()
@@ -70,7 +71,7 @@ async def delete_job(job_id: UUID, session: SessionDep):
     job = session.exec(statement).first()
     
     if not job:
-        raise HTTPException(status_code=404, detail="Job not found")
+        raise JobNotFoundError("Job not found")
     
     session.delete(job)
     session.commit()

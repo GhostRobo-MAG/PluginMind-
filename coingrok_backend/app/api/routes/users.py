@@ -11,6 +11,7 @@ from app.api.dependencies import SessionDep
 from app.middleware.auth import get_current_user
 from app.services.user_service import user_service
 from app.models.schemas import UserProfile, UserUsage
+from app.core.exceptions import UserNotFoundError
 
 logger = get_logger(__name__)
 router = APIRouter()
@@ -40,7 +41,7 @@ async def get_current_user_profile(session: SessionDep, user_id: str = Depends(g
     user = user_service.get_or_create_user(session, user_id)
     
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise UserNotFoundError("User not found")
     
     return UserProfile(
         id=user.id,
@@ -76,7 +77,7 @@ async def get_current_user_usage(session: SessionDep, user_id: str = Depends(get
     user = user_service.get_or_create_user(session, user_id)
     
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise UserNotFoundError("User not found")
     
     remaining_queries = max(0, user.queries_limit - user.queries_used)
     

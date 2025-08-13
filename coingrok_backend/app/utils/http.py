@@ -12,6 +12,7 @@ from fastapi import HTTPException
 
 from app.core.config import settings
 from app.core.logging import get_logger
+from app.core.exceptions import ServiceUnavailableError
 
 logger = get_logger(__name__)
 
@@ -99,10 +100,7 @@ class HTTPClient:
                         "HTTP request failed permanently with status %d (request_id=%s): %s",
                         response.status_code, request_id, response.text[:200]
                     )
-                    raise HTTPException(
-                        status_code=502,
-                        detail="Upstream service unavailable"
-                    )
+                    raise ServiceUnavailableError("Upstream service unavailable")
                     
             except httpx.RequestError as e:
                 # Network-level error - transient
@@ -122,10 +120,7 @@ class HTTPClient:
                     "Unexpected HTTP request error (request_id=%s): %s",
                     request_id, str(e)
                 )
-                raise HTTPException(
-                    status_code=502,
-                    detail="Upstream service unavailable"
-                )
+                raise ServiceUnavailableError("Upstream service unavailable")
             
             # Calculate backoff delay for next attempt
             if attempt < settings.http_max_retries:
@@ -141,10 +136,7 @@ class HTTPClient:
             "HTTP request failed after %d attempts (request_id=%s): %s",
             settings.http_max_retries + 1, request_id, str(last_exception)
         )
-        raise HTTPException(
-            status_code=502,
-            detail="Upstream service unavailable"
-        )
+        raise ServiceUnavailableError("Upstream service unavailable")
     
     async def close(self):
         """Close the HTTP client and clean up connections."""
