@@ -79,24 +79,24 @@ def verify_google_id_token_claims(token: str) -> Dict[str, Any]:
         # Explicit audience validation
         token_audience = idinfo.get("aud")
         if token_audience != settings.google_client_id:
-            raise AuthenticationError("Invalid audience")
+            raise HTTPException(status_code=401, detail="Invalid audience")
         
         # Verify issuer using cached discovery
         expected_issuer = get_google_issuer()
         if idinfo['iss'] != expected_issuer:
-            raise AuthenticationError("Invalid issuer")
+            raise HTTPException(status_code=401, detail="Invalid issuer")
             
         return idinfo
         
     except ValueError as e:
         # Token verification failed (includes signature, expiry, and format validation)
-        raise AuthenticationError("Invalid token format")
-    except AuthenticationError:
-        # Re-raise our own authentication exceptions
+        raise HTTPException(status_code=401, detail="Invalid token format")
+    except HTTPException:
+        # Re-raise HTTPExceptions (from our validation checks above)
         raise
     except Exception as e:
         # Other errors during token verification
-        raise AuthenticationError("Token verification failed")
+        raise HTTPException(status_code=401, detail="Token verification failed")
 
 
 def verify_google_id_token(token: str) -> str:

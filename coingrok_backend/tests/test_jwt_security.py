@@ -214,8 +214,9 @@ def test_config_validation():
     # Test 1: Missing GOOGLE_CLIENT_SECRET
     print("Test 1: Missing GOOGLE_CLIENT_SECRET")
     
-    # Temporarily remove the env var
+    # Temporarily remove the env var and disable test mode
     original_secret = os.environ.pop('GOOGLE_CLIENT_SECRET', None)
+    original_testing = os.environ.pop('TESTING', None)
     
     try:
         settings = Settings()
@@ -229,9 +230,11 @@ def test_config_validation():
             print(f"  ❌ FAIL: Wrong error message: {e}")
             result = False
     finally:
-        # Restore the env var
+        # Restore the env vars
         if original_secret:
             os.environ['GOOGLE_CLIENT_SECRET'] = original_secret
+        if original_testing:
+            os.environ['TESTING'] = original_testing
     
     # Test 2: All required vars present
     print("\nTest 2: All required variables present")
@@ -275,11 +278,15 @@ def test_attack_vector_prevention():
     
     response = client.post("/analyze?access_token=malicious-token", json={"user_input": "test"})
     
-    if response.status_code == 401 and "Authorization header" in response.json().get('detail', ''):
+    # Check for 401 status and our unified error format
+    response_data = response.json()
+    if (response.status_code == 401 and 
+        response_data.get('error', {}).get('code') == 'AUTHENTICATION_FAILED'):
         print("  ✅ PASS: Query parameter tokens ignored")
         attack_test_2 = True
     else:
         print(f"  ❌ FAIL: Should require Authorization header")
+        print(f"    Got status: {response.status_code}, response: {response_data}")
         attack_test_2 = False
     
     # Test 3: Multiple Authorization headers
