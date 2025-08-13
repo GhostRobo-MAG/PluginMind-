@@ -43,7 +43,11 @@ class Settings:
         self.database_url = os.getenv("DATABASE_URL", "sqlite:///./coingrok.db")
         
         # CORS Configuration
-        cors_origins_str = os.getenv("CORS_ORIGINS", "http://localhost:3000")
+        cors_origins_str = os.getenv("CORS_ORIGINS")
+        if not cors_origins_str and self.debug:
+            cors_origins_str = "http://localhost:3000"  # Dev fallback only
+        elif not cors_origins_str:
+            raise ValueError("CORS_ORIGINS environment variable is required in production")
         self.cors_origins = [origin.strip() for origin in cors_origins_str.split(",")]
         
         # Logging Configuration

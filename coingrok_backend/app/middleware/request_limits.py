@@ -15,7 +15,7 @@ from app.core.logging import get_logger
 logger = get_logger(__name__)
 
 
-class RequestSizeLimitMiddleware(BaseHTTPMiddleware):
+class BodySizeLimitMiddleware(BaseHTTPMiddleware):
     """
     Middleware to limit request body size.
     
@@ -26,7 +26,7 @@ class RequestSizeLimitMiddleware(BaseHTTPMiddleware):
     def __init__(self, app):
         super().__init__(app)
         self.max_bytes = settings.body_max_bytes
-        logger.info(f"Request size limit middleware initialized with max_bytes={self.max_bytes}")
+        logger.info(f"Body size limit middleware initialized with max_bytes={self.max_bytes}")
     
     async def dispatch(self, request: Request, call_next) -> Response:
         # Check Content-Length header if present

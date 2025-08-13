@@ -22,8 +22,9 @@ from app.database import create_db_and_tables
 from app.middleware.cors import setup_cors
 from app.middleware.error_handler import setup_error_handlers
 from app.middleware.security_headers import SecurityHeadersMiddleware
-from app.middleware.request_limits import RequestSizeLimitMiddleware
+from app.middleware.request_limits import BodySizeLimitMiddleware
 from app.middleware.correlation_id import CorrelationIdMiddleware
+from app.middleware.auth import AmbientJWTAuthMiddleware
 
 # API Routes
 from app.api.routes import health, analysis, jobs, query_logs, users
@@ -90,12 +91,14 @@ if not settings.debug:
 
 app = FastAPI(**fastapi_kwargs)
 
-# Setup middleware (order matters - correlation ID first for logging)
-setup_cors(app)
-app.add_middleware(CorrelationIdMiddleware)
-app.add_middleware(RequestSizeLimitMiddleware)
-app.add_middleware(SecurityHeadersMiddleware)
-setup_error_handlers(app)
+# Setup middleware (order matters - CORS outermost, correlation ID early for logging)
+# Middleware executes in reverse order: CORS -> Auth -> Security -> Body -> Correlation -> Routes
+setup_error_handlers(app)  # Error handlers (not middleware stack)
+app.add_middleware(CorrelationIdMiddleware)  # Innermost - early for logging
+app.add_middleware(BodySizeLimitMiddleware)  # Body size limits
+app.add_middleware(SecurityHeadersMiddleware)  # Security headers
+app.add_middleware(AmbientJWTAuthMiddleware)  # Ambient JWT parsing
+setup_cors(app)  # Outermost - CORS headers on all responses
 
 # Include API routers
 app.include_router(

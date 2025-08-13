@@ -8,9 +8,15 @@ Provides FastAPI dependencies for both required and optional authentication.
 from typing import Optional, Dict, Any
 from fastapi import Request, HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request as StarletteRequest
+from starlette.responses import Response
 from google.auth.transport import requests
 from google.oauth2 import id_token
 from app.core.config import settings
+from app.core.logging import get_logger
+
+logger = get_logger(__name__)
 
 
 security = HTTPBearer(auto_error=False)
@@ -160,6 +166,54 @@ def get_current_user_optional(
         return None
     
     return verify_google_id_token(credentials.credentials)
+
+
+class AmbientJWTAuthMiddleware(BaseHTTPMiddleware):
+    """
+    Non-blocking JWT authentication middleware.
+    
+    Parses Bearer JWT token if present and sets request.state.user.
+    Does not enforce authentication - that remains in route dependencies.
+    """
+    
+    def __init__(self, app):
+        super().__init__(app)
+        logger.info("Ambient JWT auth middleware initialized")
+    
+    async def dispatch(self, request: StarletteRequest, call_next) -> Response:
+        """
+        Parse JWT token if present and set request state.
+        
+        Args:
+            request: Incoming HTTP request
+            call_next: Next middleware or application handler
+            
+        Returns:
+            Response: HTTP response with user state potentially set
+        """
+        # Initialize request state
+        request.state.user = None
+        
+        # Check for Authorization header
+        auth_header = request.headers.get("authorization")
+        if auth_header and auth_header.startswith("Bearer "):
+            token = auth_header[7:]  # Remove "Bearer " prefix
+            
+            try:
+                # Verify token and set user in request state
+                user_id = verify_google_id_token(token)
+                request.state.user = user_id
+                logger.debug(f"Set ambient user in request state: {user_id}")
+            except HTTPException:
+                # Invalid token - just log and continue (non-blocking)
+                logger.debug("Invalid JWT token in Authorization header, continuing without auth")
+            except Exception as e:
+                # Unexpected error - log and continue
+                logger.warning(f"Unexpected error parsing JWT token: {str(e)}")
+        
+        # Continue processing
+        response = await call_next(request)
+        return response
 
 
 # Dependency aliases for cleaner imports
