@@ -558,7 +558,10 @@ HTTP_RETRY_BACKOFF_BASE=2.0         # Exponential backoff multiplier
 
 # Request Protection
 REQUEST_SIZE_LIMIT_MB=1              # Max request body size
-RATE_LIMIT_REQUESTS_PER_MINUTE=10   # Rate limiting per IP/user
+RATE_LIMIT_PER_MIN=60               # User rate limiting per minute
+RATE_LIMIT_BURST=120                # User rate limiting burst capacity
+RATE_LIMIT_IP_PER_MIN=300           # IP rate limiting per minute (authenticated users)
+RATE_LIMIT_IP_BURST=600             # IP rate limiting burst capacity (authenticated users)
 ```
 
 ### Production Security Features

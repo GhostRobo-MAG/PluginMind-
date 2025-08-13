@@ -70,6 +70,10 @@ class Settings:
         # Rate Limiting Configuration
         self.rate_limit_per_min = int(os.getenv("RATE_LIMIT_PER_MIN", "60"))
         self.rate_limit_burst = int(os.getenv("RATE_LIMIT_BURST", "120"))
+        
+        # IP-specific Rate Limiting Configuration
+        self.rate_limit_ip_per_min = int(os.getenv("RATE_LIMIT_IP_PER_MIN", "300"))
+        self.rate_limit_ip_burst = int(os.getenv("RATE_LIMIT_IP_BURST", "600"))
         # Supabase Configuration
         self.supabase_url = os.getenv("SUPABASE_URL")
         self.supabase_anon_key = os.getenv("SUPABASE_ANON_KEY")

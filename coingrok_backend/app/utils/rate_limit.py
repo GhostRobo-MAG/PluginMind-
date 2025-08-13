@@ -96,33 +96,40 @@ class RateLimiter:
             f"refill_rate={self.refill_rate:.2f}/sec ({settings.rate_limit_per_min}/min)"
         )
     
-    async def _get_or_create_bucket(self, key: str) -> TokenBucket:
+    async def _get_or_create_bucket(self, key: str, capacity_override: Optional[int] = None, refill_rate_override: Optional[float] = None) -> TokenBucket:
         """Get existing bucket or create new one for key."""
         async with self.lock:
             if key not in self.buckets:
-                self.buckets[key] = TokenBucket(self.capacity, self.refill_rate)
-                logger.debug(f"Created new rate limit bucket for key: {key}")
+                effective_capacity = capacity_override or self.capacity
+                effective_refill_rate = refill_rate_override or self.refill_rate
+                self.buckets[key] = TokenBucket(effective_capacity, effective_refill_rate)
+                logger.debug(f"Created new rate limit bucket for key: {key} (capacity={effective_capacity}, refill_rate={effective_refill_rate:.2f})")
             return self.buckets[key]
     
-    async def consume(self, key: str, tokens: int = 1) -> Tuple[bool, int, Optional[int]]:
+    async def consume(self, key: str, tokens: int = 1, capacity_override: Optional[int] = None, refill_rate_override: Optional[float] = None) -> Tuple[bool, int, Optional[int]]:
         """
         Attempt to consume tokens for given key.
         
         Args:
             key: Rate limit key (e.g., "user:123" or "ip:1.2.3.4")
             tokens: Number of tokens to consume
+            capacity_override: Override bucket capacity for this call
+            refill_rate_override: Override refill rate for this call
             
         Returns:
             Tuple of (allowed: bool, remaining_tokens: int, retry_after_seconds: Optional[int])
         """
-        bucket = await self._get_or_create_bucket(key)
+        bucket = await self._get_or_create_bucket(key, capacity_override, refill_rate_override)
         allowed, remaining = await bucket.consume(tokens)
+        
+        # Use override refill rate for retry calculation if provided
+        effective_refill_rate = refill_rate_override or self.refill_rate
         
         retry_after = None
         if not allowed:
             # Calculate retry-after based on how long it takes to refill needed tokens
             needed_tokens = tokens - remaining
-            retry_after = max(1, int(needed_tokens / self.refill_rate))
+            retry_after = max(1, int(needed_tokens / effective_refill_rate))
         
         if not allowed:
             logger.warning(f"Rate limit exceeded for key: {key} (remaining: {remaining})")

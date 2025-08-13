@@ -12,6 +12,7 @@ from fastapi.security import HTTPAuthorizationCredentials
 from app.core.config import settings
 from app.core.logging import get_logger
 from app.utils.rate_limit import rate_limiter
+from app.utils.ip import extract_client_ip
 from app.middleware.auth import security, verify_google_id_token
 
 logger = get_logger(__name__)
@@ -43,16 +44,8 @@ def get_rate_limit_key(
             # Invalid token, fall back to IP-based limiting
             pass
     
-    # Fall back to IP-based rate limiting
-    client_ip = "unknown"
-    if request.client and request.client.host:
-        client_ip = request.client.host
-    elif "x-forwarded-for" in request.headers:
-        # Handle proxy/load balancer forwarded IP
-        client_ip = request.headers["x-forwarded-for"].split(",")[0].strip()
-    elif "x-real-ip" in request.headers:
-        client_ip = request.headers["x-real-ip"]
-    
+    # Fall back to IP-based rate limiting using hardened extraction
+    client_ip = extract_client_ip(request)
     return f"ip:{client_ip}"
 
 
@@ -62,9 +55,10 @@ async def rate_limiter_dependency(
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)
 ):
     """
-    FastAPI dependency that enforces rate limiting.
+    FastAPI dependency that enforces dual rate limiting.
     
-    Applies token bucket rate limiting based on user authentication or IP address.
+    For authenticated users: enforces both user-specific and IP-specific limits.
+    For unauthenticated users: enforces only IP-specific limits.
     Sets appropriate response headers and raises 429 on limit exceeded.
     
     Args:
@@ -75,31 +69,86 @@ async def rate_limiter_dependency(
     Raises:
         HTTPException: 429 if rate limit is exceeded
     """
-    # Get rate limiting key
-    rate_key = get_rate_limit_key(request, credentials)
+    # Check if user is authenticated
+    user_id = None
+    if credentials and credentials.credentials:
+        try:
+            user_id = verify_google_id_token(credentials.credentials)
+        except HTTPException:
+            # Invalid token, user_id remains None
+            pass
     
-    # Attempt to consume 1 token
-    allowed, remaining, retry_after = await rate_limiter.consume(rate_key, tokens=1)
+    # Get client IP for IP-based limiting
+    client_ip = extract_client_ip(request)
+    ip_key = f"ip:{client_ip}"
     
-    # Set rate limit headers
-    response.headers["X-RateLimit-Limit"] = str(settings.rate_limit_per_min)
-    response.headers["X-RateLimit-Remaining"] = str(remaining)
-    
-    # Check if rate limit exceeded
-    if not allowed:
-        if retry_after:
-            response.headers["Retry-After"] = str(retry_after)
+    # For authenticated users: check both user and IP limits
+    if user_id:
+        user_key = f"user:{user_id}"
         
-        logger.warning(
-            f"Rate limit exceeded for {rate_key} on {request.method} {request.url.path}"
+        # Check user limit (standard rates)
+        user_allowed, user_remaining, user_retry_after = await rate_limiter.consume(user_key, tokens=1)
+        
+        # Check IP limit (higher rates for authenticated users)
+        ip_allowed, ip_remaining, ip_retry_after = await rate_limiter.consume(
+            ip_key, 
+            tokens=1,
+            capacity_override=settings.rate_limit_ip_burst,
+            refill_rate_override=settings.rate_limit_ip_per_min / 60.0
         )
         
-        raise HTTPException(
-            status_code=429,
-            detail="Too many requests"
-        )
+        # Set headers based on most restrictive limit
+        if user_remaining < ip_remaining:
+            response.headers["X-RateLimit-Limit"] = str(settings.rate_limit_per_min)
+            response.headers["X-RateLimit-Remaining"] = str(user_remaining)
+            effective_retry_after = user_retry_after
+            limiting_type = "user"
+        else:
+            response.headers["X-RateLimit-Limit"] = str(settings.rate_limit_ip_per_min)
+            response.headers["X-RateLimit-Remaining"] = str(ip_remaining)
+            effective_retry_after = ip_retry_after
+            limiting_type = "ip"
+        
+        # Check if either limit exceeded
+        if not user_allowed or not ip_allowed:
+            if effective_retry_after:
+                response.headers["Retry-After"] = str(effective_retry_after)
+            
+            logger.warning(
+                f"Rate limit exceeded for authenticated user {user_id} ({limiting_type} limit) "
+                f"on {request.method} {request.url.path}"
+            )
+            
+            raise HTTPException(
+                status_code=429,
+                detail="Too many requests"
+            )
+        
+        logger.debug(f"Rate limit check passed for user {user_id} (user: {user_remaining}, ip: {ip_remaining})")
     
-    logger.debug(f"Rate limit check passed for {rate_key} (remaining: {remaining})")
+    else:
+        # For unauthenticated users: check only IP limit (standard rates)
+        ip_allowed, ip_remaining, ip_retry_after = await rate_limiter.consume(ip_key, tokens=1)
+        
+        # Set response headers
+        response.headers["X-RateLimit-Limit"] = str(settings.rate_limit_per_min)
+        response.headers["X-RateLimit-Remaining"] = str(ip_remaining)
+        
+        # Check if limit exceeded
+        if not ip_allowed:
+            if ip_retry_after:
+                response.headers["Retry-After"] = str(ip_retry_after)
+            
+            logger.warning(
+                f"Rate limit exceeded for {ip_key} on {request.method} {request.url.path}"
+            )
+            
+            raise HTTPException(
+                status_code=429,
+                detail="Too many requests"
+            )
+        
+        logger.debug(f"Rate limit check passed for {ip_key} (remaining: {ip_remaining})")
 
 
 # Dependency alias for cleaner imports
