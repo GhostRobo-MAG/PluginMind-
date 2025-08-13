@@ -24,7 +24,7 @@ from app.middleware.error_handler import setup_error_handlers
 from app.middleware.security_headers import SecurityHeadersMiddleware
 from app.middleware.request_limits import BodySizeLimitMiddleware
 from app.middleware.correlation_id import CorrelationIdMiddleware
-from app.middleware.auth import AmbientJWTAuthMiddleware
+from app.middleware.auth import AmbientJWTAuthMiddleware, get_google_issuer
 
 # API Routes
 from app.api.routes import health, analysis, jobs, query_logs, users
@@ -90,6 +90,15 @@ if not settings.debug:
     })
 
 app = FastAPI(**fastapi_kwargs)
+
+# Pre-warm OIDC issuer cache on startup
+@app.on_event("startup")
+async def _init_oidc_issuer_cache() -> None:
+    try:
+        issuer = get_google_issuer()
+        logger.info(f"OIDC issuer cache initialized: {issuer}")
+    except Exception:
+        logger.warning("OIDC issuer cache initialization failed; using fallback")
 
 # Setup middleware (order matters - CORS outermost, correlation ID early for logging)
 # Middleware executes in reverse order: CORS -> Auth -> Security -> Body -> Correlation -> Routes

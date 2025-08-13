@@ -5,7 +5,8 @@ This directory contains tests for the CoinGrok Backend API.
 ## Test Files
 
 - `test_middleware.py` - Tests middleware configuration, order, CORS, and security headers
-- `test_production_mode.py` - Tests production configuration requirements
+- `test_production_mode.py` - Tests production configuration requirements  
+- `test_jwt_security.py` - **Comprehensive JWT authentication security tests**
 
 ## Running Tests
 
@@ -32,6 +33,7 @@ Tests set their own environment variables for isolated testing:
 
 ## Test Coverage
 
+### Middleware & Configuration
 - ✅ Middleware execution order verification
 - ✅ CORS behavior with allowed/blocked origins  
 - ✅ Security headers presence
@@ -39,3 +41,11 @@ Tests set their own environment variables for isolated testing:
 - ✅ Protected route enforcement
 - ✅ Production CORS_ORIGINS requirement
 - ✅ Development mode fallbacks
+
+### JWT Authentication Security
+- ✅ Error message sanitization (prevents info disclosure)
+- ✅ PII removal from debug logs
+- ✅ Dynamic issuer discovery with fallback
+- ✅ Enhanced configuration validation
+- ✅ Attack vector prevention (algorithm confusion, token injection)
+- ✅ Bearer-only token parsing validation

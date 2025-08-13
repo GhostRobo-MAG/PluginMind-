@@ -5,12 +5,14 @@ Handles Google ID token verification using Google's public keys and RS256 algori
 Provides FastAPI dependencies for both required and optional authentication.
 """
 
-from typing import Optional, Dict, Any
+import time
+from typing import Optional, Dict, Any, Tuple
 from fastapi import Request, HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request as StarletteRequest
 from starlette.responses import Response
+import requests as http_requests
 from google.auth.transport import requests
 from google.oauth2 import id_token
 from app.core.config import settings
@@ -18,8 +20,34 @@ from app.core.logging import get_logger
 
 logger = get_logger(__name__)
 
+# 24-hour TTL cache for Google OpenID issuer
+_ISSUER_CACHE_TTL_SECONDS: int = 86400
+_issuer_cache: Tuple[Optional[str], float] = (None, 0.0)  # (issuer, ts)
 
 security = HTTPBearer(auto_error=False)
+
+
+def get_google_issuer() -> str:
+    """
+    Returns the Google OpenID issuer using a tiny in-memory cache.
+    Refreshes at most every _ISSUER_CACHE_TTL_SECONDS.
+    Falls back to 'https://accounts.google.com' on failure.
+    """
+    issuer, ts = _issuer_cache
+    now = time.time()
+    if issuer and (now - ts) < _ISSUER_CACHE_TTL_SECONDS:
+        return issuer
+    try:
+        discovery = http_requests.get(
+            "https://accounts.google.com/.well-known/openid-configuration",
+            timeout=10
+        ).json()
+        new_issuer = discovery.get("issuer", "https://accounts.google.com")
+    except Exception:
+        new_issuer = "https://accounts.google.com"
+    # store and return
+    globals()["_issuer_cache"] = (new_issuer, now)
+    return new_issuer
 
 
 def verify_google_id_token_claims(token: str) -> Dict[str, Any]:
@@ -55,11 +83,12 @@ def verify_google_id_token_claims(token: str) -> Dict[str, Any]:
                 detail="Invalid audience"
             )
         
-        # Verify issuer
-        if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
+        # Verify issuer using cached discovery
+        expected_issuer = get_google_issuer()
+        if idinfo['iss'] != expected_issuer:
             raise HTTPException(
                 status_code=401,
-                detail="Invalid token: wrong issuer"
+                detail="Invalid issuer"
             )
             
         return idinfo
@@ -68,7 +97,7 @@ def verify_google_id_token_claims(token: str) -> Dict[str, Any]:
         # Token verification failed (includes signature, expiry, and format validation)
         raise HTTPException(
             status_code=401,
-            detail=f"Invalid token: {str(e)}"
+            detail="Invalid token format"
         )
     except HTTPException:
         # Re-raise our own HTTP exceptions (audience, issuer validation)
@@ -77,7 +106,7 @@ def verify_google_id_token_claims(token: str) -> Dict[str, Any]:
         # Other errors during token verification
         raise HTTPException(
             status_code=401,
-            detail=f"Token verification failed: {str(e)}"
+            detail="Token verification failed"
         )
 
 
@@ -135,7 +164,7 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
     
     try:
         user_id = verify_google_id_token(credentials.credentials)
-        logger.debug(f"Authentication successful for user: {user_id}")
+        logger.debug("Authentication successful")
         return user_id
     except HTTPException as e:
         logger.warning(f"Authentication failed: {e.detail}")
@@ -203,7 +232,7 @@ class AmbientJWTAuthMiddleware(BaseHTTPMiddleware):
                 # Verify token and set user in request state
                 user_id = verify_google_id_token(token)
                 request.state.user = user_id
-                logger.debug(f"Set ambient user in request state: {user_id}")
+                logger.debug("Set ambient user in request state")
             except HTTPException:
                 # Invalid token - just log and continue (non-blocking)
                 logger.debug("Invalid JWT token in Authorization header, continuing without auth")

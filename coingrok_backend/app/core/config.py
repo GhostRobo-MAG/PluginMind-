@@ -88,6 +88,8 @@ class Settings:
             raise ValueError("Missing required Supabase configuration")
         if not self.google_client_id:
             raise ValueError("Missing required Google OAuth configuration")
+        if not self.google_client_secret:
+            raise ValueError("Missing GOOGLE_CLIENT_SECRET environment variable")
     @property
     def connect_args(self) -> dict:
         """Get database connection arguments based on database type."""
