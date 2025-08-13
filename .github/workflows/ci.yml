@@ -57,6 +57,12 @@ jobs:
     - name: Run error handling tests
       env:
         PYTHONPATH: .
+        TESTING: 1
+        OPENAI_API_KEY: test-openai-key
+        GROK_API_KEY: test-grok-key
+        GOOGLE_CLIENT_ID: test-client-id.apps.googleusercontent.com
+        DATABASE_URL: sqlite:///./test.db
+        CORS_ORIGINS: http://localhost:3000
       run: |
         echo "🧪 Running Error Handling Tests..."
         python run_error_tests.py
@@ -64,6 +70,12 @@ jobs:
     - name: Run rate limiting tests
       env:
         PYTHONPATH: .
+        TESTING: 1
+        OPENAI_API_KEY: test-openai-key
+        GROK_API_KEY: test-grok-key
+        GOOGLE_CLIENT_ID: test-client-id.apps.googleusercontent.com
+        DATABASE_URL: sqlite:///./test.db
+        CORS_ORIGINS: http://localhost:3000
       run: |
         echo "🧪 Running Rate Limiting Tests..."
         python tests/test_rate_limit.py
@@ -71,6 +83,12 @@ jobs:
     - name: Run middleware tests
       env:
         PYTHONPATH: .
+        TESTING: 1
+        OPENAI_API_KEY: test-openai-key
+        GROK_API_KEY: test-grok-key
+        GOOGLE_CLIENT_ID: test-client-id.apps.googleusercontent.com
+        DATABASE_URL: sqlite:///./test.db
+        CORS_ORIGINS: http://localhost:3000
       run: |
         echo "🧪 Running Middleware Tests..."
         python tests/test_middleware.py
@@ -78,6 +96,12 @@ jobs:
     - name: Run JWT security tests
       env:
         PYTHONPATH: .
+        TESTING: 1
+        OPENAI_API_KEY: test-openai-key
+        GROK_API_KEY: test-grok-key
+        GOOGLE_CLIENT_ID: test-client-id.apps.googleusercontent.com
+        DATABASE_URL: sqlite:///./test.db
+        CORS_ORIGINS: http://localhost:3000
       run: |
         echo "🧪 Running JWT Security Tests..."
         python tests/test_jwt_security.py
@@ -85,6 +109,12 @@ jobs:
     - name: Run production mode tests
       env:
         PYTHONPATH: .
+        TESTING: 1
+        OPENAI_API_KEY: test-openai-key
+        GROK_API_KEY: test-grok-key
+        GOOGLE_CLIENT_ID: test-client-id.apps.googleusercontent.com
+        DATABASE_URL: sqlite:///./test.db
+        CORS_ORIGINS: http://localhost:3000
       run: |
         echo "🧪 Running Production Mode Tests..."
         python tests/test_production_mode.py
@@ -99,6 +129,12 @@ jobs:
     - name: Validate error handling system
       env:
         PYTHONPATH: .
+        TESTING: 1
+        OPENAI_API_KEY: test-openai-key
+        GROK_API_KEY: test-grok-key
+        GOOGLE_CLIENT_ID: test-client-id.apps.googleusercontent.com
+        DATABASE_URL: sqlite:///./test.db
+        CORS_ORIGINS: http://localhost:3000
       run: |
         echo "🔍 Validating error handling system..."
         python -c "

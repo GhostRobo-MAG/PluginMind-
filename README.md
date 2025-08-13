@@ -3,9 +3,9 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-00a5ff.svg)](https://fastapi.tiangolo.com)
 [![Next.js](https://img.shields.io/badge/Next.js-15.2+-black.svg)](https://nextjs.org)
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://python.org)
-[![SQLModel](https://img.shields.io/badge/SQLModel-latest-green.svg)](https://sqlmodel.tiangolo.com)
+[![SQLModel](https://img.shields.io/badge/SQLModel-latest-green.svg)](https://sqlmodel.tiangolo.com)  
 
-> **Transform your crypto questions into intelligent investment insights using our 4-D AI Prompt Engine**
+> **Transform your crypto questions into intelligent investment insights using our 4-D AI Prompt Engine** /
 
 CoinGrok is a full-stack web application that leverages OpenAI and Grok APIs to provide comprehensive cryptocurrency analysis. Simply ask natural language questions like "Analyze ETH over 7 days with $500" and get professional-grade insights including sentiment analysis, market data, and investment recommendations.
 

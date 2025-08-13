@@ -20,19 +20,30 @@ class Settings:
     """
     
     def __init__(self):
+        # Test mode detection
+        self.testing = os.getenv("TESTING", "0") == "1"
+        
         # Application Info
         self.app_name = "CoinGrok Backend API"
         self.version = "1.0.0"
         self.debug = os.getenv("DEBUG", "false").lower() == "true"
         
-        # API Keys (Required)
+        # API Keys (Required in production, safe defaults in testing)
         self.openai_api_key = os.getenv("OPENAI_API_KEY")
         self.grok_api_key = os.getenv("GROK_API_KEY")
         
-        if not self.openai_api_key:
-            raise ValueError("OPENAI_API_KEY environment variable is required")
-        if not self.grok_api_key:
-            raise ValueError("GROK_API_KEY environment variable is required")
+        if self.testing:
+            # In testing mode, provide safe defaults for missing secrets
+            if not self.openai_api_key:
+                self.openai_api_key = "test-openai-key"
+            if not self.grok_api_key:
+                self.grok_api_key = "test-grok-key"
+        else:
+            # In production mode, keep strict validation
+            if not self.openai_api_key:
+                raise ValueError("OPENAI_API_KEY environment variable is required")
+            if not self.grok_api_key:
+                raise ValueError("GROK_API_KEY environment variable is required")
         
         # API Configuration
         self.grok_api_url = "https://api.x.ai/v1/chat/completions"
@@ -87,13 +98,29 @@ class Settings:
         self.google_client_id = os.getenv("GOOGLE_CLIENT_ID")
         self.google_client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
 
-        # Validation
-        if not all([self.supabase_url, self.supabase_anon_key]):
-            raise ValueError("Missing required Supabase configuration")
-        if not self.google_client_id:
-            raise ValueError("Missing required Google OAuth configuration")
-        if not self.google_client_secret:
-            raise ValueError("Missing GOOGLE_CLIENT_SECRET environment variable")
+        # Test-aware validation for additional required fields
+        if self.testing:
+            # In testing mode, provide safe defaults for missing configuration
+            if not self.supabase_url:
+                self.supabase_url = "https://test-project.supabase.co"
+            if not self.supabase_anon_key:
+                self.supabase_anon_key = "test-supabase-anon-key"
+            if not self.supabase_service_role:
+                self.supabase_service_role = "test-supabase-service-role"
+            if not self.jwt_secret:
+                self.jwt_secret = "test-jwt-secret"
+            if not self.google_client_id:
+                self.google_client_id = "test-client-id.apps.googleusercontent.com"
+            if not self.google_client_secret:
+                self.google_client_secret = "test-client-secret"
+        else:
+            # In production mode, keep strict validation
+            if not all([self.supabase_url, self.supabase_anon_key]):
+                raise ValueError("Missing required Supabase configuration")
+            if not self.google_client_id:
+                raise ValueError("Missing required Google OAuth configuration")
+            if not self.google_client_secret:
+                raise ValueError("Missing GOOGLE_CLIENT_SECRET environment variable")
     @property
     def connect_args(self) -> dict:
         """Get database connection arguments based on database type."""
