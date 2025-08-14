@@ -71,7 +71,7 @@ class Settings:
             raise ValueError(f"Invalid numeric configuration: {e}")
         
         # HTTP Client Configuration - parse numerics with error handling
-        self.http_timeout_seconds = self._parse_float("HTTP_TIMEOUT_SECONDS", "120")
+        self.http_timeout_seconds = self._parse_float("HTTP_TIMEOUT_SECONDS", "150")
         self.http_max_retries = self._parse_int("HTTP_MAX_RETRIES", "1")
         self.http_retry_backoff_base = self._parse_float("HTTP_RETRY_BACKOFF_BASE", "0.5")
         self.http_max_connections = self._parse_int("HTTP_MAX_CONNECTIONS", "100")

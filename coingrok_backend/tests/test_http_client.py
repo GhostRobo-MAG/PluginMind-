@@ -168,14 +168,14 @@ def test_http_timeout_defaults():
         settings = app.core.config.settings
         
         # Verify reasonable defaults
-        assert settings.http_timeout_seconds == 150.0  # Updated to match production config
+        assert settings.http_timeout_seconds == 120.0  # OpenAI timeout (your design decision)
         assert settings.http_max_retries == 1
         assert settings.http_retry_backoff_base == 0.5
         assert settings.http_max_connections == 100
         assert settings.http_max_keepalive == 10
         
-        # Grok defaults
-        assert settings.grok_timeout_seconds == 90.0  # Updated to match production config
+        # Grok defaults  
+        assert settings.grok_timeout_seconds == 200.0  # Grok timeout (your design decision)
         assert settings.grok_connect_timeout == 10.0
         assert settings.grok_write_timeout == 30.0
         assert settings.grok_pool_timeout == 5.0
