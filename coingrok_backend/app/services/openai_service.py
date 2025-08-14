@@ -29,7 +29,7 @@ class OpenAIService:
     
     def __init__(self):
         """Initialize OpenAI service."""
-        self.api_url = "https://api.openai.com/v1/chat/completions"
+        self.api_url = settings.openai_api_url
         logger.info("OpenAI service initialized with resilient HTTP client")
     
     async def _request_with_retries(

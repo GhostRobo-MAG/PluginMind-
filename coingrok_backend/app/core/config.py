@@ -6,7 +6,6 @@ with simple environment variable loading.
 """
 
 import os
-from typing import List
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -23,9 +22,9 @@ class Settings:
         # Test mode detection
         self.testing = os.getenv("TESTING", "0") == "1"
         
-        # Application Info
-        self.app_name = "CoinGrok Backend API"
-        self.version = "1.0.0"
+        # Application Info (configurable)
+        self.app_name = os.getenv("APP_NAME", "CoinGrok Backend API")
+        self.version = os.getenv("APP_VERSION", "1.0.0")
         self.debug = os.getenv("DEBUG", "false").lower() == "true"
         
         # API Keys (Required in production, safe defaults in testing)
@@ -45,10 +44,11 @@ class Settings:
             if not self.grok_api_key:
                 raise ValueError("GROK_API_KEY environment variable is required")
         
-        # API Configuration
-        self.grok_api_url = "https://api.x.ai/v1/chat/completions"
-        self.openai_model = "gpt-5"
-        self.grok_model = "grok-4-latest"
+        # API Configuration (configurable)
+        self.openai_api_url = os.getenv("OPENAI_API_URL", "https://api.openai.com/v1/chat/completions")
+        self.grok_api_url = os.getenv("GROK_API_URL", "https://api.x.ai/v1/chat/completions")
+        self.openai_model = os.getenv("OPENAI_MODEL", "gpt-5")
+        self.grok_model = os.getenv("GROK_MODEL", "grok-4-0709")
         
         # Database Configuration
         self.database_url = os.getenv("DATABASE_URL", "sqlite:///./coingrok.db")
