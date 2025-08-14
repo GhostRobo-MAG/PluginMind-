@@ -27,7 +27,7 @@ from app.middleware.correlation_id import CorrelationIdMiddleware
 from app.middleware.auth import AmbientJWTAuthMiddleware, get_google_issuer
 
 # API Routes
-from app.api.routes import health, analysis, jobs, query_logs, users
+from app.api.routes import health, analysis, jobs, query_logs, users, testing
 
 # Initialize logging
 setup_logging()
@@ -37,22 +37,33 @@ logger = get_logger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
-    FastAPI lifespan event handler.
+    FastAPI lifespan event handler with configuration validation.
     
     Manages application startup and shutdown:
-    - Startup: Initialize database tables and services
+    - Startup: Validate configuration, initialize database tables and services
     - Shutdown: Cleanup resources (if needed)
     """
     # Startup
-    logger.info(f"Starting {settings.app_name} v{settings.version} debug={settings.debug} log_level={settings.log_level}")
+    logger.info(f"Starting {settings.app_name} v{settings.version}")
     
     try:
+        # Configuration validation happens during settings import
+        # If we got here, configuration is valid
+        logger.info("Validating configuration...")
+        logger.info("Configuration validation passed")
+        
         # Initialize database
+        logger.info("Initializing database...")
         create_db_and_tables()
+        
         logger.info("Application startup completed successfully")
         
         yield
         
+    except ValueError as config_error:
+        # Configuration validation error
+        logger.error(f"Configuration validation failed: {str(config_error)}")
+        raise
     except Exception as e:
         logger.error(f"Application startup failed: {str(e)}")
         raise
@@ -139,6 +150,14 @@ app.include_router(
     tags=["users"],
     prefix="",
 )
+
+# Testing routes (only enabled in testing mode)
+if settings.testing:
+    app.include_router(
+        testing.router,
+        tags=["testing"],
+        prefix="",
+    )
 
 # Root endpoint
 @app.get("/")

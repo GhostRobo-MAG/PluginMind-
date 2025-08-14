@@ -9,7 +9,7 @@
 
 CoinGrok is a full-stack web application that leverages OpenAI and Grok APIs to provide comprehensive cryptocurrency analysis. Simply ask natural language questions like "Analyze ETH over 7 days with $500" and get professional-grade insights including sentiment analysis, market data, and investment recommendations.
 
-##  Current Status (v1.5 - Production Configuration & Testing Complete)
+##  Current Status (v1.6 - Full Test Coverage & Configuration Validation)
 
 - **Backend:** FastAPI with Google ID token verification (RS256) ✅
 - **Frontend:** Next.js with `@react-oauth/google` integration ✅
@@ -21,10 +21,26 @@ CoinGrok is a full-stack web application that leverages OpenAI and Grok APIs to 
 - **Testing:** **Full CI/CD integration with automated smoke tests** ✅
 - **Rate Limiting:** **Enhanced with Retry-After headers and dual limits** ✅
 - **HTTP Configuration:** **Configurable connection pools and granular timeouts** ✨ **NEW**
-- **Production Environment:** **Consolidated configuration with security enhancements**  **NEW**
-- **CI/CD Pipeline:** **100% test coverage with all 7 test suites passing** ✨ **NEW**
+- **Production Environment:** **Consolidated configuration with security enhancements**  
+- **CI/CD Pipeline:** **100% test coverage with all 85 tests passing** ✨ **NEW**
+- **Configuration Validation:** **Fail-fast startup validation with comprehensive checks** ✨ **NEW**
+- **Test Suite:** **Complete test reliability with enhanced error handling** ✨ **NEW**
 
-### 🆕 Latest Release Highlights (v1.5)
+### 🆕 Latest Release Highlights (v1.6)
+
+#### **🧪 Complete Test Coverage & Reliability** ✨ **NEW**
+- **100% Test Success Rate**: All 85 tests now passing (was 78/85 passing)
+- **Error Handling Test Fixes**: Resolved auth vs validation priority conflicts
+- **Rate Limiting Improvements**: Fixed IPv6 validation and negative token handling
+- **Enhanced Token Bucket**: Security fixes preventing rate limit exploitation
+- **TestClient Improvements**: Proper exception handling with `raise_server_exceptions=False`
+
+#### **⚙️ Production Configuration Validation** ✨ **NEW**
+- **Fail-Fast Startup**: Comprehensive validation of all environment variables at startup
+- **Smart Validation Logic**: Debug vs production mode validation with appropriate defaults
+- **Cross-Dependency Checks**: Validates related configuration variables together
+- **Clear Error Messages**: Detailed validation errors with specific fix instructions
+- **Testing Mode Support**: Relaxed validation for automated testing environments
 
 #### **🔧 HTTP Client Configuration System**
 - **Configurable Connection Pools**: Environment-driven max connections and keepalive settings
@@ -39,7 +55,7 @@ CoinGrok is a full-stack web application that leverages OpenAI and Grok APIs to 
 - **Production Security**: Sensitive information properly secured and documented
 
 #### ** Complete CI/CD Test Integration**
-- **100% Test Coverage**: All 7 test suites now included in GitHub Actions workflow
+- **100% Test Success**: All 85 tests passing in CI/CD pipeline (8 test suites)
 - **HTTP Client Tests**: 10 comprehensive tests for configuration and security validation
 - **Error Integration Tests**: 10 additional tests for complete error handling validation
 - **CI Environment Fix**: Relative paths ensure tests work in both local and CI environments
@@ -251,15 +267,9 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 # Install dependencies (includes Phase 2 auth dependencies)
 pip install -r requirements.txt
 
-# Configure environment - Production ready configuration included
-# Edit .env with your API keys (template provided):
-# Key sections already organized:
-# - SECRET KEYS & API CREDENTIALS (OpenAI, Grok, Supabase, JWT, Google OAuth)
-# - APPLICATION CONFIGURATION (App metadata, debug, CORS, database)
-# - MODEL & API CONFIGURATION (gpt-5, grok-4-0709 with correct endpoints)
-# - RATE LIMITS & REQUEST LOGIC (User limits, IP limits, body size)
-# - HTTP CLIENT CONFIGURATION (Connection pools, timeouts, retries) ✨ NEW
-# - ADDITIONAL CONFIGURATION (Job management, Gunicorn settings)
+# Configure environment variables in .env file
+# The backend will validate all configuration at startup
+# See "Configuration Variables" section below for details
 
 # Start the server
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
@@ -293,8 +303,13 @@ curl http://localhost:8000/health
 
 **Complete Test Suite:** ✨ **NEW**
 ```bash
+# Run full test suite - now 100% passing!
+python -m pytest
+# Expected: 85/85 tests passed ✅
+
 # Run comprehensive error handling tests
 python run_error_tests.py
+# Expected: All error handling tests passed ✅
 
 # Run all HTTP client configuration tests
 python -m pytest tests/test_http_client.py -v
@@ -304,12 +319,9 @@ python -m pytest tests/test_http_client.py -v
 # ✅ Granular timeout configuration (Grok-specific)
 # ✅ Security documentation validation
 
-# Run all error integration tests  
-python -m pytest tests/test_error_integration.py -v
-# Expected: 10/10 tests passed
-# ✅ Custom exception response format
-# ✅ Authentication error integration
-# ✅ Error correlation ID consistency
+# Test configuration validation at startup
+OPENAI_API_KEY=invalid python -c "from app.main import app"
+# Expected: Configuration validation error with clear fix instructions
 
 # Run production smoke tests (7 scenarios)
 chmod +x scripts/smoke_errors.sh
@@ -834,7 +846,161 @@ BASE=https://api.coingrok.com TOKEN=jwt_token ./scripts/smoke_backend.sh
 - [x] **Production Validation**: **Automated post-deploy error scenario testing**
 - [x] **HTTP Configuration**: **Environment-driven connection pools and granular timeouts** ✨ **NEW**
 - [x] **Security Enhancements**: **Bearer token redaction and comprehensive header protection** ✨ **NEW**
-- [x] **CI/CD Expansion**: **100% test coverage with 27 additional tests added** ✨ **NEW**
+- [x] **CI/CD Expansion**: **100% test success rate - all 85 tests passing** ✨ **NEW**
+- [x] **Configuration Validation**: **Fail-fast startup with comprehensive environment validation** ✨ **NEW**
+
+---
+
+## ⚙️ Startup Configuration Validation (Fail-Fast)
+
+CoinGrok backend implements comprehensive configuration validation at startup to ensure production reliability and prevent runtime failures due to invalid configuration.
+
+### What is Validated
+
+**API Keys & Secrets:**
+- `OPENAI_API_KEY`, `GROK_API_KEY`: Must be present and minimum 10 characters
+- `GOOGLE_CLIENT_ID`: Must end with `.apps.googleusercontent.com`
+- Cross-dependencies: `SUPABASE_ANON_KEY` required if `SUPABASE_URL` is set
+
+**URLs & Endpoints:**
+- `OPENAI_API_URL`, `GROK_API_URL`: Must be valid HTTP/HTTPS URLs
+- `DATABASE_URL`: Must use supported schemes (postgresql, sqlite, mysql)
+
+**CORS Security:**
+- Production mode: Requires explicit `CORS_ORIGINS`, no wildcards allowed
+- Debug mode: Allows wildcards, defaults to `http://localhost:3000` if omitted
+
+**Numeric Ranges:**
+- `HTTP_TIMEOUT_SECONDS`: 1-300 seconds
+- `HTTP_MAX_CONNECTIONS`: 1-10,000 connections
+- `RATE_LIMIT_PER_MIN`: 1-10,000 requests
+- `RATE_LIMIT_BURST`: 1-20,000, must be ≥ `RATE_LIMIT_PER_MIN`
+- `GROK_*_TIMEOUT`: Various ranges for connection, read, write timeouts
+
+**Logical Consistency:**
+- Model names (`OPENAI_MODEL`, `GROK_MODEL`) cannot be empty
+- Rate limit burst must be greater than or equal to per-minute limit
+
+### How to Interpret Errors
+
+**✅ Successful startup:**
+```bash
+2024-01-15 10:00:00 - INFO - Starting CoinGrok Backend API v1.0.0
+2024-01-15 10:00:00 - INFO - Validating configuration...
+2024-01-15 10:00:00 - INFO - Configuration validation passed
+2024-01-15 10:00:00 - INFO - Application startup completed successfully
+```
+
+**❌ Configuration errors (server won't start):**
+```bash
+2024-01-15 10:00:00 - INFO - Starting CoinGrok Backend API v1.0.0
+2024-01-15 10:00:00 - INFO - Validating configuration...
+2024-01-15 10:00:00 - ERROR - Configuration validation failed:
+  - OPENAI_API_KEY is missing or too short (minimum 10 characters)
+  - CORS_ORIGINS is required in production mode
+  - HTTP_TIMEOUT_SECONDS must be 1-300, got: 500
+  - RATE_LIMIT_BURST (50) must be >= RATE_LIMIT_PER_MIN (100)
+```
+
+### Common Fixes
+
+| Error | Solution |
+|-------|----------|
+| **API key missing/too short** | Set valid API keys with minimum 10 characters |
+| **Invalid URL format** | Ensure URLs start with `http://` or `https://` |
+| **CORS required in production** | Set `CORS_ORIGINS=https://yourdomain.com` when `DEBUG=false` |
+| **Numeric out of range** | Check .env.example for valid ranges |
+| **Google Client ID format** | Must end with `.apps.googleusercontent.com` |
+| **Database URL invalid** | Use `postgresql://`, `sqlite:///`, or `mysql://` schemes |
+
+### Debug vs Production Mode
+
+**Debug Mode (`DEBUG=true`):**
+- CORS origins default to `http://localhost:3000` if omitted
+- Wildcard (`*`) CORS origins allowed
+- More lenient validation for development
+
+**Production Mode (`DEBUG=false`):**
+- Explicit CORS origins required
+- No wildcard CORS origins allowed
+- Strict validation for all configuration
+
+### Testing Mode
+
+Set `TESTING=1` to relax validation for automated tests. This provides safe defaults for missing secrets while still validating numeric ranges and formats.
+
+---
+
+## 🔧 Configuration Variables
+
+The backend uses environment variables defined in `.env` for configuration. All variables are validated at startup.
+
+### **Required Variables (Critical)**
+
+| Variable | Description | Format | Example |
+|----------|-------------|---------|---------|
+| `OPENAI_API_KEY` | OpenAI API key (min 10 chars) | `sk-proj-...` | From OpenAI dashboard |
+| `GROK_API_KEY` | Grok/xAI API key (min 10 chars) | `xai-...` | From x.ai dashboard |
+| `GOOGLE_CLIENT_ID` | Google OAuth client ID | `*.apps.googleusercontent.com` | From Google Console |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth secret | `GOCSPX-...` | From Google Console |
+| `SUPABASE_URL` | Supabase project URL | `https://*.supabase.co` | From Supabase dashboard |
+| `SUPABASE_ANON_KEY` | Supabase anonymous key | `eyJ...` | From Supabase dashboard |
+| `JWT_SECRET` | JWT signing secret | Base64 string | Generate with `openssl rand -base64 64` |
+| `DATABASE_URL` | PostgreSQL connection string | `postgresql://...` | From Supabase or your DB |
+
+### **CORS & Security**
+
+| Variable | Description | Production Value | Debug Value |
+|----------|-------------|------------------|-------------|
+| `CORS_ORIGINS` | Allowed frontend origins | `https://yourdomain.com` | `http://localhost:3000` |
+| `DEBUG` | Debug mode | `false` | `true` |
+
+### **Application Settings**
+
+| Variable | Default | Description | Range |
+|----------|---------|-------------|-------|
+| `APP_NAME` | `CoinGrok Backend API` | Application name | Any string |
+| `APP_VERSION` | `1.6.0` | Version number | Semver format |
+| `LOG_LEVEL` | `INFO` | Logging level | DEBUG/INFO/WARNING/ERROR |
+
+### **AI Models & APIs**
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `OPENAI_MODEL` | `gpt-5` | OpenAI model name |
+| `OPENAI_API_URL` | `https://api.openai.com/v1/chat/completions` | OpenAI endpoint |
+| `GROK_MODEL` | `grok-4-0709` | Grok model name |
+| `GROK_API_URL` | `https://api.x.ai/v1/chat/completions` | Grok endpoint |
+
+### **Performance & Limits**
+
+| Variable | Default | Description | Range |
+|----------|---------|-------------|-------|
+| `HTTP_TIMEOUT_SECONDS` | `120` | Global HTTP timeout | 1-300 |
+| `HTTP_MAX_CONNECTIONS` | `100` | Max concurrent connections | 1-10,000 |
+| `HTTP_MAX_KEEPALIVE` | `10` | Max keepalive connections | 1-10,000 |
+| `RATE_LIMIT_PER_MIN` | `60` | Requests per minute per user | 1-10,000 |
+| `RATE_LIMIT_BURST` | `120` | Burst capacity | ≥ `RATE_LIMIT_PER_MIN` |
+| `MAX_USER_INPUT_LENGTH` | `500` | Max input characters | 1-50,000 |
+| `BODY_MAX_BYTES` | `1000000` | Max request body size | 1MB default |
+
+### **Grok-Specific Timeouts**
+
+| Variable | Default | Description | Range |
+|----------|---------|-------------|-------|
+| `GROK_TIMEOUT_SECONDS` | `200` | Grok read timeout | 1-600 |
+| `GROK_CONNECT_TIMEOUT` | `10.0` | Grok connection timeout | 0.1-60 |
+| `GROK_WRITE_TIMEOUT` | `30.0` | Grok write timeout | 0.1-120 |
+| `GROK_POOL_TIMEOUT` | `5.0` | Grok pool timeout | 0.1-30 |
+
+### **Optional Variables**
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `TESTING` | `0` | Testing mode (use `1` for tests only) |
+| `JOB_CLEANUP_HOURS` | `1` | Hours to keep completed jobs |
+| `HTTP_MAX_RETRIES` | `1` | HTTP retry attempts |
+| `JWT_ALGORITHM` | `HS256` | JWT algorithm |
 
 ---
 
@@ -892,7 +1058,7 @@ Access `/query-logs` endpoint to monitor:
 - [x] **Correlation ID Tracking**: End-to-end request tracing for debugging
 - [x] **Error Documentation**: Complete API error reference and troubleshooting guide
 
-### ✅ Phase 2.7: HTTP Configuration & Production Readiness (COMPLETE) ✨ **NEW**
+### ✅ Phase 2.7: HTTP Configuration & Production Readiness (COMPLETE)
 - [x] **HTTP Client Configuration**: Environment-driven connection pools and timeout settings
 - [x] **Granular Grok Timeouts**: Separate connect, read, write, and pool timeout configuration
 - [x] **Security Enhancements**: Bearer token redaction and comprehensive header protection
@@ -901,8 +1067,19 @@ Access `/query-logs` endpoint to monitor:
 - [x] **CI/CD Test Expansion**: Added HTTP client tests (10 tests) and error integration tests (10 tests)
 - [x] **Cross-Platform Compatibility**: Fixed CI environment issues with relative paths
 - [x] **Database Integration**: Automatic test database initialization for integration tests
-- [x] **100% Test Coverage**: All 10 test suites now included in GitHub Actions workflow
 - [x] **Production Documentation**: Complete HTTP configuration and deployment guide
+
+### ✅ Phase 2.8: Configuration Validation & Test Reliability (COMPLETE) ✨ **NEW**
+- [x] **Fail-Fast Configuration Validation**: Comprehensive startup validation with clear error messages
+- [x] **Environment Variable Validation**: API keys, URLs, CORS, numeric ranges, and cross-dependencies
+- [x] **Debug vs Production Mode**: Smart validation logic with appropriate defaults for each environment
+- [x] **100% Test Success Rate**: All 85 tests now passing (fixed 7 originally failing tests)
+- [x] **Enhanced IP Validation**: IPv6 zone ID rejection for improved rate limiting security
+- [x] **Token Bucket Security**: Prevention of negative token consumption exploitation
+- [x] **Error Handling Test Fixes**: Resolved authentication vs validation priority conflicts
+- [x] **TestClient Improvements**: Proper exception handling for comprehensive test coverage
+- [x] **Rate Limiting Enhancements**: Fixed async mock issues and invalid token handling
+- [x] **Production Test Reliability**: Complete CI/CD pipeline with 100% test success rate
 
 ### Phase 3: Business Features
 - [ ] Subscription tiers (Free/Pro/Premium)

@@ -265,7 +265,10 @@ class TestRateLimitDependency:
         
         # Exhaust rate limit first
         with patch('app.api.dependencies_rate_limit.rate_limiter') as mock_limiter:
-            mock_limiter.consume.return_value = (False, 0, 60)  # Denied, 0 remaining, 60s retry
+            # Mock async consume method
+            async def mock_consume(*args, **kwargs):
+                return (False, 0, 60)  # Denied, 0 remaining, 60s retry
+            mock_limiter.consume = mock_consume
             
             # Should raise HTTPException
             with pytest.raises(HTTPException) as exc_info:
@@ -312,7 +315,8 @@ class TestRateLimitDependency:
         credentials.credentials = "invalid.jwt.token"
         
         with patch('app.api.dependencies_rate_limit.verify_google_id_token') as mock_verify:
-            mock_verify.side_effect = HTTPException(status_code=401, detail="Invalid token")
+            from app.core.exceptions import AuthenticationError
+            mock_verify.side_effect = AuthenticationError("Invalid token")
             
             key = get_rate_limit_key(request, credentials)
             assert key == "ip:192.168.1.1"

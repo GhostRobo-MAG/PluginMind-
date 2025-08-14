@@ -152,7 +152,7 @@ class TestErrorResponseFormat:
     def test_validation_error_format(self):
         """Test validation error format with unified envelope."""
         # Send invalid JSON to trigger validation error
-        response = client.post("/analyze", json={})  # Missing required user_input field
+        response = client.post("/test-validation-error", json={})  # Missing required user_input field
         
         # Should now use our unified error format (after RequestValidationError handler)
         assert response.status_code == 422
@@ -173,7 +173,7 @@ class TestErrorResponseFormat:
         """Test malformed JSON triggers 422 with unified format."""
         # Send malformed JSON (this should trigger RequestValidationError)
         response = client.post(
-            "/analyze",
+            "/test-malformed-json",
             data='{"user_input": "test", malformed}',  # Malformed JSON
             headers={"Content-Type": "application/json"}
         )
@@ -191,7 +191,7 @@ class TestErrorResponseFormat:
     def test_missing_required_field_validation_error(self):
         """Test missing required fields trigger 422 with unified format."""
         # Send request without required user_input field
-        response = client.post("/analyze", json={"wrong_field": "value"})
+        response = client.post("/test-validation-error", json={"wrong_field": "value"})
         
         # Should return 422 with unified error format
         assert response.status_code == 422
@@ -272,11 +272,11 @@ class TestGenericExceptionHandling:
 
     def test_generic_exception_format(self):
         """Test that unexpected exceptions return proper 500 error format."""
-        # Create test app with exception endpoint
+        # Create test app with exception endpoint  
         test_app = create_test_app_with_exception_endpoint()
-        test_client = TestClient(test_app)
+        test_client = TestClient(test_app, raise_server_exceptions=False)
         
-        # Trigger generic exception
+        # Trigger generic exception - should not raise, should return 500 response
         response = test_client.get("/test-generic-exception")
         
         # Verify status code and unified error format

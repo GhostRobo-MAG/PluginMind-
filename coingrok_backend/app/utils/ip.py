@@ -77,6 +77,11 @@ def _validate_ip(ip_str: str) -> Optional[str]:
         return None
     
     try:
+        # Handle IPv6 zone IDs - for rate limiting, we don't support them
+        # as they're interface-specific and not useful for rate limiting
+        if '%' in ip_str:
+            return None
+            
         # This validates both IPv4 and IPv6
         ip_obj = ipaddress.ip_address(ip_str)
         return str(ip_obj)

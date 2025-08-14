@@ -58,6 +58,10 @@ class TokenBucket:
             )
             self.last_refill = now
             
+            # Treat negative tokens as zero consumption
+            if tokens < 0:
+                tokens = 0
+            
             # Check if we have enough tokens
             if self.tokens >= tokens:
                 self.tokens -= tokens

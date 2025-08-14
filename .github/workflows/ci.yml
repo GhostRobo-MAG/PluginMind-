@@ -152,6 +152,19 @@ jobs:
         echo "🧪 Running Error Integration Tests..."
         python -m pytest tests/test_error_integration.py -v
         
+    - name: Run configuration validation tests
+      env:
+        PYTHONPATH: .
+        TESTING: 1
+        OPENAI_API_KEY: test-openai-key
+        GROK_API_KEY: test-grok-key
+        GOOGLE_CLIENT_ID: test-client-id.apps.googleusercontent.com
+        DATABASE_URL: sqlite:///./test.db
+        CORS_ORIGINS: http://localhost:3000
+      run: |
+        echo "🧪 Running Configuration Validation Tests..."
+        python -m pytest tests/test_config_validation.py -v
+        
     - name: Test script executability
       run: |
         echo "🔧 Testing script executability..."
@@ -194,6 +207,7 @@ jobs:
         echo "| Production Mode | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
         echo "| HTTP Client Config | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
         echo "| Error Integration | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+        echo "| Configuration Validation | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "### 🛡️ Error Handling System" >> $GITHUB_STEP_SUMMARY
         echo "- ✅ Single source of truth exception mapping" >> $GITHUB_STEP_SUMMARY
