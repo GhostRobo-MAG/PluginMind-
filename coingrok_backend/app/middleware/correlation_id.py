@@ -18,8 +18,9 @@ from app.core.logging import get_logger
 
 logger = get_logger(__name__)
 
-# Context variable to store request ID across the request lifecycle
+# Context variables to store request information across the request lifecycle
 request_id_context: contextvars.ContextVar[str] = contextvars.ContextVar('request_id', default='-')
+request_route_context: contextvars.ContextVar[str] = contextvars.ContextVar('request_route', default=None)
 
 # Regex for validating request ID format (alphanumeric, hyphens, underscores, dots)
 REQUEST_ID_PATTERN = re.compile(r'^[A-Za-z0-9\-_.]{1,64}$')
@@ -27,11 +28,11 @@ REQUEST_ID_PATTERN = re.compile(r'^[A-Za-z0-9\-_.]{1,64}$')
 
 class CorrelationIdMiddleware(BaseHTTPMiddleware):
     """
-    Middleware to handle correlation IDs for request tracing.
+    Middleware to handle correlation IDs and route information for request tracing.
     
     Reads incoming X-Request-ID header if present and valid,
-    otherwise generates a new UUID. Sets the ID in context for
-    logging and adds it to the response header.
+    otherwise generates a new UUID. Also captures the request route/endpoint.
+    Sets both ID and route in context for logging and adds ID to response header.
     """
     
     def __init__(self, app):
@@ -79,9 +80,30 @@ class CorrelationIdMiddleware(BaseHTTPMiddleware):
             REQUEST_ID_PATTERN.match(request_id) is not None
         )
     
+    def _extract_route_path(self, request: Request) -> str:
+        """
+        Extract the route path from the request.
+        
+        Args:
+            request: Incoming HTTP request
+            
+        Returns:
+            str: Route path (e.g., '/api/v1/analysis' or '/analyze')
+        """
+        try:
+            # Get the URL path from the request as fallback
+            path = str(request.url.path)
+            
+            # For FastAPI, the route information is available after routing happens
+            # We'll store the path and update it later if route info becomes available
+            return path
+        except Exception:
+            # If anything goes wrong, return unknown
+            return 'unknown'
+    
     async def dispatch(self, request: Request, call_next) -> Response:
         """
-        Process request with correlation ID handling.
+        Process request with correlation ID and route handling.
         
         Args:
             request: Incoming HTTP request
@@ -93,8 +115,12 @@ class CorrelationIdMiddleware(BaseHTTPMiddleware):
         # Get or generate request ID
         request_id = self._get_or_generate_request_id(request)
         
-        # Set request ID in context for logging and other components
-        token = request_id_context.set(request_id)
+        # Extract route path
+        route_path = self._extract_route_path(request)
+        
+        # Set request ID and route in context for logging and other components
+        request_id_token = request_id_context.set(request_id)
+        route_token = request_route_context.set(route_path)
         
         try:
             # Process request
@@ -107,7 +133,8 @@ class CorrelationIdMiddleware(BaseHTTPMiddleware):
             
         finally:
             # Clean up context
-            request_id_context.reset(token)
+            request_id_context.reset(request_id_token)
+            request_route_context.reset(route_token)
 
 
 def get_request_id() -> str:
@@ -118,3 +145,13 @@ def get_request_id() -> str:
         str: Current request ID or '-' if not set
     """
     return request_id_context.get('-')
+
+
+def get_request_route() -> str:
+    """
+    Get the current request route from context.
+    
+    Returns:
+        str: Current request route/endpoint or None if not set
+    """
+    return request_route_context.get(None)
