@@ -190,11 +190,17 @@ def test_http_timeout_defaults():
 @pytest.mark.asyncio
 async def test_header_safety_documentation():
     """Test that services have proper header safety comments."""
+    import os
+    
+    # Use relative paths that work in CI and locally
+    openai_service_path = os.path.join(os.path.dirname(__file__), '..', 'app', 'services', 'openai_service.py')
+    grok_service_path = os.path.join(os.path.dirname(__file__), '..', 'app', 'services', 'grok_service.py')
+    
     # Read the service files to ensure they have safety comments
-    with open('/Users/alexandrugabrielmihai/Desktop/everything/CoinGrok/CoinGrok-mvp/coingrok_backend/app/services/openai_service.py', 'r') as f:
+    with open(openai_service_path, 'r') as f:
         openai_content = f.read()
     
-    with open('/Users/alexandrugabrielmihai/Desktop/everything/CoinGrok/CoinGrok-mvp/coingrok_backend/app/services/grok_service.py', 'r') as f:
+    with open(grok_service_path, 'r') as f:
         grok_content = f.read()
     
     # Check that both services import redact_headers
