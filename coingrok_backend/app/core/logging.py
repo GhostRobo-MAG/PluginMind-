@@ -9,7 +9,31 @@ import logging
 import re
 import sys
 from datetime import datetime
+from typing import Mapping, Any
 from app.core.config import settings
+
+
+# Sensitive header keys that should be redacted in logs
+SENSITIVE_HEADER_KEYS = {"authorization", "proxy-authorization", "x-api-key", "api-key"}
+
+
+def redact_headers(headers: Mapping[str, Any]) -> Mapping[str, Any]:
+    """
+    Redact sensitive header values for safe logging.
+    
+    Args:
+        headers: Dictionary of HTTP headers
+        
+    Returns:
+        Dictionary with sensitive values redacted
+    """
+    safe_headers = {}
+    for key, value in headers.items():
+        if key.lower() in SENSITIVE_HEADER_KEYS:
+            safe_headers[key] = "***REDACTED***"
+        else:
+            safe_headers[key] = value
+    return safe_headers
 
 
 class StructuredJsonFormatter(logging.Formatter):

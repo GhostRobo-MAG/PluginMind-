@@ -11,7 +11,7 @@ from typing import Optional
 import httpx
 from fastapi import HTTPException
 from app.core.config import settings
-from app.core.logging import get_logger
+from app.core.logging import get_logger, redact_headers
 from app.core.exceptions import AIServiceError, RateLimitError, ServiceUnavailableError
 from app.utils.http import http_client
 
@@ -56,14 +56,15 @@ class GrokService:
             "Authorization": f"Bearer {settings.grok_api_key}",
             "Content-Type": "application/json",
         }
+        # Note: Do not log raw headers; use redact_headers() for safe logging
         
         try:
-            # Use Grok-specific timeout (200s read timeout)
+            # Use Grok-specific timeout configuration
             grok_timeout = httpx.Timeout(
-                connect=10.0, 
-                read=settings.grok_timeout_seconds, 
-                write=30.0, 
-                pool=5.0
+                connect=settings.grok_connect_timeout,
+                read=settings.grok_timeout_seconds,
+                write=settings.grok_write_timeout,
+                pool=settings.grok_pool_timeout
             )
             
             response = await http_client.request_with_retries(

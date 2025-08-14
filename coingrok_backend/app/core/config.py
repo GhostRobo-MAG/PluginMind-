@@ -73,7 +73,14 @@ class Settings:
         self.http_timeout_seconds = float(os.getenv("HTTP_TIMEOUT_SECONDS", "120"))
         self.http_max_retries = int(os.getenv("HTTP_MAX_RETRIES", "1"))
         self.http_retry_backoff_base = float(os.getenv("HTTP_RETRY_BACKOFF_BASE", "0.5"))
+        self.http_max_connections = int(os.getenv("HTTP_MAX_CONNECTIONS", "100"))
+        self.http_max_keepalive = int(os.getenv("HTTP_MAX_KEEPALIVE", "10"))
+        
+        # Grok-specific timeout configuration
         self.grok_timeout_seconds = float(os.getenv("GROK_TIMEOUT_SECONDS", "200"))
+        self.grok_connect_timeout = float(os.getenv("GROK_CONNECT_TIMEOUT", "10.0"))
+        self.grok_write_timeout = float(os.getenv("GROK_WRITE_TIMEOUT", "30.0"))
+        self.grok_pool_timeout = float(os.getenv("GROK_POOL_TIMEOUT", "5.0"))
         
         # Request Limits Configuration
         self.body_max_bytes = int(os.getenv("BODY_MAX_BYTES", "1000000"))  # ~1MB

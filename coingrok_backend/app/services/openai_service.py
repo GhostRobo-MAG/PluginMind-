@@ -11,7 +11,7 @@ from typing import Optional
 from openai import AsyncOpenAI
 from fastapi import HTTPException
 from app.core.config import settings
-from app.core.logging import get_logger
+from app.core.logging import get_logger, redact_headers
 from app.core.exceptions import AIServiceError, RateLimitError, ServiceUnavailableError
 from app.ash_prompt import ASH_SYSTEM_PROMPT
 from app.utils.http import http_client
@@ -57,6 +57,7 @@ class OpenAIService:
             "Authorization": f"Bearer {settings.openai_api_key}",
             "Content-Type": "application/json",
         }
+        # Note: Do not log raw headers; use redact_headers() for safe logging
         
         try:
             response = await http_client.request_with_retries(

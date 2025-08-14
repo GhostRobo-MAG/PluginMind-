@@ -38,6 +38,14 @@ def setup_test_environment():
     # Verify test mode is enabled
     assert os.getenv("TESTING") == "1", "Test environment not properly configured"
     
+    # Initialize database tables for integration tests
+    try:
+        from app.database import create_db_and_tables
+        create_db_and_tables()
+        print("✅ Test database initialized")
+    except Exception as e:
+        print(f"⚠️ Database initialization warning: {e}")
+    
     # Log test environment setup
     print("✅ Test environment configured with safe defaults")
     print(f"📍 Database: {os.getenv('DATABASE_URL')}")
@@ -46,5 +54,13 @@ def setup_test_environment():
     
     yield
     
-    # Cleanup after all tests
+    # Cleanup test database
+    import sqlite3
+    try:
+        if os.path.exists("test.db"):
+            os.remove("test.db")
+            print("🗑️ Test database cleaned up")
+    except Exception:
+        pass
+    
     print("🧹 Test environment cleanup complete")

@@ -30,8 +30,8 @@ class HTTPClient:
         self.client = httpx.AsyncClient(
             timeout=settings.http_timeout_seconds,
             limits=httpx.Limits(
-                max_keepalive_connections=10,
-                max_connections=100
+                max_keepalive_connections=settings.http_max_keepalive,
+                max_connections=settings.http_max_connections
             )
         )
         logger.info("HTTP client initialized with timeout=%ss", settings.http_timeout_seconds)

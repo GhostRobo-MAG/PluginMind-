@@ -119,6 +119,39 @@ jobs:
         echo "🧪 Running Production Mode Tests..."
         python tests/test_production_mode.py
         
+    - name: Run HTTP client configuration tests
+      env:
+        PYTHONPATH: .
+        TESTING: 1
+        OPENAI_API_KEY: test-openai-key
+        GROK_API_KEY: test-grok-key
+        GOOGLE_CLIENT_ID: test-client-id.apps.googleusercontent.com
+        DATABASE_URL: sqlite:///./test.db
+        CORS_ORIGINS: http://localhost:3000
+        # HTTP client specific configuration
+        HTTP_MAX_CONNECTIONS: 50
+        HTTP_MAX_KEEPALIVE: 5
+        HTTP_TIMEOUT_SECONDS: 60
+        GROK_CONNECT_TIMEOUT: 8.0
+        GROK_WRITE_TIMEOUT: 25.0
+        GROK_POOL_TIMEOUT: 4.0
+      run: |
+        echo "🧪 Running HTTP Client Configuration Tests..."
+        python -m pytest tests/test_http_client.py -v
+        
+    - name: Run error integration tests
+      env:
+        PYTHONPATH: .
+        TESTING: 1
+        OPENAI_API_KEY: test-openai-key
+        GROK_API_KEY: test-grok-key
+        GOOGLE_CLIENT_ID: test-client-id.apps.googleusercontent.com
+        DATABASE_URL: sqlite:///./test.db
+        CORS_ORIGINS: http://localhost:3000
+      run: |
+        echo "🧪 Running Error Integration Tests..."
+        python -m pytest tests/test_error_integration.py -v
+        
     - name: Test script executability
       run: |
         echo "🔧 Testing script executability..."
@@ -159,6 +192,8 @@ jobs:
         echo "| Middleware | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
         echo "| JWT Security | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
         echo "| Production Mode | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+        echo "| HTTP Client Config | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+        echo "| Error Integration | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "### 🛡️ Error Handling System" >> $GITHUB_STEP_SUMMARY
         echo "- ✅ Single source of truth exception mapping" >> $GITHUB_STEP_SUMMARY
