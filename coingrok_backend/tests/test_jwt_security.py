@@ -211,37 +211,31 @@ def test_config_validation():
     """Test enhanced configuration validation."""
     print("\n=== Configuration Validation Tests ===")
     
-    # Test 1: Missing GOOGLE_CLIENT_SECRET
-    print("Test 1: Missing GOOGLE_CLIENT_SECRET")
+    # Test 1: Invalid GOOGLE_CLIENT_ID format
+    print("Test 1: Invalid GOOGLE_CLIENT_ID format")
     
-    # Temporarily remove the env var and disable test mode
-    # But provide other required env vars so we reach the Google validation
-    original_secret = os.environ.pop('GOOGLE_CLIENT_SECRET', None)
+    # Temporarily set invalid Google Client ID and disable test mode
+    original_client_id = os.environ.get('GOOGLE_CLIENT_ID')
     original_testing = os.environ.pop('TESTING', None)
     
-    # Set required Supabase vars so validation reaches Google Client Secret check
-    os.environ['SUPABASE_URL'] = 'https://test-project.supabase.co'
-    os.environ['SUPABASE_ANON_KEY'] = 'test-anon-key'
+    # Set an invalid Google Client ID (doesn't end with .apps.googleusercontent.com)
+    os.environ['GOOGLE_CLIENT_ID'] = 'invalid-client-id'
     
     try:
         settings = Settings()
-        print("  ❌ FAIL: Should have raised ValueError for missing GOOGLE_CLIENT_SECRET")
+        print("  ❌ FAIL: Should have raised ValueError for invalid GOOGLE_CLIENT_ID")
         return False
     except ValueError as e:
-        if "Missing GOOGLE_CLIENT_SECRET environment variable" in str(e):
-            print("  ✅ PASS: Correctly validates GOOGLE_CLIENT_SECRET requirement")
+        if "GOOGLE_CLIENT_ID is missing or invalid format" in str(e):
+            print("  ✅ PASS: Correctly validates GOOGLE_CLIENT_ID format requirement")
             result = True
         else:
             print(f"  ❌ FAIL: Wrong error message: {e}")
             result = False
     finally:
-        # Clean up the temporary env vars we set
-        os.environ.pop('SUPABASE_URL', None)
-        os.environ.pop('SUPABASE_ANON_KEY', None)
-        
         # Restore the original env vars
-        if original_secret:
-            os.environ['GOOGLE_CLIENT_SECRET'] = original_secret
+        if original_client_id:
+            os.environ['GOOGLE_CLIENT_ID'] = original_client_id
         if original_testing:
             os.environ['TESTING'] = original_testing
     
