@@ -215,8 +215,13 @@ def test_config_validation():
     print("Test 1: Missing GOOGLE_CLIENT_SECRET")
     
     # Temporarily remove the env var and disable test mode
+    # But provide other required env vars so we reach the Google validation
     original_secret = os.environ.pop('GOOGLE_CLIENT_SECRET', None)
     original_testing = os.environ.pop('TESTING', None)
+    
+    # Set required Supabase vars so validation reaches Google Client Secret check
+    os.environ['SUPABASE_URL'] = 'https://test-project.supabase.co'
+    os.environ['SUPABASE_ANON_KEY'] = 'test-anon-key'
     
     try:
         settings = Settings()
@@ -230,7 +235,11 @@ def test_config_validation():
             print(f"  ❌ FAIL: Wrong error message: {e}")
             result = False
     finally:
-        # Restore the env vars
+        # Clean up the temporary env vars we set
+        os.environ.pop('SUPABASE_URL', None)
+        os.environ.pop('SUPABASE_ANON_KEY', None)
+        
+        # Restore the original env vars
         if original_secret:
             os.environ['GOOGLE_CLIENT_SECRET'] = original_secret
         if original_testing:
