@@ -1,11 +1,11 @@
 """
-CoinGrok Backend API - Main Application
+CoinGrok Backend API - Main Application with AI Service Registry
 
-A production-ready FastAPI application for AI-powered cryptocurrency analysis.
-Refactored into a clean, modular architecture with proper separation of concerns.
+A production-ready FastAPI application for AI-powered cryptocurrency analysis
+with plugin-style AI service registry for improved modularity.
 
 Author: Alexandru G. Mihai
-Version: 1.0.0
+Version: 2.0.0
 """
 
 from contextlib import asynccontextmanager
@@ -17,6 +17,14 @@ from app.core.logging import setup_logging, get_logger
 
 # Database
 from app.database import create_db_and_tables
+
+# AI Service Registry
+from app.services.service_initialization import (
+    initialize_ai_services,
+    cleanup_ai_services,
+    register_mock_services_for_testing
+)
+from app.services.ai_service_interface import ai_service_registry
 
 # Middleware
 from app.middleware.cors import setup_cors
@@ -37,24 +45,51 @@ logger = get_logger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
-    FastAPI lifespan event handler with configuration validation.
+    FastAPI lifespan event handler with AI service registry initialization.
     
     Manages application startup and shutdown:
-    - Startup: Validate configuration, initialize database tables and services
-    - Shutdown: Cleanup resources (if needed)
+    - Startup: Validate configuration, initialize database, register AI services
+    - Shutdown: Cleanup AI services and resources
     """
     # Startup
     logger.info(f"Starting {settings.app_name} v{settings.version}")
     
     try:
         # Configuration validation happens during settings import
-        # If we got here, configuration is valid
         logger.info("Validating configuration...")
         logger.info("Configuration validation passed")
         
         # Initialize database
         logger.info("Initializing database...")
         create_db_and_tables()
+        
+        # Initialize AI services registry
+        logger.info("Initializing AI services registry...")
+        if settings.testing:
+            # Use mock services in testing mode if available
+            try:
+                register_mock_services_for_testing()
+            except:
+                # Fall back to real services if mocks not available
+                initialize_ai_services()
+        else:
+            initialize_ai_services()
+        
+        # Perform initial health check on AI services
+        logger.info("Performing AI services health check...")
+        health_results = await ai_service_registry.health_check_all()
+        for service_id, is_healthy in health_results.items():
+            status = "healthy" if is_healthy else "unhealthy"
+            logger.info(f"  - {service_id}: {status}")
+        
+        # Log registered services
+        registered_services = ai_service_registry.list_services()
+        logger.info(f"Registered {len(registered_services)} AI services:")
+        for service_id, metadata in registered_services.items():
+            logger.info(
+                f"  - {service_id}: {metadata.name} "
+                f"(provider: {metadata.provider}, model: {metadata.model})"
+            )
         
         logger.info("Application startup completed successfully")
         
@@ -71,6 +106,13 @@ async def lifespan(app: FastAPI):
         # Shutdown
         logger.info("Starting application shutdown")
         
+        # Cleanup AI services
+        try:
+            cleanup_ai_services()
+            logger.info("AI services cleaned up successfully")
+        except Exception as e:
+            logger.warning(f"Error during AI services cleanup: {str(e)}")
+        
         # Gracefully close HTTP client connections
         try:
             from app.utils.http import http_client
@@ -83,11 +125,10 @@ async def lifespan(app: FastAPI):
 
 
 # Initialize FastAPI application
-# Disable docs and OpenAPI in production for security
 fastapi_kwargs = {
     "title": settings.app_name,
-    "description": "AI-powered cryptocurrency analysis service using OpenAI and Grok",
-    "version": settings.version,
+    "description": "AI-powered cryptocurrency analysis service with plugin-style AI services",
+    "version": "2.0.0",
     "lifespan": lifespan,
     "debug": settings.debug,
 }
@@ -111,53 +152,24 @@ async def _init_oidc_issuer_cache() -> None:
     except Exception:
         logger.warning("OIDC issuer cache initialization failed; using fallback")
 
-# Setup middleware (order matters - CORS outermost, correlation ID early for logging)
-# Middleware executes in reverse order: CORS -> Auth -> Security -> Body -> Correlation -> Routes
-setup_error_handlers(app)  # Error handlers (not middleware stack)
-app.add_middleware(CorrelationIdMiddleware)  # Innermost - early for logging
-app.add_middleware(BodySizeLimitMiddleware)  # Body size limits
-app.add_middleware(SecurityHeadersMiddleware)  # Security headers
-app.add_middleware(AmbientJWTAuthMiddleware)  # Ambient JWT parsing
-setup_cors(app)  # Outermost - CORS headers on all responses
+# Setup middleware (order matters)
+setup_error_handlers(app)
+app.add_middleware(CorrelationIdMiddleware)
+app.add_middleware(BodySizeLimitMiddleware)
+app.add_middleware(SecurityHeadersMiddleware)
+app.add_middleware(AmbientJWTAuthMiddleware)
+setup_cors(app)
 
 # Include API routers
-app.include_router(
-    health.router,
-    tags=["health"],
-    prefix="",
-)
-
-app.include_router(
-    analysis.router,
-    tags=["analysis"],
-    prefix="",
-)
-
-app.include_router(
-    jobs.router,
-    tags=["jobs"],
-    prefix="",
-)
-
-app.include_router(
-    query_logs.router,
-    tags=["logs"],
-    prefix="",
-)
-
-app.include_router(
-    users.router,
-    tags=["users"],
-    prefix="",
-)
+app.include_router(health.router, tags=["health"], prefix="")
+app.include_router(analysis.router, tags=["analysis"], prefix="")
+app.include_router(jobs.router, tags=["jobs"], prefix="")
+app.include_router(query_logs.router, tags=["logs"], prefix="")
+app.include_router(users.router, tags=["users"], prefix="")
 
 # Testing routes (only enabled in testing mode)
 if settings.testing:
-    app.include_router(
-        testing.router,
-        tags=["testing"],
-        prefix="",
-    )
+    app.include_router(testing.router, tags=["testing"], prefix="")
 
 # Root endpoint
 @app.get("/")
@@ -165,17 +177,58 @@ async def root():
     """Root endpoint with basic API information."""
     return {
         "name": settings.app_name,
-        "version": settings.version,
+        "version": "2.0.0",
         "description": "AI-powered cryptocurrency analysis service",
-        "docs": "/docs",
+        "features": {
+            "ai_service_registry": True,
+            "plugin_architecture": True,
+            "4d_prompt_engine": True
+        },
+        "docs": "/docs" if settings.debug else None,
         "health": "/health"
+    }
+
+# AI Services management endpoints
+@app.get("/services")
+async def list_services():
+    """
+    List all registered AI services.
+    
+    Returns information about all AI services currently registered
+    in the plugin registry.
+    """
+    from app.services.analysis_service import analysis_service
+    
+    return {
+        "registry_info": analysis_service.get_service_info(),
+        "health_status": await analysis_service.health_check()
+    }
+
+@app.get("/services/health")
+async def services_health():
+    """
+    Check health status of all AI services.
+    
+    Performs health checks on all registered AI services and returns
+    their current status.
+    """
+    health_results = await ai_service_registry.health_check_all()
+    
+    all_healthy = all(health_results.values())
+    
+    return {
+        "overall_health": "healthy" if all_healthy else "degraded",
+        "services": health_results,
+        "total_services": len(health_results),
+        "healthy_services": sum(1 for h in health_results.values() if h),
+        "unhealthy_services": sum(1 for h in health_results.values() if not h)
     }
 
 
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
-        "app.main:app",
+        "app.main_with_registry:app",
         host="0.0.0.0",
         port=8000,
         reload=settings.debug,
