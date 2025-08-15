@@ -10,6 +10,7 @@ This directory contains tests for the CoinGrok Backend API.
 - `test_rate_limit.py` - Tests dual enforcement rate limiting with IP extraction and token buckets
 - `test_error_handling.py` - **Tests unified error handling system and exception mapping**
 - `test_error_integration.py` - **Integration tests for complete error handling flow**
+- `test_ai_service_registry.py` - **Comprehensive AI service registry and plugin system tests**
 
 ## Running Tests
 
@@ -29,6 +30,9 @@ python tests/test_error_integration.py
 
 # Run rate limiting tests
 python tests/test_rate_limit.py
+
+# Run AI service registry tests
+python tests/test_ai_service_registry.py
 ```
 
 ### With pytest (if installed)
@@ -78,3 +82,13 @@ Tests set their own environment variables for isolated testing:
 - ✅ **Message sanitization and security validation**
 - ✅ **HTTPException fallback handling**
 - ✅ **Integration testing across all endpoints**
+
+### AI Service Registry System
+- ✅ **Service registration and discovery by type/capability**
+- ✅ **Health checking system for all AI services**
+- ✅ **Fallback mechanisms when primary services fail**
+- ✅ **Service metadata management and validation**
+- ✅ **Monitoring endpoints (/services, /services/health)**
+- ✅ **Plugin architecture with mock service injection**
+- ✅ **Service lifecycle management (register/unregister)**
+- ✅ **Edge case handling (no services, failed health checks)**

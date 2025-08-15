@@ -165,6 +165,19 @@ jobs:
         echo "🧪 Running Configuration Validation Tests..."
         python -m pytest tests/test_config_validation.py -v
         
+    - name: Run AI service registry tests
+      env:
+        PYTHONPATH: .
+        TESTING: 1
+        OPENAI_API_KEY: test-openai-key
+        GROK_API_KEY: test-grok-key
+        GOOGLE_CLIENT_ID: test-client-id.apps.googleusercontent.com
+        DATABASE_URL: sqlite:///./test.db
+        CORS_ORIGINS: http://localhost:3000
+      run: |
+        echo "🧪 Running AI Service Registry Tests..."
+        python -m pytest tests/test_ai_service_registry.py -v
+        
     - name: Test script executability
       run: |
         echo "🔧 Testing script executability..."
@@ -208,6 +221,7 @@ jobs:
         echo "| HTTP Client Config | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
         echo "| Error Integration | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
         echo "| Configuration Validation | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+        echo "| AI Service Registry | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "### 🛡️ Error Handling System" >> $GITHUB_STEP_SUMMARY
         echo "- ✅ Single source of truth exception mapping" >> $GITHUB_STEP_SUMMARY
@@ -215,3 +229,11 @@ jobs:
         echo "- ✅ Correlation ID tracking" >> $GITHUB_STEP_SUMMARY
         echo "- ✅ Message sanitization" >> $GITHUB_STEP_SUMMARY
         echo "- ✅ HTTP status code mapping" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 🤖 AI Service Registry System" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Plugin-style service registration" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Service discovery by type and capability" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Health checking and monitoring" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Automatic fallback mechanisms" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Service metadata management" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Monitoring endpoints (/services, /services/health)" >> $GITHUB_STEP_SUMMARY
