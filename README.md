@@ -9,7 +9,7 @@
 
 CoinGrok is a full-stack web application that leverages OpenAI and Grok APIs to provide comprehensive cryptocurrency analysis. Simply ask natural language questions like "Analyze ETH over 7 days with $500" and get professional-grade insights including sentiment analysis, market data, and investment recommendations.
 
-##  Current Status (v1.6 - Full Test Coverage & Configuration Validation)
+##  Current Status (v1.7 - AI Service Registry & Plugin Architecture)
 
 - **Backend:** FastAPI with Google ID token verification (RS256) ✅
 - **Frontend:** Next.js with `@react-oauth/google` integration ✅
@@ -20,22 +20,32 @@ CoinGrok is a full-stack web application that leverages OpenAI and Grok APIs to 
 - **Error Handling:** **Production-ready unified system with comprehensive coverage** ✅
 - **Testing:** **Full CI/CD integration with automated smoke tests** ✅
 - **Rate Limiting:** **Enhanced with Retry-After headers and dual limits** ✅
-- **HTTP Configuration:** **Configurable connection pools and granular timeouts** ✨ **NEW**
-- **Production Environment:** **Consolidated configuration with security enhancements**  
-- **CI/CD Pipeline:** **100% test coverage with all 85 tests passing** ✨ **NEW**
-- **Configuration Validation:** **Fail-fast startup validation with comprehensive checks** ✨ **NEW**
-- **Test Suite:** **Complete test reliability with enhanced error handling** ✨ **NEW**
+- **HTTP Configuration:** **Configurable connection pools and granular timeouts** ✅
+- **Production Environment:** **Consolidated configuration with security enhancements** ✅
+- **CI/CD Pipeline:** **100% test coverage with all 105 tests passing** ✅
+- **Configuration Validation:** **Fail-fast startup validation with comprehensive checks** ✅
+- **Test Suite:** **Complete test reliability with enhanced error handling** ✅
+- **AI Service Registry:** **Plugin-style architecture with service discovery** ✨ **NEW**
+- **Service Monitoring:** **Health checks and monitoring endpoints** ✨ **NEW**
 
-### 🆕 Latest Release Highlights (v1.6)
+### 🆕 Latest Release Highlights (v1.7)
 
-#### **🧪 Complete Test Coverage & Reliability** ✨ **NEW**
-- **100% Test Success Rate**: All 85 tests now passing (was 78/85 passing)
-- **Error Handling Test Fixes**: Resolved auth vs validation priority conflicts
-- **Rate Limiting Improvements**: Fixed IPv6 validation and negative token handling
-- **Enhanced Token Bucket**: Security fixes preventing rate limit exploitation
-- **TestClient Improvements**: Proper exception handling with `raise_server_exceptions=False`
+#### **🤖 AI Service Registry & Plugin Architecture** ✨ **NEW**
+- **Plugin-Style AI Services**: Abstract interface with OpenAI and Grok implementations
+- **Service Discovery System**: Type and capability-based service selection
+- **Health Monitoring**: Automatic health checks with fallback mechanisms
+- **Service Metadata Management**: Comprehensive service information and capabilities
+- **New Monitoring Endpoints**: `/services` and `/services/health` for operational insights
+- **Comprehensive Test Coverage**: 20 additional tests covering all registry functionality
 
-#### **⚙️ Production Configuration Validation** ✨ **NEW**
+#### **🧪 Enhanced Test Coverage & Reliability**
+- **105 Total Tests**: All tests passing (85 original + 20 registry tests)
+- **Service Registry Tests**: Complete coverage of plugin architecture
+- **Integration Testing**: Service discovery, health checks, and endpoint validation
+- **Mock Service Framework**: Comprehensive testing infrastructure
+- **CI/CD Integration**: Registry tests included in automated pipeline
+
+#### **⚙️ Production Configuration Validation**
 - **Fail-Fast Startup**: Comprehensive validation of all environment variables at startup
 - **Smart Validation Logic**: Debug vs production mode validation with appropriate defaults
 - **Cross-Dependency Checks**: Validates related configuration variables together
@@ -55,7 +65,8 @@ CoinGrok is a full-stack web application that leverages OpenAI and Grok APIs to 
 - **Production Security**: Sensitive information properly secured and documented
 
 #### ** Complete CI/CD Test Integration**
-- **100% Test Success**: All 85 tests passing in CI/CD pipeline (8 test suites)
+- **100% Test Success**: All 105 tests passing in CI/CD pipeline (9 test suites)
+- **AI Service Registry Tests**: 20 comprehensive tests for plugin architecture
 - **HTTP Client Tests**: 10 comprehensive tests for configuration and security validation
 - **Error Integration Tests**: 10 additional tests for complete error handling validation
 - **CI Environment Fix**: Relative paths ensure tests work in both local and CI environments
@@ -73,6 +84,7 @@ CoinGrok is a full-stack web application that leverages OpenAI and Grok APIs to 
 - **Python 3.11+** – Core application logic
 - **FastAPI** – High-performance async API framework
 - **SQLModel** – Type-safe database ORM with PostgreSQL/SQLite
+- **AI Service Registry** – Plugin architecture for AI providers
 - **OpenAI API** – GPT-5 for prompt optimization
 - **Grok xAI API** – Advanced crypto market analysis
 - **Pydantic v2** – Data validation and serialization
@@ -108,7 +120,7 @@ CoinGrok-mvp/                          # Repository root
 │
 ├── coingrok_backend/                  # Backend API service
 │   ├── app/
-│   │   ├── main.py                    # FastAPI app initialization with graceful shutdown
+│   │   ├── main.py                    # FastAPI app with AI service registry ✨
 │   │   ├── database.py               # Database engine & session management  
 │   │   ├── ash_prompt.py             # 4-D Prompt Engine system prompt
 │   │   │
@@ -127,10 +139,12 @@ CoinGrok-mvp/                          # Repository root
 │   │   │       ├── health.py        # /health, /live, /ready, /version endpoints
 │   │   │       └── query_logs.py    # /query-logs analytics
 │   │   │
-│   │   ├── services/                 # Business logic layer
-│   │   │   ├── openai_service.py    # OpenAI integration (4-D Engine)
-│   │   │   ├── grok_service.py      # Grok/xAI integration
-│   │   │   ├── analysis_service.py  # Orchestration & logging
+│   │   ├── services/                 # Business logic layer ✨ ENHANCED
+│   │   │   ├── ai_service_interface.py  # ✨ Plugin registry & abstract interface
+│   │   │   ├── service_initialization.py # ✨ Service registration at startup
+│   │   │   ├── openai_service.py    # OpenAI plugin implementation
+│   │   │   ├── grok_service.py      # Grok plugin implementation
+│   │   │   ├── analysis_service.py  # Orchestration with service discovery
 │   │   │   └── user_service.py      # User management & usage tracking
 │   │   │
 │   │   ├── models/                   # Data layer
@@ -166,10 +180,17 @@ CoinGrok-mvp/                          # Repository root
 │   │   │                            # → Connection pool configuration validation
 │   │   │                            # → Granular timeout testing (Grok-specific)
 │   │   │                            # → Security header redaction validation
+│   │   ├── test_ai_service_registry.py # ✨ AI service registry tests (20 tests)
+│   │   │                            # → Service registration and discovery
+│   │   │                            # → Health checking and monitoring
+│   │   │                            # → Fallback mechanisms and edge cases
+│   │   │                            # → Service metadata management
+│   │   │                            # → New monitoring endpoints validation
 │   │   ├── test_rate_limit.py       # Rate limiting behavior tests
 │   │   ├── test_middleware.py       # Middleware functionality tests
 │   │   ├── test_jwt_security.py     # JWT validation tests
-│   │   └── test_production_mode.py  # Production environment tests
+│   │   ├── test_production_mode.py  # Production environment tests
+│   │   └── README.md                test documentation
 │   │
 │   ├── scripts/                      # Operations & testing scripts ✨
 │   │   ├── smoke_errors.sh          # Error handling smoke tests (7 scenarios)
@@ -223,25 +244,30 @@ frontend/
 3. **Develop** → OpenAI optimizes prompt for crypto analysis
 4. **Deliver** → Grok generates comprehensive analysis with sentiment, news, recommendations
 
-### Request Flow
+### Request Flow with AI Service Registry
 ```mermaid
 graph LR
     A[User Input] --> B[Validation]
-    B --> C[OpenAI Service]
-    C --> D[Prompt Optimization]
-    D --> E[Grok Service]
-    E --> F[Market Analysis]
-    F --> G[Query Logging]
-    G --> H[Response]
+    B --> C[AI Service Registry]
+    C --> D[Service Discovery]
+    D --> E[OpenAI Plugin]
+    E --> F[Prompt Optimization]
+    F --> G[Grok Plugin]
+    G --> H[Market Analysis]
+    H --> I[Query Logging]
+    I --> J[Response]
 ```
 
 ### Architecture Benefits
+- **Plugin Architecture**: AI services implement common interface
+- **Service Discovery**: Dynamic service selection by type/capability
+- **Health Monitoring**: Automatic health checks with fallback mechanisms
 - **Modular Design**: Each component has single responsibility
 - **Type Safety**: Full TypeScript/Python type coverage
 - **Error Handling**: Centralized exception management
 - **Scalability**: Service layer ready for microservices
-- **Testing**: Clean architecture supports unit testing
-- **Monitoring**: Built-in logging and analytics
+- **Testing**: Clean architecture supports comprehensive unit testing
+- **Monitoring**: Built-in logging, analytics, and service health endpoints
 
 ---
 
@@ -293,6 +319,20 @@ pnpm dev
 
 Visit `http://localhost:3000` to access the application.
 
+### 🔍 AI Service Registry Endpoints
+
+**Service Information:**
+```bash
+curl http://localhost:8000/services
+# Response: Registry info and health status for all AI services
+```
+
+**Health Monitoring:**
+```bash
+curl http://localhost:8000/services/health
+# Response: Individual service health with overall system status
+```
+
 ### 🧪 Testing the API
 
 **Health Check:**
@@ -305,7 +345,16 @@ curl http://localhost:8000/health
 ```bash
 # Run full test suite - now 100% passing!
 python -m pytest
-# Expected: 85/85 tests passed ✅
+# Expected: 105/105 tests passed ✅
+
+# Run AI service registry tests specifically
+python -m pytest tests/test_ai_service_registry.py -v
+# Expected: 20/20 registry tests passed ✅
+# ✅ Service registration and discovery
+# ✅ Health checking and monitoring
+# ✅ Fallback mechanisms and error handling
+# ✅ Service metadata management
+# ✅ Monitoring endpoints (/services, /services/health)
 
 # Run comprehensive error handling tests
 python run_error_tests.py
@@ -846,8 +895,9 @@ BASE=https://api.coingrok.com TOKEN=jwt_token ./scripts/smoke_backend.sh
 - [x] **Production Validation**: **Automated post-deploy error scenario testing**
 - [x] **HTTP Configuration**: **Environment-driven connection pools and granular timeouts** ✨ **NEW**
 - [x] **Security Enhancements**: **Bearer token redaction and comprehensive header protection** ✨ **NEW**
-- [x] **CI/CD Expansion**: **100% test success rate - all 85 tests passing** ✨ **NEW**
+- [x] **CI/CD Expansion**: **100% test success rate - all 105 tests passing** ✨ **NEW**
 - [x] **Configuration Validation**: **Fail-fast startup with comprehensive environment validation** ✨ **NEW**
+- [x] **AI Service Registry**: **Plugin architecture with service discovery and health monitoring** ✨ **NEW**
 
 ---
 
@@ -1011,6 +1061,8 @@ The backend uses environment variables defined in `.env` for configuration. All 
 - Error tracking with categorization and stack traces
 - API usage metrics and patterns
 - Database query performance monitoring
+- AI service health and performance tracking
+- Service discovery and registry operations
 
 ### Query Analytics
 Access `/query-logs` endpoint to monitor:
@@ -1021,9 +1073,12 @@ Access `/query-logs` endpoint to monitor:
 
 ### Health Monitoring
 - `/health` endpoint for uptime monitoring
+- `/services` endpoint for AI service registry information
+- `/services/health` endpoint for individual service health status
 - Automatic cleanup of old jobs and data
 - Database connection health checks
 - Memory and resource usage tracking
+- AI service availability and performance monitoring
 
 ## 🛣️ Roadmap
 
@@ -1069,17 +1124,29 @@ Access `/query-logs` endpoint to monitor:
 - [x] **Database Integration**: Automatic test database initialization for integration tests
 - [x] **Production Documentation**: Complete HTTP configuration and deployment guide
 
-### ✅ Phase 2.8: Configuration Validation & Test Reliability (COMPLETE) ✨ **NEW**
+### ✅ Phase 2.8: Configuration Validation & Test Reliability (COMPLETE)
 - [x] **Fail-Fast Configuration Validation**: Comprehensive startup validation with clear error messages
 - [x] **Environment Variable Validation**: API keys, URLs, CORS, numeric ranges, and cross-dependencies
 - [x] **Debug vs Production Mode**: Smart validation logic with appropriate defaults for each environment
-- [x] **100% Test Success Rate**: All 85 tests now passing (fixed 7 originally failing tests)
+- [x] **100% Test Success Rate**: All 105 tests now passing (fixed 7 originally failing tests)
 - [x] **Enhanced IP Validation**: IPv6 zone ID rejection for improved rate limiting security
 - [x] **Token Bucket Security**: Prevention of negative token consumption exploitation
 - [x] **Error Handling Test Fixes**: Resolved authentication vs validation priority conflicts
 - [x] **TestClient Improvements**: Proper exception handling for comprehensive test coverage
 - [x] **Rate Limiting Enhancements**: Fixed async mock issues and invalid token handling
 - [x] **Production Test Reliability**: Complete CI/CD pipeline with 100% test success rate
+
+### ✅ Phase 2.9: AI Service Registry & Plugin Architecture (COMPLETE) ✨ **NEW**
+- [x] **Plugin-Style AI Services**: Abstract AIService interface with concrete OpenAI/Grok implementations
+- [x] **Service Discovery System**: Type and capability-based service selection and registration
+- [x] **Health Monitoring Infrastructure**: Automatic health checks with comprehensive status reporting
+- [x] **Service Metadata Management**: Complete service information tracking and validation
+- [x] **Registry-Based Orchestration**: Analysis service uses registry for dynamic service discovery
+- [x] **New Monitoring Endpoints**: `/services` and `/services/health` for operational insights
+- [x] **Backward Compatibility**: Legacy service methods preserved for seamless migration
+- [x] **Comprehensive Test Coverage**: 20 additional tests covering all registry functionality
+- [x] **CI/CD Integration**: Registry tests included in automated pipeline
+- [x] **GPT-5 API Compatibility**: Fixed parameter issues (max_completion_tokens, temperature handling)
 
 ### Phase 3: Business Features
 - [ ] Subscription tiers (Free/Pro/Premium)
