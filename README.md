@@ -1,13 +1,36 @@
-# 🪙 CoinGrok - AI-Powered Crypto Analysis Platform
+# PluginMind – Production-Ready AI SaaS Full Stack Boilerplate
+### 🚀 Build & Launch AI SaaS Faster
+
+PluginMind is a **production-ready Full Stack boilerplate** for AI-powered SaaS products.  
+It gives you a secure, extensible foundation with **authentication, database integration, plugin-style AI registry, CI/CD, and 100+ automated tests** – everything you need to launch an AI product fast.
+
+## 🧠 Background 
+
+PluginMind started as **CoinGrok**, a crypto analysis tool powered by AI.  
+But during development, we realized the real value wasn’t in the crypto wrapper – it was in the **backend engine** we built.
+
+Instead of a narrow app, we pivoted and productized the **core system**:
+
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-00a5ff.svg)](https://fastapi.tiangolo.com)
 [![Next.js](https://img.shields.io/badge/Next.js-15.2+-black.svg)](https://nextjs.org)
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://python.org)
 [![SQLModel](https://img.shields.io/badge/SQLModel-latest-green.svg)](https://sqlmodel.tiangolo.com)  
+- 🔌 **Plugin-Style AI Registry** → add new LLMs in just a few lines.  
+- 🛡️ **Secure Auth & Rate Limiting** → Google login, JWT, CORS, request limits.  
+- 🗄️ **Database Integration** → Supabase & Postgres ready.  
+- 🧪 **105+ Automated Tests** → integrated into CI/CD for reliability.  
+- ⚡ **Production Infrastructure** → FastAPI, modular services, env configs.
 
-> **Transform your crypto questions into intelligent investment insights using our 4-D AI Prompt Engine** /
+This pivot turned CoinGrok into **PluginMind: a universal AI SaaS backend boilerplate**.
 
-CoinGrok is a full-stack web application that leverages OpenAI and Grok APIs to provide comprehensive cryptocurrency analysis. Simply ask natural language questions like "Analyze ETH over 7 days with $500" and get professional-grade insights including sentiment analysis, market data, and investment recommendations.
+## 🧩 Example Use Cases
+
+PluginMind can power **any AI SaaS product**, such as:
+- 📊 Crypto Analyzer (original CoinGrok use case)  
+- 📝 Document Summarizer SaaS  
+- 🤖 AI Support Chatbot Backend  
+- 🔍 SEO Content Generator  
 
 ##  Current Status (v1.7 - AI Service Registry & Plugin Architecture)
 
@@ -112,7 +135,7 @@ CoinGrok is a full-stack web application that leverages OpenAI and Grok APIs to 
 
 ### Repository Structure (Production-Ready)
 ```
-CoinGrok-mvp/                          # Repository root
+PluginMind/                          # Repository root
 ├── .github/
 │   └── workflows/                     # CI/CD automation
 │       ├── ci.yml                     # Comprehensive test suite runner
@@ -238,12 +261,6 @@ frontend/
 
 ## 🔄 How It Works
 
-### 4-D Prompt Engine Workflow
-1. **Deconstruct** → Extract coin, timeframe, budget from user input
-2. **Diagnose** → Validate and clarify the request
-3. **Develop** → OpenAI optimizes prompt for crypto analysis
-4. **Deliver** → Grok generates comprehensive analysis with sentiment, news, recommendations
-
 ### Request Flow with AI Service Registry
 ```mermaid
 graph LR
@@ -253,7 +270,7 @@ graph LR
     D --> E[OpenAI Plugin]
     E --> F[Prompt Optimization]
     F --> G[Grok Plugin]
-    G --> H[Market Analysis]
+    G --> H[Analysis]
     H --> I[Query Logging]
     I --> J[Response]
 ```
@@ -279,45 +296,6 @@ graph LR
 - OpenAI API Key
 - Grok API Key
 
-### Backend Setup
-
-```bash
-# Clone the repository
-git clone <repo_url>
-cd CoinGrok-mvp/coingrok_backend
-
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies (includes Phase 2 auth dependencies)
-pip install -r requirements.txt
-
-# Configure environment variables in .env file
-# The backend will validate all configuration at startup
-# See "Configuration Variables" section below for details
-
-# Start the server
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
-
-### Frontend Setup
-
-```bash
-cd ../frontend
-
-# Install dependencies
-npm install
-# or
-pnpm install
-
-# Start development server
-npm run dev
-# or  
-pnpm dev
-```
-
-Visit `http://localhost:3000` to access the application.
 
 ### 🔍 AI Service Registry Endpoints
 
@@ -597,7 +575,7 @@ User management and subscription tracking:
 
 ### **Protected API Endpoints**
 ```http
-POST   /analyze        # 🔒 Protected - Crypto analysis with usage tracking
+POST   /analyze        # 🔒 Protected - Analysis with usage tracking
 GET    /me             # 🔒 Protected - User profile information
 GET    /me/usage       # 🔒 Protected - Query usage statistics
 ```
@@ -1155,14 +1133,7 @@ Access `/query-logs` endpoint to monitor:
 - [ ] Query limits enforcement
 - [ ] User dashboard and analytics
 
-### Phase 4: Advanced Analytics
-- [ ] Real-time crypto data integration
-- [ ] Interactive charts and visualizations
-- [ ] Portfolio tracking capabilities
-- [ ] Automated alerts and notifications
-- [ ] Historical analysis comparison
-
-### Phase 5: Scale & Performance
+### Phase 4: Scale & Performance
 - [ ] Redis caching layer
 - [ ] Rate limiting middleware
 - [ ] API versioning strategy
@@ -1171,8 +1142,8 @@ Access `/query-logs` endpoint to monitor:
 
 ## 🙏 Acknowledgments
 
-- **OpenAI** - GPT-4 for intelligent prompt optimization
-- **Grok AI** - Advanced crypto market analysis capabilities
+- **OpenAI** - GPT-5 for intelligent prompt optimization
+- **Grok AI** - Advanced market analysis capabilities
 - **FastAPI** - High-performance async API framework
 - **Next.js** - React framework for production applications
 - **SQLModel** - Type-safe database ORM with automatic API integration
@@ -1180,6 +1151,9 @@ Access `/query-logs` endpoint to monitor:
 
 ---
 
-**Built with ❤️ by Alexandru G. Mihai & Adrian Ungureanu**
+**Built with ❤️ by Alexandru G. Mihai** 
 
-*Transforming crypto curiosity into confident investment decisions through AI-powered analysis.*
+## 📬 Get Access to Full Boilerplate
+
+For full source code and a commercial license, contact:  
+📧 **[mihai.gl.alexandru@gmail.com]**
