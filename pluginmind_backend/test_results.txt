@@ -1,0 +1,144 @@
+/Users/alexandrugabrielmihai/Desktop/everything/PluginMind/PluginMind-/pluginmind_backend/.venv/lib/python3.13/site-packages/pytest_asyncio/plugin.py:208: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+============================= test session starts ==============================
+platform darwin -- Python 3.13.5, pytest-8.3.4, pluggy-1.6.0 -- /Users/alexandrugabrielmihai/Desktop/everything/PluginMind/PluginMind-/pluginmind_backend/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/alexandrugabrielmihai/Desktop/everything/PluginMind/PluginMind-/pluginmind_backend
+plugins: asyncio-0.24.0, anyio-4.9.0
+asyncio: mode=Mode.STRICT, default_loop_scope=None
+collecting ... collected 105 items
+
+tests/test_ai_service_registry.py::TestAIServiceInterface::test_service_metadata_creation PASSED [  0%]
+tests/test_ai_service_registry.py::TestAIServiceInterface::test_service_capability_checking PASSED [  1%]
+tests/test_ai_service_registry.py::TestAIServiceRegistry::test_service_registration PASSED [  2%]
+tests/test_ai_service_registry.py::TestAIServiceRegistry::test_service_registration_with_replacement PASSED [  3%]
+tests/test_ai_service_registry.py::TestAIServiceRegistry::test_service_discovery_by_type PASSED [  4%]
+tests/test_ai_service_registry.py::TestAIServiceRegistry::test_service_discovery_by_capability PASSED [  5%]
+tests/test_ai_service_registry.py::TestAIServiceRegistry::test_preferred_service_selection PASSED [  6%]
+tests/test_ai_service_registry.py::TestAIServiceRegistry::test_service_unregistration PASSED [  7%]
+tests/test_ai_service_registry.py::TestAIServiceRegistry::test_health_check_all_services PASSED [  8%]
+tests/test_ai_service_registry.py::TestAnalysisServiceWithRegistry::test_service_selection_by_type PASSED [  9%]
+tests/test_ai_service_registry.py::TestAnalysisServiceWithRegistry::test_fallback_mechanism PASSED [ 10%]
+tests/test_ai_service_registry.py::TestAnalysisServiceWithRegistry::test_no_fallback_available PASSED [ 11%]
+tests/test_ai_service_registry.py::TestServiceMonitoringEndpoints::test_services_list_endpoint PASSED [ 12%]
+tests/test_ai_service_registry.py::TestServiceMonitoringEndpoints::test_services_health_endpoint PASSED [ 13%]
+tests/test_ai_service_registry.py::TestServiceMonitoringEndpoints::test_services_health_all_healthy PASSED [ 14%]
+tests/test_ai_service_registry.py::TestServiceInitialization::test_initialize_ai_services PASSED [ 15%]
+tests/test_ai_service_registry.py::TestEdgeCases::test_registry_with_no_services PASSED [ 16%]
+tests/test_ai_service_registry.py::TestEdgeCases::test_invalid_service_registration PASSED [ 17%]
+tests/test_ai_service_registry.py::TestEdgeCases::test_health_check_with_exception PASSED [ 18%]
+tests/test_ai_service_registry.py::TestEdgeCases::test_service_metadata_edge_cases PASSED [ 19%]
+tests/test_config_validation.py::test_config_validation_methods_exist PASSED [ 20%]
+tests/test_config_validation.py::test_url_validation_helper PASSED       [ 20%]
+tests/test_config_validation.py::test_database_url_validation_helper PASSED [ 21%]
+tests/test_config_validation.py::test_cors_origin_validation_helper PASSED [ 22%]
+tests/test_config_validation.py::test_configuration_loads_successfully_in_testing PASSED [ 23%]
+tests/test_config_validation.py::test_numeric_parsing_methods PASSED     [ 24%]
+tests/test_config_validation.py::test_validation_fail_fast_behavior PASSED [ 25%]
+tests/test_error_handling.py::TestExceptionMapping::test_all_exceptions_mapped PASSED [ 26%]
+tests/test_error_handling.py::TestExceptionMapping::test_error_codes_exist PASSED [ 27%]
+tests/test_error_handling.py::TestExceptionMapping::test_status_codes_valid PASSED [ 28%]
+tests/test_error_handling.py::TestExceptionMapping::test_raise_api_error_helper PASSED [ 29%]
+tests/test_error_handling.py::TestErrorResponseFormat::test_job_not_found_format PASSED [ 30%]
+tests/test_error_handling.py::TestErrorResponseFormat::test_user_not_found_format PASSED [ 31%]
+tests/test_error_handling.py::TestErrorResponseFormat::test_validation_error_format PASSED [ 32%]
+tests/test_error_handling.py::TestErrorResponseFormat::test_malformed_json_validation_error PASSED [ 33%]
+tests/test_error_handling.py::TestErrorResponseFormat::test_missing_required_field_validation_error PASSED [ 34%]
+tests/test_error_handling.py::TestErrorResponseFormat::test_large_request_format PASSED [ 35%]
+tests/test_error_handling.py::TestErrorResponseFormat::test_content_type_header PASSED [ 36%]
+tests/test_error_handling.py::TestErrorResponseFormat::test_correlation_id_format PASSED [ 37%]
+tests/test_error_handling.py::TestExceptionMessageHandling::test_custom_message_exceptions PASSED [ 38%]
+tests/test_error_handling.py::TestExceptionMessageHandling::test_original_message_exceptions PASSED [ 39%]
+tests/test_error_handling.py::TestGenericExceptionHandling::test_generic_exception_format PASSED [ 40%]
+tests/test_error_handling.py::TestRateLimitRetryAfter::test_rate_limit_error_with_retry_after PASSED [ 40%]
+tests/test_error_handling.py::TestRateLimitRetryAfter::test_rate_limit_error_response_with_retry_after_header PASSED [ 41%]
+tests/test_error_handling.py::TestRateLimitRetryAfter::test_http_exception_429_uses_rate_limit_code PASSED [ 42%]
+tests/test_error_handling.py::TestExceptionStatusCodes::test_authentication_errors_401 PASSED [ 43%]
+tests/test_error_handling.py::TestExceptionStatusCodes::test_not_found_errors_404 PASSED [ 44%]
+tests/test_error_handling.py::TestExceptionStatusCodes::test_rate_limit_errors_429 PASSED [ 45%]
+tests/test_error_handling.py::TestExceptionStatusCodes::test_server_errors_5xx PASSED [ 46%]
+tests/test_error_integration.py::TestErrorIntegration::test_custom_exception_response_format PASSED [ 47%]
+tests/test_error_integration.py::TestErrorIntegration::test_health_check_errors PASSED [ 48%]
+tests/test_error_integration.py::TestErrorIntegration::test_http_exception_fallback PASSED [ 49%]
+tests/test_error_integration.py::TestErrorIntegration::test_error_logging_correlation PASSED [ 50%]
+tests/test_error_integration.py::TestErrorIntegration::test_multiple_error_consistency PASSED [ 51%]
+tests/test_error_integration.py::TestErrorIntegration::test_authentication_error_integration PASSED [ 52%]
+tests/test_error_integration.py::TestErrorIntegration::test_error_response_headers PASSED [ 53%]
+tests/test_error_integration.py::TestErrorEdgeCases::test_empty_request_handling PASSED [ 54%]
+tests/test_error_integration.py::TestErrorEdgeCases::test_invalid_json_handling PASSED [ 55%]
+tests/test_error_integration.py::TestErrorEdgeCases::test_large_correlation_id_handling PASSED [ 56%]
+tests/test_http_client.py::test_redact_headers_sensitive_keys PASSED     [ 57%]
+tests/test_http_client.py::test_redact_headers_case_insensitive PASSED   [ 58%]
+tests/test_http_client.py::test_redact_headers_empty PASSED              [ 59%]
+tests/test_http_client.py::test_http_pool_limits_configuration PASSED    [ 60%]
+tests/test_http_client.py::test_grok_timeout_configuration PASSED        [ 60%]
+tests/test_http_client.py::test_http_client_retry_configuration PASSED   [ 61%]
+tests/test_http_client.py::test_http_timeout_defaults PASSED             [ 62%]
+tests/test_http_client.py::test_header_safety_documentation PASSED       [ 63%]
+tests/test_http_client.py::test_sensitive_header_keys_coverage PASSED    [ 64%]
+tests/test_http_client.py::test_httpx_timeout_object_creation PASSED     [ 65%]
+tests/test_jwt_security.py::test_error_message_sanitization PASSED       [ 66%]
+tests/test_jwt_security.py::test_pii_removal_from_logs PASSED            [ 67%]
+tests/test_jwt_security.py::test_dynamic_issuer_discovery_DISABLED PASSED [ 68%]
+tests/test_jwt_security.py::test_config_validation PASSED                [ 69%]
+tests/test_jwt_security.py::test_attack_vector_prevention PASSED         [ 70%]
+tests/test_middleware.py::test_middleware_order PASSED                   [ 71%]
+tests/test_middleware.py::test_cors_behavior PASSED                      [ 72%]
+tests/test_middleware.py::test_auth_middleware PASSED                    [ 73%]
+tests/test_production_mode.py::test_production_cors_config PASSED        [ 74%]
+tests/test_rate_limit.py::TestTokenBucket::test_token_bucket_basic_consumption PASSED [ 75%]
+tests/test_rate_limit.py::TestTokenBucket::test_token_bucket_refill PASSED [ 76%]
+tests/test_rate_limit.py::TestTokenBucket::test_token_bucket_capacity_limit PASSED [ 77%]
+tests/test_rate_limit.py::TestTokenBucket::test_token_bucket_concurrent_access PASSED [ 78%]
+tests/test_rate_limit.py::TestRateLimiter::test_rate_limiter_separate_keys PASSED [ 79%]
+tests/test_rate_limit.py::TestRateLimiter::test_rate_limiter_overrides PASSED [ 80%]
+tests/test_rate_limit.py::TestRateLimiter::test_rate_limiter_retry_after PASSED [ 80%]
+tests/test_rate_limit.py::TestIPExtraction::test_validate_ip_valid_ipv4 PASSED [ 81%]
+tests/test_rate_limit.py::TestIPExtraction::test_validate_ip_valid_ipv6 PASSED [ 82%]
+tests/test_rate_limit.py::TestIPExtraction::test_validate_ip_invalid PASSED [ 83%]
+tests/test_rate_limit.py::TestIPExtraction::test_extract_client_ip_direct PASSED [ 84%]
+tests/test_rate_limit.py::TestIPExtraction::test_extract_client_ip_x_forwarded_for PASSED [ 85%]
+tests/test_rate_limit.py::TestIPExtraction::test_extract_client_ip_x_real_ip PASSED [ 86%]
+tests/test_rate_limit.py::TestIPExtraction::test_extract_client_ip_fallback PASSED [ 87%]
+tests/test_rate_limit.py::TestRateLimitDependency::test_unauthenticated_rate_limiting PASSED [ 88%]
+tests/test_rate_limit.py::TestRateLimitDependency::test_authenticated_dual_enforcement PASSED [ 89%]
+tests/test_rate_limit.py::TestRateLimitDependency::test_rate_limit_exceeded_response PASSED [ 90%]
+tests/test_rate_limit.py::TestRateLimitDependency::test_get_rate_limit_key_authenticated PASSED [ 91%]
+tests/test_rate_limit.py::TestRateLimitDependency::test_get_rate_limit_key_unauthenticated PASSED [ 92%]
+tests/test_rate_limit.py::TestRateLimitDependency::test_get_rate_limit_key_invalid_token PASSED [ 93%]
+tests/test_rate_limit.py::TestRateLimitConfiguration::test_default_rate_limits PASSED [ 94%]
+tests/test_rate_limit.py::TestRateLimitConfiguration::test_ip_limits_higher_than_user_limits PASSED [ 95%]
+tests/test_rate_limit.py::TestEdgeCases::test_concurrent_bucket_creation PASSED [ 96%]
+tests/test_rate_limit.py::TestEdgeCases::test_malformed_headers PASSED   [ 97%]
+tests/test_rate_limit.py::TestEdgeCases::test_empty_headers PASSED       [ 98%]
+tests/test_rate_limit.py::TestEdgeCases::test_zero_token_consumption PASSED [ 99%]
+tests/test_rate_limit.py::TestEdgeCases::test_negative_token_consumption PASSED [100%]
+
+=============================== warnings summary ===============================
+app/main.py:147
+  /Users/alexandrugabrielmihai/Desktop/everything/PluginMind/PluginMind-/pluginmind_backend/app/main.py:147: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("startup")
+
+.venv/lib/python3.13/site-packages/fastapi/applications.py:4495
+  /Users/alexandrugabrielmihai/Desktop/everything/PluginMind/PluginMind-/pluginmind_backend/.venv/lib/python3.13/site-packages/fastapi/applications.py:4495: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)
+
+tests/test_error_handling.py::TestErrorResponseFormat::test_malformed_json_validation_error
+tests/test_error_integration.py::TestErrorEdgeCases::test_invalid_json_handling
+  /Users/alexandrugabrielmihai/Desktop/everything/PluginMind/PluginMind-/pluginmind_backend/.venv/lib/python3.13/site-packages/httpx/_content.py:204: DeprecationWarning: Use 'content=<...>' to upload raw bytes/text content.
+    warnings.warn(message, DeprecationWarning)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================= 105 passed, 4 warnings in 3.80s ========================

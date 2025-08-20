@@ -148,7 +148,7 @@ def test_pii_removal_from_logs():
         # Clean up
         logger.removeHandler(handler)
 
-def test_dynamic_issuer_discovery_DISABLED():
+def test_dynamic_issuer_discovery():
     """Test dynamic issuer discovery with fallback."""
     print("\n=== Dynamic Issuer Discovery Tests ===")
     
