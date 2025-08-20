@@ -115,7 +115,7 @@ def render_item(type_, obj, autogen_context):
 
 def process_revision_directives(context, revision, directives):
     """Process revision directives to customize migration generation."""
-    if getattr(config.cmd_opts, 'autogenerate', False):
+    if getattr(config.cmd_opts, "autogenerate", False):
         script = directives[0]
         if script.upgrade_ops.is_empty():
             directives[:] = []
@@ -151,8 +151,8 @@ def run_migrations_online() -> None:
     # Check if we're using an async engine
     database_url = get_url()
     if database_url and (
-        database_url.startswith("postgresql+asyncpg://") or
-        database_url.startswith("sqlite+aiosqlite://")
+        database_url.startswith("postgresql+asyncpg://")
+        or database_url.startswith("sqlite+aiosqlite://")
     ):
         # Run async migrations
         asyncio.run(run_async_migrations())

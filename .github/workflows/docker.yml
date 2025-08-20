@@ -82,6 +82,7 @@ jobs:
           # Test container startup
           docker run --rm \
             --network pluginmind-test \
+            -e TESTING=1 \
             -e DATABASE_URL="postgresql://test:test@postgres-test:5432/test" \
             -e OPENAI_API_KEY="test-key" \
             -e GROK_API_KEY="test-key" \
@@ -93,7 +94,7 @@ jobs:
           from app.core.config import settings
           from app.database import create_db_and_tables
           print('✅ Container configuration valid')
-          asyncio.run(create_db_and_tables())
+          create_db_and_tables()
           print('✅ Database connection successful')
           "
           
@@ -131,6 +132,7 @@ jobs:
             --name backend-prod-test \
             --network pluginmind-prod-test \
             -p 8000:8000 \
+            -e TESTING=1 \
             -e DATABASE_URL="postgresql://test:test@postgres-prod-test:5432/test" \
             -e OPENAI_API_KEY="test-key" \
             -e GROK_API_KEY="test-key" \
