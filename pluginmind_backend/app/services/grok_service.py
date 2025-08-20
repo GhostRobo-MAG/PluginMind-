@@ -47,13 +47,17 @@ class GrokService(AIService):
         
         # Service metadata
         self._metadata = AIServiceMetadata(
-            name="Grok Crypto Analyzer",
+            name="Grok AI Service",
             provider="xAI",
             version="1.0.0",
             capabilities=[
+                AIServiceCapability.GENERIC_ANALYSIS,
+                AIServiceCapability.DOCUMENT_SUMMARIZATION,
+                AIServiceCapability.DOCUMENT_ANALYSIS,
                 AIServiceCapability.CRYPTO_ANALYSIS,
                 AIServiceCapability.SENTIMENT_ANALYSIS,
-                AIServiceCapability.MARKET_PREDICTION
+                AIServiceCapability.MARKET_PREDICTION,
+                AIServiceCapability.NEWS_SUMMARIZATION
             ],
             model=self.model,
             max_tokens=3000,

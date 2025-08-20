@@ -1,22 +1,22 @@
 """
-Custom exception classes for CoinGrok Backend.
+Custom exception classes for PluginMind Backend.
 
 Defines application-specific exceptions for better error handling
 and user experience.
 """
 
 
-class CoinGrokBaseException(Exception):
-    """Base exception for all CoinGrok-specific errors."""
+class PluginMindBaseException(Exception):
+    """Base exception for all PluginMind-specific errors."""
     pass
 
 
-class APIKeyMissingError(CoinGrokBaseException):
+class APIKeyMissingError(PluginMindBaseException):
     """Raised when required API keys are missing."""
     pass
 
 
-class AIServiceError(CoinGrokBaseException):
+class AIServiceError(PluginMindBaseException):
     """Raised when AI service (OpenAI/Grok) requests fail."""
     pass
 
@@ -36,42 +36,42 @@ class RateLimitError(AIServiceError):
         self.retry_after = retry_after
 
 
-class InvalidInputError(CoinGrokBaseException):
+class InvalidInputError(PluginMindBaseException):
     """Raised when user input validation fails."""
     pass
 
 
-class JobNotFoundError(CoinGrokBaseException):
+class JobNotFoundError(PluginMindBaseException):
     """Raised when requested job ID doesn't exist."""
     pass
 
 
-class DatabaseError(CoinGrokBaseException):
+class DatabaseError(PluginMindBaseException):
     """Raised when database operations fail."""
     pass
 
 
-class AuthenticationError(CoinGrokBaseException):
+class AuthenticationError(PluginMindBaseException):
     """Raised when authentication fails."""
     pass
 
 
-class UserAccessError(CoinGrokBaseException):
+class UserAccessError(PluginMindBaseException):
     """Raised when user account operations fail."""
     pass
 
 
-class QueryLimitExceededError(CoinGrokBaseException):
+class QueryLimitExceededError(PluginMindBaseException):
     """Raised when user exceeds query limits."""
     pass
 
 
-class UserNotFoundError(CoinGrokBaseException):
+class UserNotFoundError(PluginMindBaseException):
     """Raised when requested user doesn't exist."""
     pass
 
 
-class ServiceUnavailableError(CoinGrokBaseException):
+class ServiceUnavailableError(PluginMindBaseException):
     """Raised when external services are unavailable."""
     pass
 

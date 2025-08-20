@@ -14,17 +14,45 @@ logger = get_logger(__name__)
 
 
 class AIServiceType(str, Enum):
-    """Enumeration of available AI service types."""
+    """Enumeration of available AI service types for PluginMind processing."""
+    # Core processing services
     PROMPT_OPTIMIZER = "prompt_optimizer"
-    CRYPTO_ANALYZER = "crypto_analyzer"
-    # Future service types can be added here
+    GENERIC_ANALYZER = "generic_analyzer"
+    
+    # PluginMind template features
+    DOCUMENT_PROCESSOR = "document_processor"
+    CHAT_PROCESSOR = "chat_processor"
+    SEO_GENERATOR = "seo_generator"
+    
+    # Legacy and specialized services
+    CRYPTO_ANALYZER = "crypto_analyzer"  # Legacy support
     SENTIMENT_ANALYZER = "sentiment_analyzer"
     NEWS_SUMMARIZER = "news_summarizer"
 
 
 class AIServiceCapability(str, Enum):
-    """Capabilities that AI services can provide."""
+    """Capabilities that AI services can provide across different use cases."""
+    # Core capabilities
     PROMPT_OPTIMIZATION = "prompt_optimization"
+    GENERIC_ANALYSIS = "generic_analysis"
+    
+    # Document processing capabilities
+    DOCUMENT_SUMMARIZATION = "document_summarization"
+    DOCUMENT_ANALYSIS = "document_analysis"
+    KEY_EXTRACTION = "key_extraction"
+    
+    # Conversational capabilities
+    CONVERSATION_HANDLING = "conversation_handling"
+    CONTEXT_MANAGEMENT = "context_management"
+    RESPONSE_GENERATION = "response_generation"
+    
+    # SEO capabilities
+    CONTENT_OPTIMIZATION = "content_optimization"
+    KEYWORD_ANALYSIS = "keyword_analysis"
+    SEO_SCORING = "seo_scoring"
+    META_GENERATION = "meta_generation"
+    
+    # Legacy crypto capabilities
     CRYPTO_ANALYSIS = "crypto_analysis"
     SENTIMENT_ANALYSIS = "sentiment_analysis"
     NEWS_SUMMARIZATION = "news_summarization"

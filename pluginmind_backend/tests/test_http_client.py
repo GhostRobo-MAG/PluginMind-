@@ -19,7 +19,7 @@ def test_redact_headers_sensitive_keys():
         "Authorization": "Bearer secret-token-12345",
         "X-Api-Key": "super-secret-api-key", 
         "Content-Type": "application/json",
-        "User-Agent": "CoinGrok/1.0",
+        "User-Agent": "PluginMind/1.0",
         "api-key": "another-secret",
         "Proxy-Authorization": "Basic dXNlcjpwYXNz"
     }
@@ -34,7 +34,7 @@ def test_redact_headers_sensitive_keys():
     
     # Non-sensitive headers should be preserved
     assert safe_headers["Content-Type"] == "application/json"
-    assert safe_headers["User-Agent"] == "CoinGrok/1.0"
+    assert safe_headers["User-Agent"] == "PluginMind/1.0"
 
 
 def test_redact_headers_case_insensitive():

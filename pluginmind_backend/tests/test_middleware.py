@@ -108,7 +108,7 @@ def test_auth_middleware():
     return True
 
 if __name__ == "__main__":
-    print("Testing CoinGrok Backend Middleware Configuration")
+    print("Testing PluginMind Backend Middleware Configuration")
     print("=" * 60)
     
     try:

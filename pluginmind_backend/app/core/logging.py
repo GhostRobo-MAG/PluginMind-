@@ -1,5 +1,5 @@
 """
-Logging configuration for CoinGrok Backend.
+Logging configuration for PluginMind Backend.
 
 Provides centralized logging setup with structured formatting and correlation ID support.
 """

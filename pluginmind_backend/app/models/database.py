@@ -1,5 +1,5 @@
 """
-Database models for CoinGrok Backend.
+Database models for PluginMind Backend.
 
 SQLModel-based database schema definitions for:
 - Analysis job tracking (async operations)
@@ -9,11 +9,21 @@ SQLModel-based database schema definitions for:
 All models use SQLModel for type safety and automatic FastAPI integration.
 """
 
-from sqlmodel import SQLModel, Field
+from sqlmodel import SQLModel, Field, Column
+from sqlalchemy import JSON
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Dict, Any
+from enum import Enum
 
 from app.models.enums import JobStatus
+
+
+class AnalysisResultStatus(str, Enum):
+    """Status enumeration for generic analysis results."""
+    PENDING = "PENDING"
+    PROCESSING = "PROCESSING"
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
 
 
 class AnalysisJob(SQLModel, table=True):
@@ -100,3 +110,46 @@ class QueryLog(SQLModel, table=True):
     openai_cost: Optional[float] = Field(None, description="OpenAI API cost")
     grok_cost: Optional[float] = Field(None, description="Grok API cost")
     total_cost: Optional[float] = Field(None, description="Total API cost for this query")
+
+
+class AnalysisResult(SQLModel, table=True):
+    """
+    Database model for generic AI processing results.
+    
+    Flexible schema to support multiple AI processing types:
+    - Document summarization
+    - Chatbot conversations  
+    - SEO content generation
+    - Custom AI workflows
+    
+    Replaces crypto-specific storage with generic JSON-based result storage.
+    """
+    __tablename__ = "analysis_results"
+    
+    # Primary key and identifiers
+    id: Optional[int] = Field(default=None, primary_key=True)
+    analysis_id: str = Field(unique=True, index=True, description="UUID for external result tracking")
+    analysis_type: str = Field(index=True, description="Type of analysis: document, chat, seo, custom")
+    
+    # User and ownership
+    user_id: Optional[str] = Field(None, index=True, description="User identifier for ownership tracking")
+    
+    # Input and processing data
+    user_input: str = Field(description="Original user input/query")
+    result_data: Optional[Dict[str, Any]] = Field(None, sa_column=Column(JSON), description="AI processing results")
+    processing_metadata: Optional[Dict[str, Any]] = Field(None, sa_column=Column(JSON), description="Additional processing metadata")
+    
+    # Timestamps
+    created_at: datetime = Field(default_factory=datetime.now, index=True, description="Creation time")
+    updated_at: Optional[datetime] = Field(None, description="Last update time")
+    
+    # Performance tracking
+    processing_time_ms: Optional[int] = Field(None, description="Total processing time")
+    ai_service_used: Optional[str] = Field(None, description="AI service used for processing")
+    
+    # Cost tracking
+    cost: Optional[float] = Field(None, description="Total API cost for this analysis")
+    
+    # Status and error handling
+    status: AnalysisResultStatus = Field(default=AnalysisResultStatus.PENDING, description="Processing status")
+    error_details: Optional[str] = Field(None, description="Error message if processing failed")

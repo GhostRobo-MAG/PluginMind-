@@ -2,7 +2,7 @@
 Database connection and session management.
 
 Provides SQLModel engine creation, session management, and database
-initialization functions for the CoinGrok Backend.
+initialization functions for the PluginMind Backend.
 """
 
 from sqlmodel import SQLModel, Session, create_engine
@@ -28,7 +28,7 @@ def create_db_and_tables():
     """
     try:
         # Import all models to register them with SQLModel metadata
-        from app.models.database import User, AnalysisJob, QueryLog  # noqa: F401
+        from app.models.database import User, AnalysisJob, QueryLog, AnalysisResult  # noqa: F401
         
         logger.info(f"Creating database tables: {list(SQLModel.metadata.tables.keys())}")
         SQLModel.metadata.create_all(engine)

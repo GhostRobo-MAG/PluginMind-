@@ -1,68 +1,67 @@
-# PluginMind – Production-Ready AI SaaS Full Stack Boilerplate
-### 🚀 Build & Launch AI SaaS Faster
+# PluginMind – Production-Ready AI SaaS Full Stack Template
+### 🚀 Build & Launch AI SaaS Applications Faster
 
-PluginMind is a **production-ready Full Stack boilerplate** for AI-powered SaaS products.  
-It gives you a secure, extensible foundation with **authentication, database integration, plugin-style AI registry, CI/CD, and 100+ automated tests** – everything you need to launch an AI product fast.
+PluginMind is a **production-ready Full Stack template** for AI-powered SaaS products.  
+It provides a secure, extensible foundation with **generic AI processing, plugin-style service registry, production infrastructure, and 107+ automated tests** – everything developers need to launch AI applications fast.
 
 ## 🧠 Background 
 
-PluginMind started as **CoinGrok**, a crypto analysis tool powered by AI.  
-But during development, we realized the real value wasn’t in the crypto wrapper – it was in the **backend engine** we built.
+PluginMind evolved from **CoinGrok**, a crypto analysis tool, into a **generic AI processing platform**.  
+Through strategic transformation, we generalized the crypto-specific system into a **flexible AI SaaS template** that supports multiple use cases.
 
-Instead of a narrow app, we pivoted and productized the **core system**:
+The real value is in the **production-ready backend architecture** we built:
 
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-00a5ff.svg)](https://fastapi.tiangolo.com)
 [![Next.js](https://img.shields.io/badge/Next.js-15.2+-black.svg)](https://nextjs.org)
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://python.org)
 [![SQLModel](https://img.shields.io/badge/SQLModel-latest-green.svg)](https://sqlmodel.tiangolo.com)  
-- 🔌 **Plugin-Style AI Registry** → add new LLMs in just a few lines.  
+- 🔌 **Generic AI Processing** → configurable workflows for document, chat, SEO, crypto, custom use cases.  
 - 🛡️ **Secure Auth & Rate Limiting** → Google login, JWT, CORS, request limits.  
-- 🗄️ **Database Integration** → Supabase & Postgres ready.  
-- 🧪 **105+ Automated Tests** → integrated into CI/CD for reliability.  
-- ⚡ **Production Infrastructure** → FastAPI, modular services, env configs.
+- 🗄️ **Production Infrastructure** → Docker, CI/CD, Alembic migrations, environment management.  
+- 🧪 **107+ Automated Tests** → comprehensive coverage with CI/CD integration.  
+- ⚡ **Plugin Architecture** → AI service registry with OpenAI, Grok, and extensible providers.
 
-This pivot turned CoinGrok into **PluginMind: a universal AI SaaS backend boilerplate**.
+This transformation created **PluginMind: a universal AI SaaS template**.
 
-## 🧩 Example Use Cases
+## 🧩 Use Cases & Applications
 
-PluginMind can power **any AI SaaS product**, such as:
-- 📊 Crypto Analyzer (original CoinGrok use case)  
-- 📝 Document Summarizer SaaS  
-- 🤖 AI Support Chatbot Backend  
-- 🔍 SEO Content Generator  
+PluginMind supports **multiple AI-powered SaaS applications**:
+- 📝 **Document Summarizer** → AI-powered document analysis and summarization  
+- 🤖 **AI Chatbot Backend** → conversational AI with context management  
+- 🔍 **SEO Content Generator** → AI-driven content optimization and generation
+- 📊 **Data Analyzer** → configurable AI analysis workflows
+- 🎯 **Custom AI Processing** → flexible templates for any AI use case  
 
-##  Current Status (v1.7 - AI Service Registry & Plugin Architecture)
+## Current Status (v2.0 - PluginMind Transformation Complete) ✨
 
-- **Backend:** FastAPI with Google ID token verification (RS256) ✅
-- **Frontend:** Next.js with `@react-oauth/google` integration ✅
-- **Database:** PostgreSQL/SQLite with user management ✅
-- **Authentication:** Native Google OAuth with secure token validation ✅
-- **Security:** Protected routes, usage tracking, query limits ✅
-- **API:** Centralized authentication wrapper with automatic token handling ✅
-- **Error Handling:** **Production-ready unified system with comprehensive coverage** ✅
-- **Testing:** **Full CI/CD integration with automated smoke tests** ✅
-- **Rate Limiting:** **Enhanced with Retry-After headers and dual limits** ✅
-- **HTTP Configuration:** **Configurable connection pools and granular timeouts** ✅
-- **Production Environment:** **Consolidated configuration with security enhancements** ✅
-- **CI/CD Pipeline:** **100% test coverage with all 105 tests passing** ✅
-- **Configuration Validation:** **Fail-fast startup validation with comprehensive checks** ✅
-- **Test Suite:** **Complete test reliability with enhanced error handling** ✅
-- **AI Service Registry:** **Plugin-style architecture with service discovery** ✨ **NEW**
-- **Service Monitoring:** **Health checks and monitoring endpoints** ✨ **NEW**
+- **Generic AI Processing:** Multi-use-case AI workflows (document, chat, SEO, crypto, custom) ✅
+- **Production Infrastructure:** Docker multi-stage builds, Alembic migrations, CI/CD pipelines ✅
+- **API Architecture:** Generic `/process` endpoint + backward-compatible legacy endpoints ✅
+- **AI Service Registry:** Plugin-style architecture with OpenAI/Grok providers ✅
+- **Prompt Template Engine:** Configurable 4-D methodology for all analysis types ✅
+- **Authentication:** Google OAuth with JWT validation and user management ✅
+- **Database System:** PostgreSQL/SQLite with flexible AnalysisResult model ✅
+- **Error Handling:** Production-ready unified system with comprehensive coverage ✅
+- **Testing Suite:** 107+ automated tests with CI/CD integration ✅
+- **Rate Limiting:** Enhanced with Retry-After headers and dual limits ✅
+- **Configuration:** Fail-fast validation with environment-driven settings ✅
+- **Monitoring:** Service health endpoints and comprehensive logging ✅
+- **Security:** Production-ready headers, CORS, request limits ✅
+- **Template Ready:** Production template with comprehensive developer documentation ✅
 
-### 🆕 Latest Release Highlights (v1.7)
+### 🆕 Latest Release Highlights (v2.0 - PluginMind Transformation)
 
-#### **🤖 AI Service Registry & Plugin Architecture** ✨ **NEW**
-- **Plugin-Style AI Services**: Abstract interface with OpenAI and Grok implementations
-- **Service Discovery System**: Type and capability-based service selection
-- **Health Monitoring**: Automatic health checks with fallback mechanisms
-- **Service Metadata Management**: Comprehensive service information and capabilities
-- **New Monitoring Endpoints**: `/services` and `/services/health` for operational insights
-- **Comprehensive Test Coverage**: 20 additional tests covering all registry functionality
+#### **🚀 Complete Transformation: CoinGrok → PluginMind** ✨ **NEW**
+- **Generic AI Processing**: Transformed from crypto-specific to multi-use-case AI platform
+- **Template Productization**: Production-ready developer template with full documentation
+- **Branding Generalization**: Complete transformation across 38+ files and configurations
+- **API Enhancement**: New `/process` endpoint supporting document, chat, SEO, crypto, custom workflows
+- **Infrastructure Modernization**: Docker, Alembic migrations, enhanced CI/CD pipelines
+- **Architecture Excellence**: Maintained FastAPI patterns while adding generic capabilities
 
 #### **🧪 Enhanced Test Coverage & Reliability**
-- **105 Total Tests**: All tests passing (85 original + 20 registry tests)
+- **107 Total Tests**: All tests passing with comprehensive coverage
 - **Service Registry Tests**: Complete coverage of plugin architecture
 - **Integration Testing**: Service discovery, health checks, and endpoint validation
 - **Mock Service Framework**: Comprehensive testing infrastructure
@@ -88,7 +87,7 @@ PluginMind can power **any AI SaaS product**, such as:
 - **Production Security**: Sensitive information properly secured and documented
 
 #### ** Complete CI/CD Test Integration**
-- **100% Test Success**: All 105 tests passing in CI/CD pipeline (9 test suites)
+- **100% Test Success**: All 107 tests passing in CI/CD pipeline (9 test suites)
 - **AI Service Registry Tests**: 20 comprehensive tests for plugin architecture
 - **HTTP Client Tests**: 10 comprehensive tests for configuration and security validation
 - **Error Integration Tests**: 10 additional tests for complete error handling validation
@@ -108,11 +107,12 @@ PluginMind can power **any AI SaaS product**, such as:
 - **FastAPI** – High-performance async API framework
 - **SQLModel** – Type-safe database ORM with PostgreSQL/SQLite
 - **AI Service Registry** – Plugin architecture for AI providers
-- **OpenAI API** – GPT-5 for prompt optimization
-- **Grok xAI API** – Advanced crypto market analysis
+- **OpenAI API** – GPT-4/5 for prompt optimization and generic AI processing
+- **Grok xAI API** – Advanced AI analysis capabilities
 - **Pydantic v2** – Data validation and serialization
 - **google-auth** – Google ID token verification (RS256)
-- **Supabase** – User database and management
+- **Alembic** – Database migrations and schema management
+- **Docker** – Multi-stage containerization with production optimization
 
 ### Frontend  
 - **Next.js 15** – React framework with App Router
@@ -124,107 +124,114 @@ PluginMind can power **any AI SaaS product**, such as:
 - **Recharts** – Interactive data visualizations
 
 ### Database & Infrastructure
-- **PostgreSQL** – Production database
-- **SQLite** – Development database
-- **Database Migrations** – Automatic schema management
-- **Query Logging** – Complete usage analytics
+- **PostgreSQL** – Production database with flexible schema
+- **SQLite** – Development database with same schema compatibility
+- **Alembic Migrations** – Automatic schema management and versioning
+- **Docker Compose** – Complete development environment orchestration
+- **CI/CD Pipelines** – GitHub Actions with 100% test pass gates
+- **Query Analytics** – Comprehensive usage tracking and analysis
 
 ---
 
 ## 🏗️ Project Architecture
 
-### Repository Structure (Production-Ready)
+### Repository Structure (Production-Ready PluginMind Template)
 ```
-PluginMind/                          # Repository root
+PluginMind/                          # Repository root - Production AI SaaS Template
 ├── .github/
-│   └── workflows/                     # CI/CD automation
-│       ├── ci.yml                     # Comprehensive test suite runner
-│       └── post-deploy-smoke.yml      # Production smoke test validation
+│   └── workflows/                     # CI/CD automation with 100% test gates
+│       ├── test.yml                   # Comprehensive test suite runner
+│       ├── docker.yml                 # Docker build and validation
+│       ├── feature-document.yml       # Document processing feature validation
+│       ├── feature-chatbot.yml        # Chatbot backend feature validation
+│       └── feature-seo.yml           # SEO generator feature validation
 │
-├── coingrok_backend/                  # Backend API service
+├── pluginmind_backend/                # Generic AI Processing Backend ✨ TRANSFORMED
+│   ├── Dockerfile                     # Multi-stage production Docker build ✨ NEW
+│   ├── docker-compose.yml            # Complete development orchestration ✨ NEW
+│   ├── alembic.ini                   # Database migration configuration ✨ NEW
+│   ├── alembic/                      # Database migration system ✨ NEW
+│   │   ├── env.py                    # Migration environment setup
+│   │   └── versions/                 # Migration version history
+│   │       └── 001_initial_pluginmind_schema.py # Initial schema with AnalysisResult
+│   │
 │   ├── app/
-│   │   ├── main.py                    # FastAPI app with AI service registry ✨
+│   │   ├── main.py                    # FastAPI app with generic AI service registry ✨
 │   │   ├── database.py               # Database engine & session management  
-│   │   ├── ash_prompt.py             # 4-D Prompt Engine system prompt
+│   │   ├── ash_prompt.py             # Generic 4-D Prompt Template Engine ✨ ENHANCED
+│   │   │                             # → Configurable templates for document, chat, SEO, crypto, custom
 │   │   │
 │   │   ├── core/                     # Core infrastructure
-│   │   │   ├── config.py            # Environment settings & validation
+│   │   │   ├── config.py            # Environment settings & comprehensive validation
 │   │   │   ├── logging.py           # Centralized logging setup
-│   │   │   └── exceptions.py        # Custom exception classes + RateLimitError enhancements ✨
+│   │   │   └── exceptions.py        # PluginMind exception classes ✨ UPDATED
 │   │   │
-│   │   ├── api/                      # API layer
+│   │   ├── api/                      # Generic API layer ✨ ENHANCED
 │   │   │   ├── dependencies.py      # FastAPI dependencies (DB sessions)
-│   │   │   ├── dependencies_rate_limit.py # Rate limiting dependencies + Retry-After headers ✨
-│   │   │   └── routes/              # Endpoint handlers
-│   │   │       ├── analysis.py      # /analyze, /analyze-async (auth-protected)
+│   │   │   ├── dependencies_rate_limit.py # Rate limiting with Retry-After headers
+│   │   │   └── routes/              # Generic endpoint handlers ✨ ENHANCED
+│   │   │       ├── analysis.py      # /process (generic), /analyze (legacy) ✨ NEW ENDPOINT
 │   │   │       ├── users.py         # /me, /me/usage (user profiles)
 │   │   │       ├── jobs.py          # /jobs management with UUID validation
-│   │   │       ├── health.py        # /health, /live, /ready, /version endpoints
-│   │   │       └── query_logs.py    # /query-logs analytics
+│   │   │       ├── health.py        # /health, /services, /services/health ✨ ENHANCED
+│   │   │       ├── query_logs.py    # /query-logs analytics
+│   │   │       └── testing.py       # Testing utilities and endpoints
 │   │   │
-│   │   ├── services/                 # Business logic layer ✨ ENHANCED
-│   │   │   ├── ai_service_interface.py  # ✨ Plugin registry & abstract interface
-│   │   │   ├── service_initialization.py # ✨ Service registration at startup
-│   │   │   ├── openai_service.py    # OpenAI plugin implementation
-│   │   │   ├── grok_service.py      # Grok plugin implementation
-│   │   │   ├── analysis_service.py  # Orchestration with service discovery
+│   │   ├── services/                 # Generic AI Service Layer ✨ ENHANCED
+│   │   │   ├── ai_service_interface.py  # Multi-use-case service registry ✨ ENHANCED
+│   │   │   │                        # → Document, chat, SEO, crypto, custom service types
+│   │   │   ├── service_initialization.py # Enhanced service registration ✨ ENHANCED
+│   │   │   ├── openai_service.py    # OpenAI multi-capability implementation ✨ ENHANCED
+│   │   │   ├── grok_service.py      # Grok multi-capability implementation ✨ ENHANCED
+│   │   │   ├── analysis_service.py  # Generic orchestration with service discovery ✨ ENHANCED
 │   │   │   └── user_service.py      # User management & usage tracking
 │   │   │
-│   │   ├── models/                   # Data layer
-│   │   │   ├── database.py          # SQLModel tables (jobs, users, logs)
-│   │   │   ├── schemas.py           # Pydantic request/response models
+│   │   ├── models/                   # Flexible data layer ✨ ENHANCED
+│   │   │   ├── database.py          # AnalysisResult model for generic AI processing ✨ NEW
+│   │   │   ├── schemas.py           # Generic request/response models ✨ ENHANCED
 │   │   │   └── enums.py             # Status enums & constants
 │   │   │
-│   │   ├── middleware/               # Cross-cutting concerns
+│   │   ├── middleware/               # Production middleware stack
 │   │   │   ├── auth.py              # JWT validation & auth dependencies
 │   │   │   ├── cors.py              # CORS configuration
-│   │   │   ├── error_handler.py     # Unified exception handling system ✨
-│   │   │   │                        # → RequestValidationError handler (422)
-│   │   │   │                        # → StarletteHTTPException handler (404 routing)
-│   │   │   │                        # → Enhanced rate limit + retry-after headers
-│   │   │   │                        # → Generic exception handler (500)
+│   │   │   ├── error_handler.py     # Unified PluginMind exception handling ✨
 │   │   │   ├── security_headers.py  # Production HTTP security headers
 │   │   │   ├── request_limits.py    # Request body size limits
 │   │   │   └── correlation_id.py    # Request tracing with correlation IDs
 │   │   │
 │   │   └── utils/                    # Utilities
 │   │       ├── background_tasks.py  # Async job processing
-│   │       ├── http.py              # Resilient HTTP client with configurable pools ✨
+│   │       ├── http.py              # Resilient HTTP client with configurable pools
 │   │       ├── rate_limit.py        # Token-bucket rate limiting + retry calculation
 │   │       └── ip.py                # IP extraction utilities
 │   │
-│   ├── tests/                         # Comprehensive test suite ✨
+│   ├── tests/                         # Comprehensive test suite (107+ tests) ✨
+│   │   ├── test_ai_service_registry.py # AI service registry tests (20 tests) ✨ ENHANCED
+│   │   │                            # → Multi-use-case service registration and discovery
+│   │   │                            # → Document, chat, SEO, crypto service type validation
+│   │   │                            # → Health checking and monitoring endpoints
+│   │   │                            # → Generic analysis workflow testing
 │   │   ├── test_error_handling.py    # Exception mapping & response format tests
-│   │   │                            # → 422 validation error tests (malformed JSON, missing fields)
-│   │   │                            # → 500 generic exception tests  
-│   │   │                            # → 429 rate limit + Retry-After header tests
 │   │   ├── test_error_integration.py # API endpoint integration tests (10 tests)
-│   │   ├── test_http_client.py      # HTTP client configuration tests (10 tests) ✨
-│   │   │                            # → Connection pool configuration validation
-│   │   │                            # → Granular timeout testing (Grok-specific)
-│   │   │                            # → Security header redaction validation
-│   │   ├── test_ai_service_registry.py # ✨ AI service registry tests (20 tests)
-│   │   │                            # → Service registration and discovery
-│   │   │                            # → Health checking and monitoring
-│   │   │                            # → Fallback mechanisms and edge cases
-│   │   │                            # → Service metadata management
-│   │   │                            # → New monitoring endpoints validation
+│   │   ├── test_http_client.py      # HTTP client configuration tests (10 tests)
+│   │   ├── test_config_validation.py # Environment validation tests ✨ NEW
 │   │   ├── test_rate_limit.py       # Rate limiting behavior tests
 │   │   ├── test_middleware.py       # Middleware functionality tests
 │   │   ├── test_jwt_security.py     # JWT validation tests
 │   │   ├── test_production_mode.py  # Production environment tests
-│   │   └── README.md                test documentation
+│   │   └── conftest.py              # Shared test configuration and fixtures
 │   │
-│   ├── scripts/                      # Operations & testing scripts ✨
-│   │   ├── smoke_errors.sh          # Error handling smoke tests (7 scenarios)
-│   │   │                            # → 422 validation, 404 routing, 401 auth, etc.
-│   │   └── smoke_backend.sh         # Comprehensive production smoke test
+│   ├── scripts/                      # Operations & deployment scripts ✨
+│   │   ├── smoke_backend.sh          # Comprehensive production smoke tests
+│   │   ├── smoke_errors.sh          # Error handling validation (7 scenarios)
+│   │   ├── validate_env.py          # Environment configuration validator ✨ NEW
+│   │   ├── manage_db.py             # Database management utilities ✨ NEW
+│   │   └── init-db.sh               # Database initialization script ✨ NEW
 │   │
-│   ├── run_error_tests.py           # Test suite runner ✨
+│   ├── run_error_tests.py           # Test suite runner
 │   ├── gunicorn_conf.py             # Production WSGI server configuration
-│   ├── requirements.txt             # Python dependencies (includes Gunicorn)
-│   ├── .env.example                # Environment template with production vars
-│   └── .gitignore                  # Security & cleanup
+│   ├── requirements.txt             # Python dependencies with production packages
+│   └── SYSTEM_MAP.md                # Complete system architecture documentation ✨ NEW
 │
 ├── frontend/                         # Next.js React application
 │   ├── app/                         # Next.js 15 App Router
@@ -261,30 +268,31 @@ frontend/
 
 ## 🔄 How It Works
 
-### Request Flow with AI Service Registry
+### Request Flow with Generic AI Processing
 ```mermaid
 graph LR
-    A[User Input] --> B[Validation]
-    B --> C[AI Service Registry]
-    C --> D[Service Discovery]
-    D --> E[OpenAI Plugin]
-    E --> F[Prompt Optimization]
-    F --> G[Grok Plugin]
-    G --> H[Analysis]
-    H --> I[Query Logging]
-    I --> J[Response]
+    A[User Input + Analysis Type] --> B[Validation]
+    B --> C[Prompt Template Engine]
+    C --> D[AI Service Registry]
+    D --> E[Service Discovery]
+    E --> F[AI Service Processing]
+    F --> G[Result Storage]
+    G --> H[Response]
 ```
 
 ### Architecture Benefits
-- **Plugin Architecture**: AI services implement common interface
-- **Service Discovery**: Dynamic service selection by type/capability
-- **Health Monitoring**: Automatic health checks with fallback mechanisms
-- **Modular Design**: Each component has single responsibility
-- **Type Safety**: Full TypeScript/Python type coverage
-- **Error Handling**: Centralized exception management
-- **Scalability**: Service layer ready for microservices
-- **Testing**: Clean architecture supports comprehensive unit testing
-- **Monitoring**: Built-in logging, analytics, and service health endpoints
+- **Generic AI Processing**: Supports document, chat, SEO, crypto, and custom workflows
+- **Plugin Architecture**: AI services implement common interface for extensibility
+- **Service Discovery**: Dynamic service selection by type and capability
+- **Template Engine**: Configurable 4-D prompt methodology for all use cases
+- **Health Monitoring**: Automatic health checks with comprehensive reporting
+- **Modular Design**: Clean separation of concerns with single responsibility
+- **Type Safety**: Full TypeScript/Python type coverage throughout
+- **Error Handling**: Production-ready unified exception management
+- **Scalability**: Service layer architecture ready for microservices
+- **Testing**: Clean architecture with 107+ comprehensive tests
+- **Database Flexibility**: Generic AnalysisResult model supporting varied content types
+- **Production Ready**: Docker, CI/CD, migrations, monitoring, and deployment automation
 
 ---
 
@@ -297,15 +305,22 @@ graph LR
 - Grok API Key
 
 
-### 🔍 AI Service Registry Endpoints
+### 🔍 Generic AI Processing Endpoints
+
+**Generic AI Processing (Primary Endpoint):**
+```bash
+curl -X POST "http://localhost:8000/process" \
+  -H "Content-Type: application/json" \
+  -d '{"user_input": "Summarize this document: ...", "analysis_type": "document"}'
+```
 
 **Service Information:**
 ```bash
 curl http://localhost:8000/services
-# Response: Registry info and health status for all AI services
+# Response: Available AI services, analysis types, and endpoint information
 ```
 
-**Health Monitoring:**
+**Service Health Monitoring:**
 ```bash
 curl http://localhost:8000/services/health
 # Response: Individual service health with overall system status
@@ -323,7 +338,7 @@ curl http://localhost:8000/health
 ```bash
 # Run full test suite - now 100% passing!
 python -m pytest
-# Expected: 105/105 tests passed ✅
+# Expected: 107/107 tests passed ✅
 
 # Run AI service registry tests specifically
 python -m pytest tests/test_ai_service_registry.py -v
@@ -363,19 +378,35 @@ chmod +x scripts/smoke_errors.sh
 # ✅ Health check endpoint (200)
 ```
 
-**Synchronous Analysis:**
+**Generic AI Processing Examples:**
 ```bash
+# Document Summarization
+curl -X POST "http://localhost:8000/process" \
+  -H "Content-Type: application/json" \
+  -d '{"user_input": "Summarize this research paper: ...", "analysis_type": "document"}'
+
+# Chat/Conversation Processing
+curl -X POST "http://localhost:8000/process" \
+  -H "Content-Type: application/json" \
+  -d '{"user_input": "Help me plan a vacation to Japan", "analysis_type": "chat"}'
+
+# SEO Content Generation
+curl -X POST "http://localhost:8000/process" \
+  -H "Content-Type: application/json" \
+  -d '{"user_input": "Create SEO content for digital marketing", "analysis_type": "seo"}'
+
+# Legacy Crypto Analysis (Backward Compatible)
 curl -X POST "http://localhost:8000/analyze" \
   -H "Content-Type: application/json" \
   -d '{"user_input": "Analyze Bitcoin over 7 days with $500"}'
 ```
 
-**Async Analysis:**
+**Async Processing:**
 ```bash
-# Start job
+# Start background job
 curl -X POST "http://localhost:8000/analyze-async" \
   -H "Content-Type: application/json" \
-  -d '{"user_input": "Deep analysis of Ethereum market trends"}'
+  -d '{"user_input": "Deep analysis of market trends"}'
 
 # Check results (use job_id from above)
 curl http://localhost:8000/analyze-async/{job_id}
@@ -391,8 +422,32 @@ curl http://localhost:8000/analyze-async/{job_id}
 
 ### Core Endpoints
 
-#### `POST /analyze`
-Synchronous crypto analysis with immediate response
+#### `POST /process` ✨ **NEW - Primary Endpoint**
+Generic AI processing with configurable analysis types
+```json
+{
+  "user_input": "Your content or query here",
+  "analysis_type": "document" // Options: document, chat, seo, crypto, custom
+}
+```
+
+**Response:**
+```json
+{
+  "analysis_type": "document",
+  "optimized_prompt": "AI-optimized prompt for document processing...",
+  "analysis_result": "Comprehensive analysis results based on type...",
+  "system_prompt": "System prompt template used",
+  "services_used": {
+    "prompt_optimizer": {"name": "OpenAI", "provider": "OpenAI", "model": "gpt-4"},
+    "analyzer": {"name": "OpenAI", "provider": "OpenAI", "model": "gpt-4"}
+  },
+  "metadata": {}
+}
+```
+
+#### `POST /analyze` (Legacy - Backward Compatible)
+Legacy crypto analysis endpoint (deprecated, use `/process` instead)
 ```json
 {
   "user_input": "Analyze Bitcoin over 7 days with $500"
@@ -403,7 +458,7 @@ Synchronous crypto analysis with immediate response
 ```json
 {
   "optimized_prompt": "Professional crypto analysis prompt...",
-  "analysis": "Comprehensive market analysis with sentiment, news, recommendations..."
+  "analysis": "Comprehensive crypto market analysis..."
 }
 ```
 
@@ -428,6 +483,12 @@ Start background analysis job
 #### `GET /analyze-async/{job_id}`
 Check job status and retrieve results
 
+#### `GET /services` ✨ **NEW**
+Get AI service registry information and available analysis types
+
+#### `GET /services/health` ✨ **NEW**
+Individual AI service health monitoring with detailed status
+
 #### `GET /health`
 Health check with active job count
 
@@ -436,7 +497,7 @@ View recent query history (debugging)
 
 ### Error Handling
 
-CoinGrok implements a **production-ready unified error handling system** with consistent response format, comprehensive logging, and full CI/CD integration.
+PluginMind implements a **production-ready unified error handling system** with consistent response format, comprehensive logging, and full CI/CD integration.
 
 #### Error Response Format
 
@@ -527,7 +588,17 @@ Retry-After: 120  # ✨ New: Seconds to wait before retry
 
 ### Database Schema
 
-#### QueryLog Table
+#### AnalysisResult Table ✨ **NEW - Primary Model**
+Flexible schema for generic AI processing results:
+- `analysis_id`: UUID for external tracking
+- `analysis_type`: Type of analysis (document, chat, seo, crypto, custom)
+- `user_id`: User identifier for ownership tracking
+- `user_input`: Original user input/query
+- `result_data`: JSON storage for AI processing results and metadata
+- `status`: PENDING → PROCESSING → COMPLETED/FAILED
+- `created_at`, `updated_at`: Timestamp tracking
+
+#### QueryLog Table (Legacy Analytics)
 Tracks all user queries for analytics and billing:
 - `user_id`: User identifier (nullable for anonymous usage)
 - `user_input`: Original query
@@ -536,16 +607,16 @@ Tracks all user queries for analytics and billing:
 - `success`: Query completion status
 - `openai_cost`, `grok_cost`, `total_cost`: Billing tracking
 
-#### AnalysisJob Table  
+#### AnalysisJob Table (Async Processing)
 Manages asynchronous job processing:
 - `job_id`: UUID for external tracking
 - `status`: queued → processing_openai → processing_grok → completed
-- `optimized_prompt`: OpenAI-generated prompt
-- `analysis`: Final Grok analysis
-- `user_id`: Links jobs to users (Phase 2)
+- `optimized_prompt`: AI-generated prompt
+- `analysis`: Final analysis result
+- `user_id`: Links jobs to users
 - `cost`: Total API cost for billing
 
-#### User Table (Phase 2 Ready)
+#### User Table (Authentication & Usage)
 User management and subscription tracking:
 - `email`: User email address
 - `google_id`: Google OAuth identifier
@@ -652,6 +723,38 @@ graph LR
 
 ## 🚀 Production Deployment
 
+### Docker Deployment ✨ **NEW**
+
+**Quick Start with Docker:**
+```bash
+# Development with hot reload
+cd pluginmind_backend
+docker-compose up --build
+
+# Production deployment
+docker build --target production -t pluginmind-backend .
+docker run -p 8000:8000 --env-file .env pluginmind-backend
+```
+
+**Multi-stage Docker Build:**
+- **Development**: Python with hot reload and debugging tools
+- **Production**: Optimized image with security enhancements
+- **Testing**: Isolated environment for CI/CD pipelines
+
+### Database Migrations ✨ **NEW**
+
+**Initialize Database:**
+```bash
+# Create initial migration
+alembic upgrade head
+
+# Generate new migration
+alembic revision --autogenerate -m "description"
+
+# Apply migrations
+alembic upgrade head
+```
+
 ### Environment Variables
 
 **Backend (.env)**
@@ -661,11 +764,11 @@ OPENAI_API_KEY=your-openai-api-key
 GROK_API_KEY=your-grok-api-key
 
 # Database Configuration
-DATABASE_URL=postgresql://user:pass@localhost:5432/coingrok  # Production
-# DATABASE_URL=sqlite:///./coingrok.db  # Development
+DATABASE_URL=postgresql://user:pass@localhost:5432/pluginmind  # Production
+# DATABASE_URL=sqlite:///./pluginmind.db  # Development
 
 # Security & Performance
-CORS_ORIGINS=https://coingrok.vercel.app,https://your-domain.com
+CORS_ORIGINS=https://pluginmind.vercel.app,https://your-domain.com
 LOG_LEVEL=INFO
 DEBUG=false
 
@@ -703,7 +806,7 @@ NEXT_PUBLIC_FRONTEND_URL=https://your-frontend-domain.com
 # render.yaml
 services:
 - type: web
-  name: coingrok-api
+  name: pluginmind-api
   env: python
   plan: starter
   buildCommand: pip install -r requirements.txt
@@ -750,7 +853,7 @@ DATABASE_URL=postgresql://username:password@host:5432/database
 
 **Development SQLite:**
 ```bash
-DATABASE_URL=sqlite:///./coingrok.db
+DATABASE_URL=sqlite:///./pluginmind.db
 ```
 
 ## Production Deployment
@@ -761,7 +864,7 @@ The backend includes production-ready Gunicorn configuration with environment-dr
 
 ```bash
 # Start with Gunicorn (production)
-cd coingrok_backend
+cd pluginmind_backend
 gunicorn app.main:app --config gunicorn_conf.py
 
 # Key production features:
@@ -845,7 +948,7 @@ chmod +x scripts/smoke_backend.sh
 BASE=http://localhost:8000 ./scripts/smoke_backend.sh
 
 # Test against staging/production (with auth token)
-BASE=https://api.coingrok.com TOKEN=jwt_token ./scripts/smoke_backend.sh
+BASE=https://api.pluginmind.com TOKEN=jwt_token ./scripts/smoke_backend.sh
 
 # Tests include:
 # ✅ Health endpoints and JSON responses
@@ -873,7 +976,7 @@ BASE=https://api.coingrok.com TOKEN=jwt_token ./scripts/smoke_backend.sh
 - [x] **Production Validation**: **Automated post-deploy error scenario testing**
 - [x] **HTTP Configuration**: **Environment-driven connection pools and granular timeouts** ✨ **NEW**
 - [x] **Security Enhancements**: **Bearer token redaction and comprehensive header protection** ✨ **NEW**
-- [x] **CI/CD Expansion**: **100% test success rate - all 105 tests passing** ✨ **NEW**
+- [x] **CI/CD Expansion**: **100% test success rate - all 107 tests passing** ✨ **NEW**
 - [x] **Configuration Validation**: **Fail-fast startup with comprehensive environment validation** ✨ **NEW**
 - [x] **AI Service Registry**: **Plugin architecture with service discovery and health monitoring** ✨ **NEW**
 
@@ -881,7 +984,7 @@ BASE=https://api.coingrok.com TOKEN=jwt_token ./scripts/smoke_backend.sh
 
 ## ⚙️ Startup Configuration Validation (Fail-Fast)
 
-CoinGrok backend implements comprehensive configuration validation at startup to ensure production reliability and prevent runtime failures due to invalid configuration.
+PluginMind backend implements comprehensive configuration validation at startup to ensure production reliability and prevent runtime failures due to invalid configuration.
 
 ### What is Validated
 
@@ -913,7 +1016,7 @@ CoinGrok backend implements comprehensive configuration validation at startup to
 
 **✅ Successful startup:**
 ```bash
-2024-01-15 10:00:00 - INFO - Starting CoinGrok Backend API v1.0.0
+2024-01-15 10:00:00 - INFO - Starting PluginMind Backend API v2.0.0
 2024-01-15 10:00:00 - INFO - Validating configuration...
 2024-01-15 10:00:00 - INFO - Configuration validation passed
 2024-01-15 10:00:00 - INFO - Application startup completed successfully
@@ -921,7 +1024,7 @@ CoinGrok backend implements comprehensive configuration validation at startup to
 
 **❌ Configuration errors (server won't start):**
 ```bash
-2024-01-15 10:00:00 - INFO - Starting CoinGrok Backend API v1.0.0
+2024-01-15 10:00:00 - INFO - Starting PluginMind Backend API v2.0.0
 2024-01-15 10:00:00 - INFO - Validating configuration...
 2024-01-15 10:00:00 - ERROR - Configuration validation failed:
   - OPENAI_API_KEY is missing or too short (minimum 10 characters)
@@ -987,8 +1090,8 @@ The backend uses environment variables defined in `.env` for configuration. All 
 
 | Variable | Default | Description | Range |
 |----------|---------|-------------|-------|
-| `APP_NAME` | `CoinGrok Backend API` | Application name | Any string |
-| `APP_VERSION` | `1.6.0` | Version number | Semver format |
+| `APP_NAME` | `PluginMind Backend API` | Application name | Any string |
+| `APP_VERSION` | `2.0.0` | Version number | Semver format |
 | `LOG_LEVEL` | `INFO` | Logging level | DEBUG/INFO/WARNING/ERROR |
 
 ### **AI Models & APIs**
@@ -1106,7 +1209,7 @@ Access `/query-logs` endpoint to monitor:
 - [x] **Fail-Fast Configuration Validation**: Comprehensive startup validation with clear error messages
 - [x] **Environment Variable Validation**: API keys, URLs, CORS, numeric ranges, and cross-dependencies
 - [x] **Debug vs Production Mode**: Smart validation logic with appropriate defaults for each environment
-- [x] **100% Test Success Rate**: All 105 tests now passing (fixed 7 originally failing tests)
+- [x] **100% Test Success Rate**: All 107 tests now passing (fixed 7 originally failing tests, added 2 new tests)
 - [x] **Enhanced IP Validation**: IPv6 zone ID rejection for improved rate limiting security
 - [x] **Token Bucket Security**: Prevention of negative token consumption exploitation
 - [x] **Error Handling Test Fixes**: Resolved authentication vs validation priority conflicts
@@ -1153,7 +1256,16 @@ Access `/query-logs` endpoint to monitor:
 
 **Built with ❤️ by Alexandru G. Mihai** 
 
-## 📬 Get Access to Full Boilerplate
+## 📬 Contact & Information
 
-For full source code and a commercial license, contact:  
+**PluginMind is a production-ready AI SaaS template featuring:**
+- ✅ Generic AI processing for multiple use cases
+- ✅ Production infrastructure (Docker, CI/CD, migrations)
+- ✅ Complete authentication and user management
+- ✅ 107+ automated tests with comprehensive coverage
+- ✅ Comprehensive developer documentation and setup guides
+
+For inquiries about the PluginMind template, contact:  
 📧 **[mihai.gl.alexandru@gmail.com]**
+
+Transform your AI idea into a production SaaS in days, not months.

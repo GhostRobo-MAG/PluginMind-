@@ -13,7 +13,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from app.core.logging import get_logger
 from app.middleware.correlation_id import get_request_id
 from app.core.exceptions import (
-    CoinGrokBaseException,
+    PluginMindBaseException,
     RateLimitError,
     AIServiceError,
     InvalidInputError,
@@ -30,7 +30,7 @@ from app.core.exceptions import (
 logger = get_logger(__name__)
 
 # Single source of truth: Custom exception → (status_code, error_code) mapping
-EXCEPTION_MAP: Dict[Type[CoinGrokBaseException], Tuple[int, str]] = {
+EXCEPTION_MAP: Dict[Type[PluginMindBaseException], Tuple[int, str]] = {
     AuthenticationError: (401, ErrorCodes.AUTHENTICATION_FAILED),
     UserAccessError: (500, ErrorCodes.USER_ACCESS_FAILED),
     QueryLimitExceededError: (429, ErrorCodes.QUERY_LIMIT_EXCEEDED),
@@ -44,7 +44,7 @@ EXCEPTION_MAP: Dict[Type[CoinGrokBaseException], Tuple[int, str]] = {
 }
 
 # User-friendly messages for each exception type
-EXCEPTION_MESSAGES: Dict[Type[CoinGrokBaseException], str] = {
+EXCEPTION_MESSAGES: Dict[Type[PluginMindBaseException], str] = {
     AuthenticationError: "Authentication failed. Please check your credentials.",
     UserAccessError: "User account access failed. Please try again.",
     QueryLimitExceededError: None,  # Use original message (safe for users)
@@ -90,7 +90,7 @@ def create_error_response(message: str, code: str, status_code: int, extra_heade
     )
 
 
-def raise_api_error(exc: CoinGrokBaseException) -> None:
+def raise_api_error(exc: PluginMindBaseException) -> None:
     """
     Tiny helper to raise exceptions that will be handled by the unified system.
     
@@ -221,10 +221,10 @@ def setup_error_handlers(app: FastAPI) -> None:
             headers={"Content-Type": "application/json"}
         )
     
-    @app.exception_handler(CoinGrokBaseException)
-    async def coingrok_exception_handler(request: Request, exc: CoinGrokBaseException):
+    @app.exception_handler(PluginMindBaseException)
+    async def pluginmind_exception_handler(request: Request, exc: PluginMindBaseException):
         """
-        Generic handler for all CoinGrok custom exceptions.
+        Generic handler for all PluginMind custom exceptions.
         
         Uses EXCEPTION_MAP for single source of truth mapping.
         """

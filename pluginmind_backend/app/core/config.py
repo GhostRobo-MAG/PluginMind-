@@ -1,5 +1,5 @@
 """
-Core configuration settings for CoinGrok Backend.
+Core configuration settings for PluginMind Backend.
 
 Manages environment variables, API keys, and application settings
 with comprehensive validation at startup.
@@ -29,7 +29,7 @@ class Settings:
         self.testing = os.getenv("TESTING", "0") == "1"
         
         # Application Info (configurable)
-        self.app_name = os.getenv("APP_NAME", "CoinGrok Backend API")
+        self.app_name = os.getenv("APP_NAME", "PluginMind Backend API")
         self.version = os.getenv("APP_VERSION", "1.0.0")
         self.debug = os.getenv("DEBUG", "false").lower() == "true"
         

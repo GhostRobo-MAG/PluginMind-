@@ -1,6 +1,6 @@
 # Test Suite
 
-This directory contains tests for the CoinGrok Backend API.
+This directory contains tests for the PluginMind Backend API.
 
 ## Test Files
 

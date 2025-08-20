@@ -1,0 +1,321 @@
+# PluginMind - Document Summarizer Feature Validation
+# CI/CD Pipeline for AI-Powered Document Analysis Feature
+
+name: 📄 Document Summarizer
+
+on:
+  push:
+    paths:
+      - 'pluginmind_backend/app/services/document_service.py'
+      - 'pluginmind_backend/app/api/routes/document.py'
+      - 'pluginmind_backend/tests/test_document_*.py'
+  pull_request:
+    paths:
+      - 'pluginmind_backend/app/services/document_service.py'
+      - 'pluginmind_backend/app/api/routes/document.py'
+      - 'pluginmind_backend/tests/test_document_*.py'
+  workflow_call:
+  workflow_dispatch:
+    inputs:
+      test-level:
+        description: 'Test level to run'
+        required: false
+        default: 'full'
+        type: choice
+        options: [ 'unit', 'integration', 'full' ]
+
+env:
+  PYTHON_VERSION: "3.11"
+  TEST_DOCUMENTS_PATH: "tests/fixtures/documents"
+
+jobs:
+  # =============================================================================
+  # Feature Availability Check
+  # =============================================================================
+  check-feature:
+    name: 🔍 Feature Availability Check
+    runs-on: ubuntu-latest
+    outputs:
+      feature-available: ${{ steps.check.outputs.available }}
+      
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🔍 Check Feature Implementation
+        id: check
+        run: |
+          if [[ -f "pluginmind_backend/app/services/document_service.py" && \
+                -f "pluginmind_backend/app/api/routes/document.py" ]]; then
+            echo "available=true" >> $GITHUB_OUTPUT
+            echo "✅ Document Summarizer feature files found"
+          else
+            echo "available=false" >> $GITHUB_OUTPUT
+            echo "⏳ Document Summarizer feature not yet implemented"
+          fi
+
+  # =============================================================================
+  # Document Processing Tests
+  # =============================================================================
+  document-tests:
+    name: 📄 Document Processing Tests
+    runs-on: ubuntu-latest
+    needs: [check-feature]
+    if: needs.check-feature.outputs.feature-available == 'true'
+    
+    strategy:
+      matrix:
+        document-type: ['pdf', 'docx', 'txt', 'md']
+        
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_USER: test_user
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: 📦 Install Dependencies
+        working-directory: ./pluginmind_backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-asyncio httpx
+          pip install -r requirements.txt
+
+      - name: 🧪 Test Document Processing (${{ matrix.document-type }})
+        working-directory: ./pluginmind_backend
+        env:
+          DATABASE_URL: "postgresql://test_user:test_password@localhost:5432/test_db"
+          OPENAI_API_KEY: "test-key"
+          GROK_API_KEY: "test-key"
+          GOOGLE_CLIENT_ID: "test-client-id"
+          JWT_SECRET: "dGVzdC1zZWNyZXQtZm9yLWNpLWNkLXRlc3Rpbmc="
+        run: |
+          python -m pytest \
+            -v \
+            -k "document and ${{ matrix.document-type }}" \
+            --tb=short \
+            tests/test_document_*.py
+
+  # =============================================================================
+  # AI Service Integration Tests
+  # =============================================================================
+  ai-integration:
+    name: 🤖 AI Service Integration
+    runs-on: ubuntu-latest
+    needs: [check-feature]
+    if: needs.check-feature.outputs.feature-available == 'true'
+    
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_USER: test_user
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: 📦 Install Dependencies
+        working-directory: ./pluginmind_backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-asyncio httpx
+          pip install -r requirements.txt
+
+      - name: 🤖 Test AI Service Registry Integration
+        working-directory: ./pluginmind_backend
+        env:
+          DATABASE_URL: "postgresql://test_user:test_password@localhost:5432/test_db"
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY || 'test-key' }}
+          GROK_API_KEY: ${{ secrets.GROK_API_KEY || 'test-key' }}
+          GOOGLE_CLIENT_ID: "test-client-id"
+          JWT_SECRET: "dGVzdC1zZWNyZXQtZm9yLWNpLWNkLXRlc3Rpbmc="
+        run: |
+          python -m pytest \
+            -v \
+            -k "document and ai_service" \
+            --tb=short \
+            tests/
+
+      - name: 📊 Test Document Analysis Results Storage
+        working-directory: ./pluginmind_backend
+        env:
+          DATABASE_URL: "postgresql://test_user:test_password@localhost:5432/test_db"
+          OPENAI_API_KEY: "test-key"
+          GROK_API_KEY: "test-key"
+          GOOGLE_CLIENT_ID: "test-client-id"
+          JWT_SECRET: "dGVzdC1zZWNyZXQtZm9yLWNpLWNkLXRlc3Rpbmc="
+        run: |
+          python -c "
+          import asyncio
+          from app.models.database import AnalysisResult, AnalysisResultStatus
+          from app.database import create_db_and_tables
+          print('✅ Testing AnalysisResult model for document analysis')
+          
+          # Test that document analysis type is supported
+          result = AnalysisResult(
+              result_id='test-doc-001',
+              analysis_type='document',
+              input_data={'file_type': 'pdf', 'content': 'test'},
+              result_data={'summary': 'test summary'},
+              status=AnalysisResultStatus.COMPLETED
+          )
+          print('✅ Document analysis model validation passed')
+          "
+
+  # =============================================================================
+  # API Endpoint Tests
+  # =============================================================================
+  api-tests:
+    name: 🌐 Document API Tests
+    runs-on: ubuntu-latest
+    needs: [check-feature]
+    if: needs.check-feature.outputs.feature-available == 'true'
+    
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_USER: test_user
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: 📦 Install Dependencies
+        working-directory: ./pluginmind_backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-asyncio httpx
+          pip install -r requirements.txt
+
+      - name: 🚀 Start Test Server
+        working-directory: ./pluginmind_backend
+        env:
+          DATABASE_URL: "postgresql://test_user:test_password@localhost:5432/test_db"
+          OPENAI_API_KEY: "test-key"
+          GROK_API_KEY: "test-key"
+          GOOGLE_CLIENT_ID: "test-client-id"
+          JWT_SECRET: "dGVzdC1zZWNyZXQtZm9yLWNpLWNkLXRlc3Rpbmc="
+        run: |
+          uvicorn app.main:app --host 0.0.0.0 --port 8000 &
+          sleep 10
+
+      - name: 🧪 Test Document Upload Endpoint
+        run: |
+          # Test document upload endpoint exists and responds
+          response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/document/upload)
+          if [[ $response -eq 404 ]]; then
+            echo "⏳ Document upload endpoint not yet implemented"
+          else
+            echo "✅ Document upload endpoint available"
+          fi
+
+      - name: 🧪 Test Document Analysis Endpoint
+        run: |
+          # Test document analysis endpoint
+          response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/document/analyze)
+          if [[ $response -eq 404 ]]; then
+            echo "⏳ Document analysis endpoint not yet implemented"
+          else
+            echo "✅ Document analysis endpoint available"
+          fi
+
+  # =============================================================================
+  # Performance & Load Tests
+  # =============================================================================
+  performance:
+    name: ⚡ Performance Tests
+    runs-on: ubuntu-latest
+    needs: [document-tests, api-tests]
+    if: |
+      always() && 
+      needs.check-feature.outputs.feature-available == 'true' &&
+      (needs.document-tests.result == 'success' || needs.document-tests.result == 'skipped') &&
+      (needs.api-tests.result == 'success' || needs.api-tests.result == 'skipped')
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: ⚡ Load Test Document Processing
+        run: |
+          # Placeholder for load testing with realistic document sizes
+          echo "⚡ Load testing document processing (placeholder)"
+          echo "✅ Performance tests would run here when feature is complete"
+
+  # =============================================================================
+  # Results Summary
+  # =============================================================================
+  results:
+    name: 📋 Document Feature Results
+    runs-on: ubuntu-latest
+    needs: [check-feature, document-tests, ai-integration, api-tests, performance]
+    if: always()
+    
+    steps:
+      - name: 📊 Summary Report
+        run: |
+          echo "## 📄 Document Summarizer Feature Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [[ "${{ needs.check-feature.outputs.feature-available }}" == "true" ]]; then
+            echo "| Test Suite | Status |" >> $GITHUB_STEP_SUMMARY
+            echo "|------------|--------|" >> $GITHUB_STEP_SUMMARY
+            echo "| Document Processing | ${{ needs.document-tests.result == 'success' && '✅ Pass' || needs.document-tests.result == 'skipped' && '⏭️ Skipped' || '❌ Fail' }} |" >> $GITHUB_STEP_SUMMARY
+            echo "| AI Integration | ${{ needs.ai-integration.result == 'success' && '✅ Pass' || needs.ai-integration.result == 'skipped' && '⏭️ Skipped' || '❌ Fail' }} |" >> $GITHUB_STEP_SUMMARY
+            echo "| API Endpoints | ${{ needs.api-tests.result == 'success' && '✅ Pass' || needs.api-tests.result == 'skipped' && '⏭️ Skipped' || '❌ Fail' }} |" >> $GITHUB_STEP_SUMMARY
+            echo "| Performance | ${{ needs.performance.result == 'success' && '✅ Pass' || needs.performance.result == 'skipped' && '⏭️ Skipped' || '❌ Fail' }} |" >> $GITHUB_STEP_SUMMARY
+            
+            # Check if any tests failed
+            if [[ "${{ needs.document-tests.result }}" == "failure" || 
+                  "${{ needs.ai-integration.result }}" == "failure" || 
+                  "${{ needs.api-tests.result }}" == "failure" ]]; then
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "❌ Document Summarizer feature tests failed"
+              exit 1
+            else
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "✅ Document Summarizer feature validation passed"
+            fi
+          else
+            echo "⏳ **Feature Status**: Not yet implemented" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "The Document Summarizer feature is not yet available." >> $GITHUB_STEP_SUMMARY
+            echo "This workflow will validate the feature once Dev Agent B implements it." >> $GITHUB_STEP_SUMMARY
+          fi

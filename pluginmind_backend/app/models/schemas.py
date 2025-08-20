@@ -11,6 +11,7 @@ from typing import Optional
 from pydantic import BaseModel, Field, field_validator
 
 from app.core.config import settings
+from app.ash_prompt import AnalysisType
 
 
 class SubscriptionTier(str, Enum):
@@ -22,16 +23,21 @@ class SubscriptionTier(str, Enum):
 
 class AnalysisRequest(BaseModel):
     """
-    Request model for crypto analysis endpoints.
+    Request model for AI analysis endpoints.
     
     Validates user input to ensure it's within acceptable limits
-    and contains meaningful content for AI processing.
+    and contains meaningful content for AI processing. Supports
+    both legacy crypto analysis and new generic analysis types.
     """
     user_input: str = Field(
         ..., 
         min_length=1, 
         max_length=settings.max_user_input_length,
-        description=f"User's crypto analysis query (1-{settings.max_user_input_length} characters)"
+        description=f"User's analysis query (1-{settings.max_user_input_length} characters)"
+    )
+    analysis_type: Optional[AnalysisType] = Field(
+        default=AnalysisType.CRYPTO,
+        description="Type of analysis to perform (document, chat, seo, crypto, custom)"
     )
 
     @field_validator("user_input")
@@ -77,9 +83,19 @@ class JobResult(BaseModel):
 
 
 class AnalysisResponse(BaseModel):
-    """Response model for synchronous analysis results."""
+    """Response model for synchronous analysis results (legacy crypto format)."""
     optimized_prompt: str = Field(description="AI-optimized prompt from OpenAI")
     analysis: str = Field(description="Final analysis result from Grok")
+
+
+class GenericAnalysisResponse(BaseModel):
+    """Response model for generic analysis results with enhanced metadata."""
+    analysis_type: AnalysisType = Field(description="Type of analysis performed")
+    optimized_prompt: str = Field(description="AI-optimized prompt")
+    analysis_result: str = Field(description="Final analysis result")
+    system_prompt: str = Field(description="System prompt template used")
+    services_used: dict = Field(description="AI services used in the analysis pipeline")
+    metadata: dict = Field(default_factory=dict, description="Additional analysis metadata")
 
 
 class HealthResponse(BaseModel):

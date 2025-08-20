@@ -1,5 +1,5 @@
 """
-Test configuration for CoinGrok Backend.
+Test configuration for PluginMind Backend.
 
 Sets up test environment with TESTING=1 flag and safe dummy environment variables
 so that local pytest runs work out of the box without requiring real secrets.

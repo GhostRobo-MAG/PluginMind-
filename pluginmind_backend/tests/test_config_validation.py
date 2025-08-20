@@ -1,5 +1,5 @@
 """
-Test configuration validation for CoinGrok Backend.
+Test configuration validation for PluginMind Backend.
 
 Tests configuration validation methods and startup behavior.
 """

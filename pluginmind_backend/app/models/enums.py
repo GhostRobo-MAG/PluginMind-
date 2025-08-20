@@ -1,5 +1,5 @@
 """
-Enumeration definitions for CoinGrok Backend.
+Enumeration definitions for PluginMind Backend.
 
 Contains all enum classes used throughout the application
 for type safety and consistency.

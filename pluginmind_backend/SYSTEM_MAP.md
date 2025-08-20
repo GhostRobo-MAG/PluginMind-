@@ -1,4 +1,4 @@
-CoinGrok Backend – Ground‑Truth System Map 
+PluginMind Backend – Ground‑Truth System Map 
 
 ⸻
 

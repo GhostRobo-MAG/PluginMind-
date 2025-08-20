@@ -1,7 +1,7 @@
 """
-CoinGrok Backend API - Main Application with AI Service Registry
+PluginMind Backend API - Main Application with AI Service Registry
 
-A production-ready FastAPI application for AI-powered cryptocurrency analysis
+A production-ready FastAPI application for AI-powered processing and analysis
 with plugin-style AI service registry for improved modularity.
 
 Author: Alexandru G. Mihai

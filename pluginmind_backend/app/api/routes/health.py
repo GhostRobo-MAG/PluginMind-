@@ -152,3 +152,82 @@ async def version_info():
         "version": settings.version,
         "git_sha": os.getenv("GIT_SHA", "-")
     }
+
+
+@router.get("/services")
+async def services_info():
+    """
+    AI Services Information Endpoint.
+    
+    Returns information about registered AI services, their capabilities,
+    and supported analysis types. Useful for clients to understand
+    what processing capabilities are available.
+    
+    Returns:
+        dict: AI service registry information and analysis types
+    """
+    try:
+        from app.services.analysis_service import analysis_service
+        from app.ash_prompt import AnalysisType
+        
+        # Get service info from analysis service
+        service_info = analysis_service.get_service_info()
+        
+        # Add available analysis types
+        analysis_types = {
+            analysis_type.value: {
+                "name": analysis_type.value.replace("_", " ").title(),
+                "description": f"{analysis_type.value.replace('_', ' ').title()} processing using 4-D methodology"
+            }
+            for analysis_type in AnalysisType
+        }
+        
+        return {
+            "ai_services": service_info,
+            "analysis_types": analysis_types,
+            "endpoints": {
+                "legacy_crypto": "/analyze (deprecated)",
+                "generic_processing": "/process",
+                "async_processing": "/analyze-async"
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to get services info: {str(e)}")
+        return {
+            "ai_services": {"error": "Failed to retrieve service information"},
+            "analysis_types": {},
+            "endpoints": {}
+        }
+
+
+@router.get("/services/health")
+async def services_health():
+    """
+    AI Services Health Check Endpoint.
+    
+    Performs health checks on all registered AI services and returns
+    detailed status information. Useful for monitoring AI service
+    availability and troubleshooting issues.
+    
+    Returns:
+        dict: Detailed health status of all AI services
+    """
+    try:
+        from app.services.analysis_service import analysis_service
+        
+        health_status = await analysis_service.health_check()
+        
+        return {
+            "timestamp": datetime.now().isoformat(),
+            "overall_healthy": health_status.get("healthy", False),
+            "service_details": health_status
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to check services health: {str(e)}")
+        return {
+            "timestamp": datetime.now().isoformat(),
+            "overall_healthy": False,
+            "service_details": {"error": str(e)}
+        }

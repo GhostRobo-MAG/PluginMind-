@@ -36,7 +36,7 @@ loglevel = os.environ.get("LOG_LEVEL", "info").lower()
 access_log_format = '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s" req_id=%({x-request-id}i)s'
 
 # Process naming
-proc_name = "coingrok-backend"
+proc_name = "pluginmind-backend"
 
 # Security
 limit_request_line = 4096

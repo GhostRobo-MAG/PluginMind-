@@ -40,6 +40,42 @@ def initialize_ai_services() -> None:
         )
         logger.info("Registered OpenAI service as prompt optimizer")
         
+        # Register OpenAI service for document processing
+        ai_service_registry.register(
+            service_id="openai_document",
+            service=openai_service,
+            service_type=AIServiceType.DOCUMENT_PROCESSOR,
+            replace_if_exists=True
+        )
+        logger.info("Registered OpenAI service as document processor")
+        
+        # Register OpenAI service for chat processing
+        ai_service_registry.register(
+            service_id="openai_chat",
+            service=openai_service,
+            service_type=AIServiceType.CHAT_PROCESSOR,
+            replace_if_exists=True
+        )
+        logger.info("Registered OpenAI service as chat processor")
+        
+        # Register OpenAI service for SEO generation
+        ai_service_registry.register(
+            service_id="openai_seo",
+            service=openai_service,
+            service_type=AIServiceType.SEO_GENERATOR,
+            replace_if_exists=True
+        )
+        logger.info("Registered OpenAI service as SEO generator")
+        
+        # Register OpenAI service as generic analyzer (fallback)
+        ai_service_registry.register(
+            service_id="openai_generic",
+            service=openai_service,
+            service_type=AIServiceType.GENERIC_ANALYZER,
+            replace_if_exists=True
+        )
+        logger.info("Registered OpenAI service as generic analyzer")
+        
         # Register Grok service for crypto analysis
         grok_service = GrokService()
         ai_service_registry.register(
@@ -49,6 +85,23 @@ def initialize_ai_services() -> None:
             replace_if_exists=True
         )
         logger.info("Registered Grok service as crypto analyzer")
+        
+        # Register Grok service as document processor (alternative)
+        ai_service_registry.register(
+            service_id="grok_document",
+            service=grok_service,
+            service_type=AIServiceType.DOCUMENT_PROCESSOR,
+            replace_if_exists=True
+        )
+        logger.info("Registered Grok service as document processor")
+        
+        # Register Grok service as generic analyzer (alternative)
+        ai_service_registry.register(
+            service_id="grok_generic",
+            service=grok_service,
+            service_type=AIServiceType.GENERIC_ANALYZER,
+            replace_if_exists=True
+        )
         
         # Future: Register additional services based on configuration
         # This could be extended to load services dynamically from config

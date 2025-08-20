@@ -43,11 +43,22 @@ class OpenAIService(AIService):
         default_temperature = 1.0 if self.model.startswith("gpt-5") else 0.7
         
         self._metadata = AIServiceMetadata(
-            name="OpenAI Prompt Optimizer",
+            name="OpenAI AI Service",
             provider="OpenAI",
             version="1.0.0",
             capabilities=[
                 AIServiceCapability.PROMPT_OPTIMIZATION,
+                AIServiceCapability.GENERIC_ANALYSIS,
+                AIServiceCapability.DOCUMENT_SUMMARIZATION,
+                AIServiceCapability.DOCUMENT_ANALYSIS,
+                AIServiceCapability.KEY_EXTRACTION,
+                AIServiceCapability.CONVERSATION_HANDLING,
+                AIServiceCapability.CONTEXT_MANAGEMENT,
+                AIServiceCapability.RESPONSE_GENERATION,
+                AIServiceCapability.CONTENT_OPTIMIZATION,
+                AIServiceCapability.KEYWORD_ANALYSIS,
+                AIServiceCapability.SEO_SCORING,
+                AIServiceCapability.META_GENERATION,
                 AIServiceCapability.NEWS_SUMMARIZATION
             ],
             model=self.model,
