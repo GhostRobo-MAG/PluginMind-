@@ -121,6 +121,7 @@ jobs:
       - name: 🗄️ Database Setup
         working-directory: ./pluginmind_backend
         env:
+          TESTING: "1"
           DATABASE_URL: "postgresql://test_user:test_password@localhost:5432/test_db"
           OPENAI_API_KEY: "test-key"
           GROK_API_KEY: "test-key"
@@ -136,6 +137,7 @@ jobs:
       - name: 🧪 Run Tests with Coverage
         working-directory: ./pluginmind_backend
         env:
+          TESTING: "1"
           DATABASE_URL: "postgresql://test_user:test_password@localhost:5432/test_db"
           OPENAI_API_KEY: "test-key"
           GROK_API_KEY: "test-key" 
@@ -208,6 +210,7 @@ jobs:
       - name: 🚨 Run Error Tests
         working-directory: ./pluginmind_backend
         env:
+          TESTING: "1"
           DATABASE_URL: "postgresql://test_user:test_password@localhost:5432/test_db"
           OPENAI_API_KEY: "test-key"
           GROK_API_KEY: "test-key"
@@ -220,6 +223,7 @@ jobs:
       - name: 🔥 Smoke Tests
         working-directory: ./pluginmind_backend
         env:
+          TESTING: "1"
           DATABASE_URL: "postgresql://test_user:test_password@localhost:5432/test_db"
           OPENAI_API_KEY: "test-key"
           GROK_API_KEY: "test-key"
