@@ -7,6 +7,8 @@ __pycache__/
 venv/
 .env
 .main_old.py
+CLAUDE.md
+.claude 
 
 # Database files
 *.db
