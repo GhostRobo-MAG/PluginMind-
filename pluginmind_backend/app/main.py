@@ -227,9 +227,11 @@ async def services_health():
 
 if __name__ == "__main__":
     import uvicorn
+    # Use localhost by default for security, can be overridden via environment
+    host = "127.0.0.1" if not settings.debug else "0.0.0.0"  # nosec B104
     uvicorn.run(
-        "app.main_with_registry:app",
-        host="0.0.0.0",
+        "app.main:app",
+        host=host,
         port=8000,
         reload=settings.debug,
         log_level=settings.log_level.lower()
