@@ -176,13 +176,15 @@ jobs:
           docker stop backend-prod-test postgres-prod-test || true
           docker network rm pluginmind-prod-test || true
 
-      - name: 🔍 Security Scan
-        uses: docker/scout-action@v1
-        with:
-          command: cves
-          image: pluginmind-backend:prod-test
-          only-severities: critical,high
-          exit-code: true
+      # Docker Scout requires paid subscription - commented out
+      # Users can enable their own security scanning solution
+      # - name: 🔍 Security Scan
+      #   uses: docker/scout-action@v1
+      #   with:
+      #     command: cves
+      #     image: pluginmind-backend:prod-test
+      #     only-severities: critical,high
+      #     exit-code: true
 
   # =============================================================================
   # Push to Registry (if authorized)
