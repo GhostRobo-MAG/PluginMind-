@@ -129,10 +129,11 @@ jobs:
       - name: 🏗️ Database Migration Test
         working-directory: ./pluginmind_backend
         env:
+          TESTING: "1"  # Enable test mode
           DATABASE_URL: "postgresql://test_user:test_password@localhost:5432/test_db"
           OPENAI_API_KEY: "test-key"
           GROK_API_KEY: "test-key"
-          GOOGLE_CLIENT_ID: "test-client-id"
+          GOOGLE_CLIENT_ID: "test-client-id.apps.googleusercontent.com"
           JWT_SECRET: "dGVzdC1zZWNyZXQtZm9yLWNpLWNkLXRlc3Rpbmc="
         run: |
           # Test Alembic migration system
@@ -155,12 +156,14 @@ jobs:
       - name: 🚀 End-to-End Service Test
         working-directory: ./pluginmind_backend
         env:
+          TESTING: "1"  # Enable test mode to bypass API key validation
           DATABASE_URL: "postgresql://test_user:test_password@localhost:5432/test_db"
           REDIS_URL: "redis://localhost:6379"
           OPENAI_API_KEY: "test-key"
           GROK_API_KEY: "test-key"
-          GOOGLE_CLIENT_ID: "test-client-id"
+          GOOGLE_CLIENT_ID: "test-client-id.apps.googleusercontent.com"
           JWT_SECRET: "dGVzdC1zZWNyZXQtZm9yLWNpLWNkLXRlc3Rpbmc="
+          CORS_ORIGINS: "http://localhost:3000"
         run: |
           # Start the full application
           uvicorn app.main:app --host 0.0.0.0 --port 8000 &
