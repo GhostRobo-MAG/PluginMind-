@@ -54,7 +54,7 @@ def test_middleware_order():
     print("  app.add_middleware(AmbientJWTAuthMiddleware)  # Ambient JWT parsing")
     print("  setup_cors(app)  # Outermost - CORS headers on all responses")
     
-    return expected_order
+    # Test passes by not throwing an error
 
 def test_cors_behavior():
     """Test CORS behavior with different origins."""
@@ -81,7 +81,6 @@ def test_cors_behavior():
     print(f"  CORS headers: {dict((k, v) for k, v in response.headers.items() if 'access-control' in k.lower())}")
     print(f"  Security headers: {dict((k, v) for k, v in response.headers.items() if k.startswith(('x-', 'strict-transport', 'referrer')))}")
     
-    return True
 
 def test_auth_middleware():
     """Test ambient JWT auth middleware."""
@@ -105,7 +104,6 @@ def test_auth_middleware():
     print(f"  Status: {response.status_code}")
     print(f"  Response: {response.json() if response.status_code < 500 else 'Server error'}")
     
-    return True
 
 if __name__ == "__main__":
     print("Testing PluginMind Backend Middleware Configuration")
