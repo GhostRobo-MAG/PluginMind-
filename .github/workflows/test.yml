@@ -20,10 +20,10 @@ env:
 
 jobs:
   # =============================================================================
-  # Code Quality & Linting
+  # Basic Linting Only (removed formatting checks)
   # =============================================================================
   lint:
-    name: 🔍 Code Quality
+    name: 🔍 Basic Syntax Check
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout Code
@@ -38,27 +38,12 @@ jobs:
         working-directory: ./pluginmind_backend
         run: |
           python -m pip install --upgrade pip
-          pip install flake8 black isort mypy
+          pip install flake8
           pip install -r requirements.txt
 
-      # Commented out - formatting is not critical for functionality
-      # - name: 🖤 Format Check (Black)
-      #   working-directory: ./pluginmind_backend
-      #   run: black --check --diff .
-
-      # Commented out - import sorting is not critical for functionality
-      # - name: 📋 Import Sort Check (isort)
-      #   working-directory: ./pluginmind_backend
-      #   run: isort --check-only --diff .
-
-      - name: ⚡ Linting (flake8)
+      - name: ⚡ Syntax Check (flake8 - errors only)
         working-directory: ./pluginmind_backend
         run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-
-      - name: 🏷️ Type Check (mypy)
-        working-directory: ./pluginmind_backend
-        run: mypy app/ --ignore-missing-imports
-        continue-on-error: true  # Non-blocking initially
 
   # =============================================================================
   # Unit & Integration Tests

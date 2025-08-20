@@ -142,24 +142,33 @@ jobs:
           
           # Wait for startup with retry logic
           echo "Waiting for backend to start..."
-          for i in {1..30}; do
-            if curl -s http://localhost:8000/health >/dev/null 2>&1; then
-              echo "✅ Backend is ready after $i seconds"
+          MAX_RETRIES=30
+          RETRY_COUNT=0
+          
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            
+            if curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/health 2>/dev/null | grep -q "200"; then
+              echo "✅ Backend is ready after $RETRY_COUNT seconds"
               break
             fi
-            echo "Waiting... ($i/30)"
+            
+            echo "Waiting... ($RETRY_COUNT/$MAX_RETRIES)"
             sleep 1
-            if [ $i -eq 30 ]; then
-              echo "❌ Backend failed to start"
+            
+            if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
+              echo "❌ Backend failed to start after $MAX_RETRIES seconds"
+              echo "Container logs:"
               docker logs backend-prod-test
               exit 1
             fi
           done
           
           # Test health endpoints
-          curl -f http://localhost:8000/health || exit 1
-          curl -f http://localhost:8000/ready || exit 1
-          curl -f http://localhost:8000/live || exit 1
+          echo "Testing health endpoints..."
+          curl -f http://localhost:8000/health || (echo "Health check failed"; docker logs backend-prod-test; exit 1)
+          curl -f http://localhost:8000/ready || (echo "Ready check failed"; docker logs backend-prod-test; exit 1)
+          curl -f http://localhost:8000/live || (echo "Live check failed"; docker logs backend-prod-test; exit 1)
           
           echo "✅ Production container health checks passed"
           
