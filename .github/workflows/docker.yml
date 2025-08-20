@@ -86,7 +86,7 @@ jobs:
             -e DATABASE_URL="postgresql://test:test@postgres-test:5432/test" \
             -e OPENAI_API_KEY="test-key" \
             -e GROK_API_KEY="test-key" \
-            -e GOOGLE_CLIENT_ID="test-client-id" \
+            -e GOOGLE_CLIENT_ID="test-client-id.apps.googleusercontent.com" \
             -e JWT_SECRET="dGVzdC1zZWNyZXQtZm9yLWNpLWNkLXRlc3Rpbmc=" \
             pluginmind-backend:dev-test \
             python -c "
@@ -136,7 +136,7 @@ jobs:
             -e DATABASE_URL="postgresql://test:test@postgres-prod-test:5432/test" \
             -e OPENAI_API_KEY="test-key" \
             -e GROK_API_KEY="test-key" \
-            -e GOOGLE_CLIENT_ID="test-client-id" \
+            -e GOOGLE_CLIENT_ID="test-client-id.apps.googleusercontent.com" \
             -e JWT_SECRET="dGVzdC1zZWNyZXQtZm9yLWNpLWNkLXRlc3Rpbmc=" \
             pluginmind-backend:prod-test
           
