@@ -210,9 +210,9 @@ jobs:
           
           echo "| Component | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Core Tests | ${CORE_TESTS == 'success' && '✅ Pass' || '❌ Fail'} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Docker Build | ${DOCKER_BUILD == 'success' && '✅ Pass' || '❌ Fail'} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Integration Tests | ${INTEGRATION == 'success' && '✅ Pass' || INTEGRATION == 'skipped' && '⏭️ Skipped' || '❌ Fail'} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Core Tests | $([[ "$CORE_TESTS" == "success" ]] && echo '✅ Pass' || echo '❌ Fail') |" >> $GITHUB_STEP_SUMMARY
+          echo "| Docker Build | $([[ "$DOCKER_BUILD" == "success" ]] && echo '✅ Pass' || echo '❌ Fail') |" >> $GITHUB_STEP_SUMMARY
+          echo "| Integration Tests | $([[ "$INTEGRATION" == "success" ]] && echo '✅ Pass' || [[ "$INTEGRATION" == "skipped" ]] && echo '⏭️ Skipped' || echo '❌ Fail') |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
           # Calculate quality score

@@ -129,9 +129,8 @@ jobs:
           JWT_SECRET: "dGVzdC1zZWNyZXQtZm9yLWNpLWNkLXRlc3Rpbmc="
         run: |
           python -c "
-          import asyncio
           from app.database import create_db_and_tables
-          asyncio.run(create_db_and_tables())
+          create_db_and_tables()
           "
 
       - name: 🧪 Run Tests with Coverage
@@ -282,21 +281,26 @@ jobs:
     
     steps:
       - name: 📊 Summary Report
+        env:
+          LINT_RESULT: ${{ needs.lint.result }}
+          TEST_RESULT: ${{ needs.test.result }}
+          ERROR_TESTS_RESULT: ${{ needs.error-tests.result }}
+          SECURITY_RESULT: ${{ needs.security.result }}
         run: |
           echo "## 🧪 Test Suite Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Component | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Code Quality | ${{ needs.lint.result == 'success' && '✅ Pass' || '❌ Fail' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Unit Tests | ${{ needs.test.result == 'success' && '✅ Pass' || '❌ Fail' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Error Handling | ${{ needs.error-tests.result == 'success' && '✅ Pass' || '❌ Fail' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Security Scan | ${{ needs.security.result == 'success' && '✅ Pass' || '❌ Fail' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Code Quality | $([[ "$LINT_RESULT" == "success" ]] && echo '✅ Pass' || echo '❌ Fail') |" >> $GITHUB_STEP_SUMMARY
+          echo "| Unit Tests | $([[ "$TEST_RESULT" == "success" ]] && echo '✅ Pass' || echo '❌ Fail') |" >> $GITHUB_STEP_SUMMARY
+          echo "| Error Handling | $([[ "$ERROR_TESTS_RESULT" == "success" ]] && echo '✅ Pass' || echo '❌ Fail') |" >> $GITHUB_STEP_SUMMARY
+          echo "| Security Scan | $([[ "$SECURITY_RESULT" == "success" ]] && echo '✅ Pass' || echo '❌ Fail') |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
           # Fail the workflow if any tests failed
-          if [[ "${{ needs.lint.result }}" != "success" || 
-                "${{ needs.test.result }}" != "success" || 
-                "${{ needs.error-tests.result }}" != "success" ]]; then
+          if [[ "$LINT_RESULT" != "success" || 
+                "$TEST_RESULT" != "success" || 
+                "$ERROR_TESTS_RESULT" != "success" ]]; then
             echo "❌ Some tests failed - blocking deployment"
             exit 1
           else
