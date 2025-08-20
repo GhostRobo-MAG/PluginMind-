@@ -61,11 +61,12 @@ PluginMind supports **multiple AI-powered SaaS applications**:
 - **Architecture Excellence**: Maintained FastAPI patterns while adding generic capabilities
 
 #### **🧪 Enhanced Test Coverage & Reliability**
-- **107 Total Tests**: All tests passing with comprehensive coverage
-- **Service Registry Tests**: Complete coverage of plugin architecture
+- **115 Total Tests**: 100% pass rate (114 passing, 1 skipped)
+- **No API Keys Required**: Tests run in TESTING mode - works out-of-the-box
+- **Service Registry Tests**: Complete coverage of plugin architecture (20 tests)
 - **Integration Testing**: Service discovery, health checks, and endpoint validation
 - **Mock Service Framework**: Comprehensive testing infrastructure
-- **CI/CD Integration**: Registry tests included in automated pipeline
+- **CI/CD Integration**: All tests pass in GitHub Actions without configuration
 
 #### **⚙️ Production Configuration Validation**
 - **Fail-Fast Startup**: Comprehensive validation of all environment variables at startup
@@ -328,38 +329,46 @@ curl http://localhost:8000/services/health
 
 ### 🧪 Testing the API
 
+**No API Keys Required for Testing!** 🎉
+```bash
+# Tests run in TESTING mode - no real API keys needed
+cd pluginmind_backend
+TESTING=1 python -m pytest
+# Expected: 115 tests (114 passed, 1 skipped) ✅
+```
+
 **Health Check:**
 ```bash
 curl http://localhost:8000/health
 # Response: {"status": "ok", "active_jobs": 0}
 ```
 
-**Complete Test Suite:** ✨ **NEW**
+**Complete Test Suite:** ✨ **100% Pass Rate**
 ```bash
-# Run full test suite - now 100% passing!
-python -m pytest
-# Expected: 107/107 tests passed ✅
+# Run full test suite - no configuration needed!
+cd pluginmind_backend
+TESTING=1 python -m pytest -v
+# Expected: 115 tests total
+# ✅ 114 passing tests
+# ⏭️ 1 skipped (complex JWT mocking)
 
-# Run AI service registry tests specifically
+# Test Coverage by Module:
+# ✅ AI Service Registry: 20 tests
+# ✅ Configuration Validation: 7 tests  
+# ✅ Error Handling: 22 tests
+# ✅ Generic Processing: 10 tests
+# ✅ Rate Limiting: 27 tests
+# ✅ JWT Security: 5 tests
+# ✅ HTTP Client: 10 tests
+# ✅ Middleware & Integration: 14 tests
+
+# Run specific test modules
 python -m pytest tests/test_ai_service_registry.py -v
-# Expected: 20/20 registry tests passed ✅
-# ✅ Service registration and discovery
-# ✅ Health checking and monitoring
-# ✅ Fallback mechanisms and error handling
-# ✅ Service metadata management
-# ✅ Monitoring endpoints (/services, /services/health)
+python -m pytest tests/test_generic_processing.py -v
+python -m pytest tests/test_error_handling.py -v
 
-# Run comprehensive error handling tests
-python run_error_tests.py
-# Expected: All error handling tests passed ✅
-
-# Run all HTTP client configuration tests
-python -m pytest tests/test_http_client.py -v
-# Expected: 10/10 tests passed
-# ✅ Header redaction (Bearer tokens, API keys)
-# ✅ Connection pool configuration validation
-# ✅ Granular timeout configuration (Grok-specific)
-# ✅ Security documentation validation
+# Run with coverage report
+python -m pytest --cov=app --cov-report=term
 
 # Test configuration validation at startup
 OPENAI_API_KEY=invalid python -c "from app.main import app"
