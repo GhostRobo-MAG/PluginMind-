@@ -140,8 +140,21 @@ jobs:
             -e JWT_SECRET="dGVzdC1zZWNyZXQtZm9yLWNpLWNkLXRlc3Rpbmc=" \
             pluginmind-backend:prod-test
           
-          # Wait for startup
-          sleep 15
+          # Wait for startup with retry logic
+          echo "Waiting for backend to start..."
+          for i in {1..30}; do
+            if curl -s http://localhost:8000/health >/dev/null 2>&1; then
+              echo "✅ Backend is ready after $i seconds"
+              break
+            fi
+            echo "Waiting... ($i/30)"
+            sleep 1
+            if [ $i -eq 30 ]; then
+              echo "❌ Backend failed to start"
+              docker logs backend-prod-test
+              exit 1
+            fi
+          done
           
           # Test health endpoints
           curl -f http://localhost:8000/health || exit 1
