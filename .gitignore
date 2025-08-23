@@ -8,8 +8,9 @@ venv/
 .env
 .main_old.py
 CLAUDE.md
-.claude 
-
+.CLAUDE
+CLAUDE_AGENT_FRAMEWORK_GUIDE.md
+claude-agent-framework.sh
 # Database files
 *.db
 *.sqlite

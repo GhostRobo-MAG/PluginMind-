@@ -1,5 +1,5 @@
 """
-Database Models for CoinGrok Backend
+Database Models for PluginMind Backend
 
 SQLModel-based database schema definitions for:
 - Analysis job tracking (async operations)
