@@ -4,7 +4,7 @@
 # =============================================================================
 # Base Python image with shared dependencies
 # =============================================================================
-FROM python:3.11-slim as base
+FROM python:3.12-alpine as base
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -14,14 +14,16 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1
 
 # Install system dependencies required for Python packages
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libpq-dev \
+RUN apk add --no-cache \
+    build-base \
+    postgresql-dev \
     curl \
-    && rm -rf /var/lib/apt/lists/*
+    gcc \
+    musl-dev \
+    libffi-dev
 
 # Create app user for security
-RUN groupadd -r appgroup && useradd -r -g appgroup appuser
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
 # Set work directory
 WORKDIR /app
